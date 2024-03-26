@@ -1,29 +1,25 @@
-const express = require("express");
-const mongoose = require("mongoose");
-const cors = require("cors");
-const app = express();
-const { Schema, model } = mongoose;
+import mongodb from "mongodb";
+import dotenv from "dotenv";
 
-mongoose.connect("mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+2.2.1");
+import app from "./server.js";
 
-const UserSchema = new Schema({
-    username: String
-});
+async function main() {
+    dotenv.config();
 
-const UserModel = model("User", UserSchema);
+    const client = new mongodb.MongoClient(process.env.DB_URI);
+    const port = process.env.PORT || 4000;
 
-app.set('views', './views')
-app.set("view engine", "ejs");
+    try {
+        await client.connect();
 
-app.use(cors());
+        app.listen(port, () => {
+            console.log("server is running on port: " + port);
+        });
+    }
+    catch (err) {
+        console.error(err);
+        process.exit(1);
+    }
+}
 
-app.get("/newUser", (req, res) => {
-    res.render("home.ejs", { message: "Hi from server" });
-    UserModel.create({ username: "John" });
-});
-
-app.get("/test", (req, res) => {
-    res.send("test ok");
-});
-
-app.listen(4000);
+main().catch(console.error);
