@@ -6,7 +6,7 @@ const ProjectSchema = new Schema({
 });
 
 const CertificateSchema = new Schema({
-    photoPath: String,
+    photo: String,
     description: String,
 });
 
