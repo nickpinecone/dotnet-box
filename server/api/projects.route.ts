@@ -1,10 +1,9 @@
 import express from "express";
 import Portfolio from "../models/portfolio.model";
 import multer from "multer";
-import path from "path";
 
 const router = express.Router({ mergeParams: true });
-const upload = multer({ dest: path.resolve(__dirname, "..", "public/certificates/") });
+const upload = multer();
 
 router.route("/:id/project").get(async (req, res) => {
     try {

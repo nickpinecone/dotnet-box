@@ -19,7 +19,7 @@ router.route("/").post(async (req, res) => {
 
 router.route("/:id").get(async (req, res) => {
     try {
-        const portfolio = await Portfolio.findOne({ _id: req.params.id });
+        const portfolio = await Portfolio.findOne({ _id: req.params.id }).populate("owner");
 
         if (portfolio == null) throw new Error();
 
