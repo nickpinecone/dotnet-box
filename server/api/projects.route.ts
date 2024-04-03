@@ -9,9 +9,12 @@ const upload = multer();
 router.route("/:id/project").get(async (req, res) => {
     try {
         const portfolio = await Portfolio.findOne({ _id: req.params.id });
-
         const project = await Project.create({});
+
+        project.portfolio = portfolio?._id;
         portfolio?.projects.push(project._id);
+
+        await project.save();
         await portfolio?.save();
 
         res.send(project);

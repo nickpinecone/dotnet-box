@@ -12,9 +12,12 @@ const upload = multer({ dest: path.resolve(__dirname, "..", "public/certificates
 router.route("/:id/certificate").get(async (req, res) => {
     try {
         const portfolio = await Portfolio.findOne({ _id: req.params.id });
-
         const certificate = await Certificate.create({});
+
+        certificate.portfolio = portfolio?._id;
         portfolio?.certificates.push(certificate._id);
+
+        await certificate.save();
         await portfolio?.save();
 
         res.send(certificate);
@@ -49,11 +52,11 @@ router.route("/:id/certificate/:certificateId").put(upload.single("certificate")
     }
     catch (err) {
         console.error(err);
-        res.status(500).send("could not update certifiace with id: " + req.params.certificateId);
+        res.status(500).send("could not update certificate with id: " + req.params.certificateId);
     }
 });
 
-// Get certifiace photo
+// Get certificate photo
 router.route("/:id/certificate/:certificateId/photo").get(async (req, res) => {
     try {
         const certificate = await Certificate.findOne({ _id: req.params.certificateId });
@@ -91,7 +94,7 @@ router.route("/:id/certificate/:certificatedId").delete(async (req, res) => {
     }
     catch (err) {
         console.error(err);
-        res.status(500).send("could not delete certifiace with id: " + req.params.certificatedId);
+        res.status(500).send("could not delete certificate with id: " + req.params.certificatedId);
     }
 });
 

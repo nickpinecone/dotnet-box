@@ -87,7 +87,13 @@ router.route("/me").get(auth.verifyToken, async (req, res) => {
     // @ts-expect-error userId is inserted in auth middleware
     const userId = req.userId;
 
-    const user = await User.findOne({ _id: userId }).populate("portfolio");
+    const user = await User.findOne({ _id: userId }).populate({
+        path: "portfolio",
+        populate: {
+            path: "projects certificates"
+        }
+    });
+    user?.portfolio
 
     if (!user) throw new Error("could not authenticate user with id: " + userId);
 
@@ -96,7 +102,12 @@ router.route("/me").get(auth.verifyToken, async (req, res) => {
 
 router.route("/:id").get(async (req, res) => {
     try {
-        const user = await User.findOne({ _id: req.params.id }).populate("portfolio");
+        const user = await User.findOne({ _id: req.params.id }).populate({
+            path: "portfolio",
+            populate: {
+                path: "projects certificates"
+            }
+        });
 
         res.status(200).send(user);
     }

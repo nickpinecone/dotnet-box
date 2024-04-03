@@ -9,7 +9,7 @@ const router = express.Router();
 const upload = multer();
 
 router.route("/").get(async (req, res) => {
-    const portfolios = await Portfolio.find({}).sort({ createdAt: -1 });
+    const portfolios = await Portfolio.find({}).sort({ createdAt: -1 }).populate("owner projects certificates");
 
     res.send(portfolios);
 });
@@ -36,7 +36,7 @@ router.route("/:id").get(async (req, res) => {
 router.route("/:id").put(upload.none(), async (req, res) => {
     try {
         const description = req.body.description;
-        const portfolio = await Portfolio.findOne({ _id: req.params.id }).populate("owner");
+        const portfolio = await Portfolio.findOne({ _id: req.params.id });
 
         if (portfolio == null) throw new Error();
 
