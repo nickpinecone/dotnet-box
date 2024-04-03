@@ -5,13 +5,19 @@ import fs from "fs";
 
 import Portfolio from "../models/portfolio.model";
 import Certificate from "../models/certificate.model";
+import User from "../models/user.model";
+import auth from "../middlewares/auth.middleware";
 
-const router = express.Router({ mergeParams: true });
+const router = express.Router();
 const upload = multer({ dest: path.resolve(__dirname, "..", "public/certificates/") });
 
-router.route("/:id/certificate").get(async (req, res) => {
+router.route("/me/certificate").get(auth.verifyToken, async (req, res) => {
     try {
-        const portfolio = await Portfolio.findOne({ _id: req.params.id });
+        // @ts-expect-error userId is inserted in auth middleware
+        const userId = req.userId;
+
+        const user = await User.findOne({ _id: userId });
+        const portfolio = await Portfolio.findOne({ _id: user?.portfolio?.toString() });
         const certificate = await Certificate.create({});
 
         certificate.portfolio = portfolio?._id;
@@ -24,14 +30,21 @@ router.route("/:id/certificate").get(async (req, res) => {
     }
     catch (err) {
         console.error(err);
-        res.status(500).send("could not create certificate in portfolio with id: " + req.params.id);
+        res.status(500).send("could not create certificate in user portfolio");
     }
 });
 
-router.route("/:id/certificate/:certificateId").put(upload.single("certificate"), async (req, res) => {
+router.route("/me/certificate/:certificateId").put(auth.verifyToken, upload.single("certificate"), async (req, res) => {
     try {
+        // @ts-expect-error userId is inserted in auth middleware
+        const userId = req.userId;
+        const user = await User.findOne({ _id: userId });
+
         const body = req.body;
         const certificate = await Certificate.findOne({ _id: req.params.certificateId });
+
+        if (certificate?.portfolio?._id.toString() != user?.portfolio?._id.toString())
+            throw new Error();
 
         if (certificate && req.file) {
             if (certificate.photo) {
@@ -56,28 +69,19 @@ router.route("/:id/certificate/:certificateId").put(upload.single("certificate")
     }
 });
 
-// Get certificate photo
-router.route("/:id/certificate/:certificateId/photo").get(async (req, res) => {
+router.route("/me/certificate/:certificatedId").delete(auth.verifyToken, async (req, res) => {
     try {
-        const certificate = await Certificate.findOne({ _id: req.params.certificateId });
+        // @ts-expect-error userId is inserted in auth middleware
+        const userId = req.userId;
+        const user = await User.findOne({ _id: userId });
 
-        if (!certificate) throw new Error();
+        const portfolio = await Portfolio.findOne({ _id: user?.portfolio?.toString() });
+        const certificate = await Certificate.findOne({ _id: req.params.certificatedId });
 
-        const photoName = path.resolve(__dirname, "..", "public/certificates/" + certificate?.photo);
-        const readStream = fs.createReadStream(photoName);
-        res.status(200);
-        readStream.pipe(res);
-    }
-    catch (err) {
-        console.error(err);
-        res.status(500).send("could not get photo for certificate with id: " + req.params.certificateId);
-    }
-});
+        if (certificate?.portfolio?._id.toString() != portfolio?._id.toString())
+            throw new Error();
 
-router.route("/:id/certificate/:certificatedId").delete(async (req, res) => {
-    try {
-        const portfolio = await Portfolio.findOne({ _id: req.params.id });
-        const certificate = await Certificate.findOneAndDelete({ _id: req.params.certificatedId });
+        await Certificate.deleteOne({ _id: req.params.certificatedId });
 
         if (certificate?.photo) {
             const photoName = path.resolve(__dirname, "..", "public/certificates/" + certificate?.photo);
