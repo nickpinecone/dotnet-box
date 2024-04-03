@@ -3,11 +3,21 @@ import mongoose, { Schema } from "mongoose";
 const ProjectSchema = new Schema({
     url: String,
     description: String,
+
+    updatedAt: {
+        type: Date,
+        default: Date.now(),
+    },
 });
 
 const CertificateSchema = new Schema({
     photo: String,
     description: String,
+
+    updatedAt: {
+        type: Date,
+        default: Date.now(),
+    },
 });
 
 const PortfolioSchema = new Schema({
@@ -16,7 +26,9 @@ const PortfolioSchema = new Schema({
         ref: "user"
     },
 
-    createdAt: {
+    description: String,
+
+    updatedAt: {
         type: Date,
         default: Date.now(),
     },
