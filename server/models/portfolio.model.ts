@@ -1,25 +1,5 @@
 import mongoose, { Schema } from "mongoose";
 
-const ProjectSchema = new Schema({
-    url: String,
-    description: String,
-
-    updatedAt: {
-        type: Date,
-        default: Date.now(),
-    },
-});
-
-const CertificateSchema = new Schema({
-    photo: String,
-    description: String,
-
-    updatedAt: {
-        type: Date,
-        default: Date.now(),
-    },
-});
-
 const PortfolioSchema = new Schema({
     owner: {
         type: mongoose.Schema.Types.ObjectId,
@@ -33,8 +13,14 @@ const PortfolioSchema = new Schema({
         default: Date.now(),
     },
 
-    projects: [ProjectSchema],
-    certificates: [CertificateSchema],
+    projects: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "project"
+    }],
+    certificates: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "certificate"
+    }],
 });
 
 const Portfolio = mongoose.model("portfolio", PortfolioSchema);

@@ -1,8 +1,10 @@
 import express from "express";
-import Portfolio from "../models/portfolio.model";
 import multer from "multer";
 import path from "path";
 import fs from "fs";
+
+import Portfolio from "../models/portfolio.model";
+import Certificate from "../models/certificate.model";
 
 const router = express.Router({ mergeParams: true });
 const upload = multer({ dest: path.resolve(__dirname, "..", "public/certificates/") });
@@ -11,11 +13,11 @@ router.route("/:id/certificate").get(async (req, res) => {
     try {
         const portfolio = await Portfolio.findOne({ _id: req.params.id });
 
-        const certifiace = { description: "", photo: "" };
-        const count = portfolio?.certificates.push(certifiace);
+        const certificate = await Certificate.create({});
+        portfolio?.certificates.push(certificate._id);
         await portfolio?.save();
 
-        res.send(portfolio?.certificates[(count as number) - 1]);
+        res.send(certificate);
     }
     catch (err) {
         console.error(err);
@@ -26,20 +28,18 @@ router.route("/:id/certificate").get(async (req, res) => {
 router.route("/:id/certificate/:certificateId").put(upload.single("certificate"), async (req, res) => {
     try {
         const body = req.body;
-        const portfolio = await Portfolio.findOne({ _id: req.params.id });
+        const certificate = await Certificate.findOne({ _id: req.params.certificateId });
 
-        const certifiace = portfolio?.certificates.find((one) => one._id?.toString() == req.params.certificateId);
-
-        if (certifiace && req.file) {
-            if (certifiace.photo) {
-                const photoName = path.resolve(__dirname, "..", "public/certificates/" + certifiace?.photo);
+        if (certificate && req.file) {
+            if (certificate.photo) {
+                const photoName = path.resolve(__dirname, "..", "public/certificates/" + certificate?.photo);
                 fs.unlink(photoName, (err) => { if (err) console.error(err); });
             }
 
-            certifiace.description = body.description;
-            certifiace.photo = req.file.filename;
+            certificate.description = body.description;
+            certificate.photo = req.file.filename;
 
-            await portfolio?.save();
+            certificate.save();
         }
         else {
             throw new Error();
@@ -56,13 +56,11 @@ router.route("/:id/certificate/:certificateId").put(upload.single("certificate")
 // Get certifiace photo
 router.route("/:id/certificate/:certificateId/photo").get(async (req, res) => {
     try {
-        const portfolio = await Portfolio.findOne({ _id: req.params.id });
+        const certificate = await Certificate.findOne({ _id: req.params.certificateId });
 
-        const certifiace = portfolio?.certificates.find((one) => one._id?.toString() == req.params.certificateId);
+        if (!certificate) throw new Error();
 
-        if (!certifiace) throw new Error();
-
-        const photoName = path.resolve(__dirname, "..", "public/certificates/" + certifiace?.photo);
+        const photoName = path.resolve(__dirname, "..", "public/certificates/" + certificate?.photo);
         const readStream = fs.createReadStream(photoName);
         res.status(200);
         readStream.pipe(res);
@@ -76,13 +74,16 @@ router.route("/:id/certificate/:certificateId/photo").get(async (req, res) => {
 router.route("/:id/certificate/:certificatedId").delete(async (req, res) => {
     try {
         const portfolio = await Portfolio.findOne({ _id: req.params.id });
+        const certificate = await Certificate.findOneAndDelete({ _id: req.params.certificatedId });
 
-        const certifiace = portfolio?.certificates.find((one) => one._id?.toString() == req.params.certificatedId);
-        if (certifiace?.photo) {
-            const photoName = path.resolve(__dirname, "..", "public/certificates/" + certifiace?.photo);
+        if (certificate?.photo) {
+            const photoName = path.resolve(__dirname, "..", "public/certificates/" + certificate?.photo);
             fs.unlink(photoName, (err) => { if (err) console.error(err); });
         }
-        portfolio?.certificates.remove(certifiace);
+
+        if (portfolio && certificate) {
+            portfolio.certificates = portfolio?.certificates.filter((el) => el._id.toString() != certificate._id.toString());
+        }
 
         await portfolio?.save();
 

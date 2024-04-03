@@ -1,5 +1,6 @@
 import express from "express";
 import Portfolio from "../models/portfolio.model";
+import Project from "../models/project.model";
 import multer from "multer";
 
 const router = express.Router({ mergeParams: true });
@@ -8,13 +9,12 @@ const upload = multer();
 router.route("/:id/project").get(async (req, res) => {
     try {
         const portfolio = await Portfolio.findOne({ _id: req.params.id });
-        console.log(req.params.id);
 
-        const project = { description: "", url: "" };
-        const count = portfolio?.projects.push(project);
+        const project = await Project.create({});
+        portfolio?.projects.push(project._id);
         await portfolio?.save();
 
-        res.send(portfolio?.projects[(count as number) - 1]);
+        res.send(project);
     }
     catch (err) {
         console.error(err);
@@ -25,15 +25,13 @@ router.route("/:id/project").get(async (req, res) => {
 router.route("/:id/project/:projectId").put(upload.none(), async (req, res) => {
     try {
         const body = req.body;
-        const portfolio = await Portfolio.findOne({ _id: req.params.id });
-
-        const project = portfolio?.projects.find((one) => one._id?.toString() == req.params.projectId);
+        const project = await Project.findOne({ _id: req.params.projectId });
 
         if (project) {
             project.description = body.description;
             project.url = body.url;
 
-            await portfolio?.save();
+            await project?.save();
         }
         else {
             throw new Error();
@@ -47,12 +45,14 @@ router.route("/:id/project/:projectId").put(upload.none(), async (req, res) => {
     }
 });
 
-router.route("/:id/proejct/:projectId").delete(async (req, res) => {
+router.route("/:id/project/:projectId").delete(async (req, res) => {
     try {
         const portfolio = await Portfolio.findOne({ _id: req.params.id });
+        const project = await Project.findOneAndDelete({ _id: req.params.projectId });
 
-        const project = portfolio?.projects.find((one) => one._id?.toString() == req.params.projectId);
-        portfolio?.projects.remove(project);
+        if (portfolio && project) {
+            portfolio.projects = portfolio?.projects.filter((el) => el._id.toString() != project._id.toString());
+        }
 
         await portfolio?.save();
 

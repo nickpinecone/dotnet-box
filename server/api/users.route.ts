@@ -10,7 +10,6 @@ import Portfolio from "../models/portfolio.model";
 const router = express.Router();
 const upload = multer();
 
-
 router.route("/").get(async (req, res) => {
     const users = await User.find({});
 
@@ -106,6 +105,5 @@ router.route("/:id").get(async (req, res) => {
         res.status(500).send("could not find user with id: " + req.params.id);
     }
 });
-
 
 export default router;
