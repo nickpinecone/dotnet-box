@@ -84,8 +84,7 @@ router.route("/login").post(upload.none(), async (req, res) => {
 });
 
 router.route("/me").get(auth.verifyToken, async (req, res) => {
-    // @ts-expect-error userId is inserted in auth middleware
-    const userId = req.userId;
+    const userId = res.locals.userId;
 
     const user = await User.findOne({ _id: userId }).populate({
         path: "portfolio",
@@ -98,6 +97,47 @@ router.route("/me").get(auth.verifyToken, async (req, res) => {
     if (!user) throw new Error("could not authenticate user with id: " + userId);
 
     res.status(200).send(user);
+});
+
+router.route("/me/subscribe").get(auth.verifyToken, async (req, res) => {
+    try {
+        const userId = res.locals.userId;
+
+        const user = await User.findOne({ _id: userId }).populate({
+            path: "subscriptions",
+            populate: {
+                path: "portfolio", populate: { path: "projects certificates" },
+            }
+        });
+
+        res.send(user?.subscriptions);
+    }
+    catch (err) {
+        console.error(err);
+        res.status(500).send("could not get subscriptions for user");
+    }
+});
+
+router.route("/me/subscribe/:subId").put(auth.verifyToken, async (req, res) => {
+    try {
+        const userId = res.locals.userId;
+
+        const user = await User.findOne({ _id: userId });
+        const subUser = await User.findOne({ _id: req.params.subId });
+
+        if (subUser) {
+            user?.subscriptions.push(subUser._id);
+            user?.save();
+        }
+        else
+            throw new Error();
+
+        res.sendStatus(200);
+    }
+    catch (err) {
+        console.error(err);
+        res.status(500).send("Could not subscribe to user with id: " + req.params.subId);
+    }
 });
 
 router.route("/:id").get(async (req, res) => {

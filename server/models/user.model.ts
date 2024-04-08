@@ -9,6 +9,11 @@ const UserSchema = new Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "portfolio",
     },
+
+    subscriptions: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "user",
+    }],
 });
 
 const User = mongoose.model("user", UserSchema);

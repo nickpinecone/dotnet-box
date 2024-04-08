@@ -10,8 +10,7 @@ const upload = multer();
 
 router.route("/me/project").get(auth.verifyToken, async (req, res) => {
     try {
-        // @ts-expect-error userId is inserted in auth middleware
-        const userId = req.userId;
+        const userId = res.locals.userId;
 
         const user = await User.findOne({ _id: userId });
         const portfolio = await Portfolio.findOne({ _id: user?.portfolio?.toString() });
@@ -33,8 +32,7 @@ router.route("/me/project").get(auth.verifyToken, async (req, res) => {
 
 router.route("/me/project/:projectId").put(auth.verifyToken, upload.none(), async (req, res) => {
     try {
-        // @ts-expect-error userId is inserted in auth middleware
-        const userId = req.userId;
+        const userId = res.locals.userId;
         const user = await User.findOne({ _id: userId });
 
         const body = req.body;
@@ -63,8 +61,7 @@ router.route("/me/project/:projectId").put(auth.verifyToken, upload.none(), asyn
 
 router.route("/me/project/:projectId").delete(auth.verifyToken, async (req, res) => {
     try {
-        // @ts-expect-error userId is inserted in auth middleware
-        const userId = req.userId;
+        const userId = res.locals.userId;
         const user = await User.findOne({ _id: userId });
 
         const portfolio = await Portfolio.findOne({ _id: user?.portfolio?.toString() });

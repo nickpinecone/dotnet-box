@@ -13,8 +13,7 @@ const upload = multer({ dest: path.resolve(__dirname, "..", "public/certificates
 
 router.route("/me/certificate").get(auth.verifyToken, async (req, res) => {
     try {
-        // @ts-expect-error userId is inserted in auth middleware
-        const userId = req.userId;
+        const userId = res.locals.userId;
 
         const user = await User.findOne({ _id: userId });
         const portfolio = await Portfolio.findOne({ _id: user?.portfolio?.toString() });
@@ -36,8 +35,7 @@ router.route("/me/certificate").get(auth.verifyToken, async (req, res) => {
 
 router.route("/me/certificate/:certificateId").put(auth.verifyToken, upload.single("certificate"), async (req, res) => {
     try {
-        // @ts-expect-error userId is inserted in auth middleware
-        const userId = req.userId;
+        const userId = res.locals.userId;
         const user = await User.findOne({ _id: userId });
 
         const body = req.body;
@@ -71,8 +69,7 @@ router.route("/me/certificate/:certificateId").put(auth.verifyToken, upload.sing
 
 router.route("/me/certificate/:certificatedId").delete(auth.verifyToken, async (req, res) => {
     try {
-        // @ts-expect-error userId is inserted in auth middleware
-        const userId = req.userId;
+        const userId = res.locals.userId;
         const user = await User.findOne({ _id: userId });
 
         const portfolio = await Portfolio.findOne({ _id: user?.portfolio?.toString() });

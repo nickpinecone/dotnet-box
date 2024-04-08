@@ -18,8 +18,7 @@ router.route("/").get(async (req, res) => {
 
 router.route("/me").get(auth.verifyToken, async (req, res) => {
     try {
-        // @ts-expect-error userId is inserted in auth middleware
-        const userId = req.userId;
+        const userId = res.locals.userId;
 
         const user = await User.findOne({ _id: userId });
         const portfolio = await Portfolio.findOne({ _id: user?.portfolio?.toString() }).populate("owner projects certificates");
@@ -37,8 +36,7 @@ router.route("/me").get(auth.verifyToken, async (req, res) => {
 router.route("/me").put(auth.verifyToken, upload.none(), async (req, res) => {
     try {
         const description = req.body.description;
-        // @ts-expect-error userId is inserted in auth middleware
-        const userId = req.userId;
+        const userId = res.locals.userId;
 
         const user = await User.findOne({ _id: userId });
         const portfolio = await Portfolio.findOne({ _id: user?.portfolio?.toString() });
