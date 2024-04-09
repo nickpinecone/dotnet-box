@@ -147,6 +147,46 @@ router.route("/me/verify").put(auth.verifyToken, async (req, res) => {
     }
 });
 
+router.route("/reset").post(upload.none(), async (req, res) => {
+    try {
+        const email = req.body.email;
+
+        const user = await User.findOne({ email: email });
+
+        const token = jwt.sign(
+            { id: user?.id },
+            process.env.VERIFICATION_SECRET as string,
+            {
+                algorithm: 'HS256',
+                allowInsecureKeySizes: true,
+                expiresIn: 3600, // 1 hour
+            }
+        );
+
+        if (user) {
+            // Link to the frontend password reset form, link reset token
+            const link = `http://localhost:4000/api/users/reset/${user.id}/${token}`;
+
+            const sender = new Sender(process.env.EMAIL_HOST as string, "Digital Portfolio");
+            const recipient = [new Recipient(user.email as string, user.username as string)];
+
+            const emailParams = new EmailParams()
+                .setFrom(sender)
+                .setTo(recipient)
+                .setSubject("Password reset")
+                .setHtml(`<section><h1>Click link below to reset your password</h1><a>${link}</a></section>`);
+
+            await mailerSend.email.send(emailParams);
+        }
+
+        res.send(200);
+    }
+    catch (err) {
+        console.error(err);
+        res.status(500).send("could not initiate password reset for user");
+    }
+});
+
 router.route("/verify/:id/:token").get(async (req, res) => {
     try {
         const user = await User.findOne({ _id: req.params.id });
@@ -160,7 +200,7 @@ router.route("/verify/:id/:token").get(async (req, res) => {
             process.env.VERIFICATION_SECRET as string,
             (err, decoded) => {
                 if (err) {
-                    throw new Error("can not verify user with id: " + req.params.id);
+                    throw new Error("can not decode provided token: " + req.params.token);
                 }
                 if ((decoded as jwt.JwtPayload).id === req.params.id) {
                     user.verified = true;
@@ -173,10 +213,47 @@ router.route("/verify/:id/:token").get(async (req, res) => {
         );
 
         res.sendStatus(200);
+        // redirect to frontend home page
+        //res.redirect()
     }
     catch (err) {
         console.error(err);
         res.status(500).send("could not verify user with id: " + req.params.id);
+    }
+});
+
+router.route("/reset/:id/:token").post(upload.none(), async (req, res) => {
+    try {
+        const user = await User.findOne({ _id: req.params.id });
+        const password = req.body.password;
+
+        if (!user) {
+            throw new Error();
+        }
+
+        jwt.verify(
+            req.params.token as string,
+            process.env.VERIFICATION_SECRET as string,
+            (err, decoded) => {
+                if (err) {
+                    throw new Error("can not decode provided token: " + req.params.token);
+                }
+                if ((decoded as jwt.JwtPayload).id === req.params.id) {
+                    user.password = password;
+                    user.save();
+                    res.sendStatus(200);
+                    // redirect to frontend home page
+                    //res.redirect()
+                }
+                else {
+                    throw new Error("token does not match user id");
+                }
+            }
+        );
+    }
+    catch (err) {
+        console.error(err);
+        res.status(500).send("could not reset password for user with id: " + req.params.id);
     }
 });
 
