@@ -10,7 +10,7 @@ function verifyToken(req: express.Request, res: express.Response, next: express.
 
     jwt.verify(
         token as string,
-        process.env.SECRET as string,
+        process.env.LOGIN_SECRET as string,
         (err, decoded) => {
             if (err) {
                 throw new Error("can not access with token: " + token);

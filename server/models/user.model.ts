@@ -4,6 +4,7 @@ const UserSchema = new Schema({
     username: String,
     password: String,
     email: String,
+    verified: { type: Boolean, default: false },
 
     portfolio: {
         type: mongoose.Schema.Types.ObjectId,

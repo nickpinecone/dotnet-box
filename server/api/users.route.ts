@@ -2,13 +2,21 @@ import express from "express";
 import bcrypt from "bcrypt";
 import multer from "multer";
 import jwt from "jsonwebtoken";
+import { MailerSend, Recipient, Sender, EmailParams } from "mailersend";
+import dotenv from "dotenv";
 
 import auth from "../middlewares/auth.middleware";
 import User from "../models/user.model";
 import Portfolio from "../models/portfolio.model";
 
+dotenv.config();
+
 const router = express.Router();
 const upload = multer();
+
+const mailerSend = new MailerSend({
+    apiKey: process.env.EMAIL_API as string,
+});
 
 router.route("/").get(async (req, res) => {
     const users = await User.find({});
@@ -64,7 +72,7 @@ router.route("/login").post(upload.none(), async (req, res) => {
 
         const token = jwt.sign(
             { id: user.id },
-            process.env.SECRET as string,
+            process.env.LOGIN_SECRET as string,
             {
                 algorithm: 'HS256',
                 allowInsecureKeySizes: true,
@@ -97,6 +105,79 @@ router.route("/me").get(auth.verifyToken, async (req, res) => {
     if (!user) throw new Error("could not authenticate user with id: " + userId);
 
     res.status(200).send(user);
+});
+
+router.route("/me/verify").put(auth.verifyToken, async (req, res) => {
+    try {
+        const userId = res.locals.userId;
+
+        const user = await User.findOne({ _id: userId });
+
+        const token = jwt.sign(
+            { id: user?.id },
+            process.env.VERIFICATION_SECRET as string,
+            {
+                algorithm: 'HS256',
+                allowInsecureKeySizes: true,
+                expiresIn: 3600, // 1 hour
+            }
+        );
+
+        if (user) {
+            const link = `http://localhost:4000/api/users/verify/${user.id}/${token}`;
+
+            const sender = new Sender(process.env.EMAIL_HOST as string, "Digital Portfolio");
+            const recipient = [new Recipient(user.email as string, user.username as string)];
+
+            const emailParams = new EmailParams()
+                .setFrom(sender)
+                .setTo(recipient)
+                .setSubject("Email verification")
+                .setHtml(`<section><h1>Click link below to verify email</h1><a>${link}</a></section>`);
+
+            await mailerSend.email.send(emailParams);
+        }
+
+
+        res.send(200);
+    }
+    catch (err) {
+        console.error(err);
+        res.status(500).send("could not initiate verification for user");
+    }
+});
+
+router.route("/verify/:id/:token").get(async (req, res) => {
+    try {
+        const user = await User.findOne({ _id: req.params.id });
+
+        if (!user) {
+            throw new Error();
+        }
+
+        jwt.verify(
+            req.params.token as string,
+            process.env.VERIFICATION_SECRET as string,
+            (err, decoded) => {
+                if (err) {
+                    throw new Error("can not verify user with id: " + req.params.id);
+                }
+                if ((decoded as jwt.JwtPayload).id === req.params.id) {
+                    user.verified = true;
+                    user.save();
+                }
+                else {
+                    throw new Error("token does not match user id");
+                }
+            }
+        );
+
+        res.sendStatus(200);
+    }
+    catch (err) {
+        console.error(err);
+        res.status(500).send("could not verify user with id: " + req.params.id);
+    }
 });
 
 router.route("/me/subscribe").get(auth.verifyToken, async (req, res) => {
@@ -136,7 +217,7 @@ router.route("/me/subscribe/:subId").put(auth.verifyToken, async (req, res) => {
     }
     catch (err) {
         console.error(err);
-        res.status(500).send("Could not subscribe to user with id: " + req.params.subId);
+        res.status(500).send("could not subscribe to user with id: " + req.params.subId);
     }
 });
 
