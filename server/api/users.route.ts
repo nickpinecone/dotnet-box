@@ -76,7 +76,7 @@ router.route("/login").post(upload.none(), async (req, res) => {
             {
                 algorithm: 'HS256',
                 allowInsecureKeySizes: true,
-                expiresIn: 86400, // 24 hours
+                expiresIn: 86400 * 365, // 24 hours (* 365 days for testing)
             }
         );
 
@@ -105,6 +105,24 @@ router.route("/me").get(auth.verifyToken, async (req, res) => {
     if (!user) throw new Error("could not authenticate user with id: " + userId);
 
     res.status(200).send(user);
+});
+
+router.route("/me").put(auth.verifyToken, async (req, res) => {
+    try {
+        const userId = res.locals.userId;
+
+        const user = await User.findOne({ _id: userId });
+
+        // Make some changes 
+
+        user?.save();
+
+        res.sendStatus(200);
+    }
+    catch (err) {
+        console.error(err);
+        res.status(500).send("could not update user profile");
+    }
 });
 
 router.route("/me/verify").put(auth.verifyToken, async (req, res) => {

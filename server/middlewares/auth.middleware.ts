@@ -15,7 +15,6 @@ function verifyToken(req: express.Request, res: express.Response, next: express.
             if (err) {
                 throw new Error("can not access with token: " + token);
             }
-            // req.locals.userId = (decoded as jwt.JwtPayload).id;
             res.locals.userId = (decoded as jwt.JwtPayload).id;
             next();
         }
