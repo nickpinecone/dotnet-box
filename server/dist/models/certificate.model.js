@@ -24,24 +24,17 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = __importStar(require("mongoose"));
-const PortfolioSchema = new mongoose_1.Schema({
-    owner: {
-        type: mongoose_1.default.Schema.Types.ObjectId,
-        ref: "user"
-    },
+const CertificateSchema = new mongoose_1.Schema({
+    photo: String,
     description: String,
     updatedAt: {
         type: Date,
         default: Date.now(),
     },
-    projects: [{
-            type: mongoose_1.default.Schema.Types.ObjectId,
-            ref: "project"
-        }],
-    certificates: [{
-            type: mongoose_1.default.Schema.Types.ObjectId,
-            ref: "certificate"
-        }],
+    portfolio: {
+        type: mongoose_1.default.Schema.Types.ObjectId,
+        ref: "portfolio"
+    },
 });
-const Portfolio = mongoose_1.default.model("portfolio", PortfolioSchema);
-exports.default = Portfolio;
+const Certificate = mongoose_1.default.model("certificate", CertificateSchema);
+exports.default = Certificate;
