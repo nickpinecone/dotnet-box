@@ -8,7 +8,7 @@ import User from "../models/user.model";
 const router = express.Router();
 const upload = multer();
 
-router.route("/me/project").get(auth.verifyToken, async (req, res) => {
+router.route("/me/project").post(auth.verifyToken, async (req, res) => {
     try {
         const userId = res.locals.userId;
 

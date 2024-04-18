@@ -11,7 +11,7 @@ import auth from "../middlewares/auth.middleware";
 const router = express.Router();
 const upload = multer({ dest: path.resolve(__dirname, "..", "public/certificates/") });
 
-router.route("/me/certificate").get(auth.verifyToken, async (req, res) => {
+router.route("/me/certificate").post(auth.verifyToken, async (req, res) => {
     try {
         const userId = res.locals.userId;
 
