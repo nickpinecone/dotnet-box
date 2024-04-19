@@ -285,7 +285,7 @@ router.route("/reset/:id/:token").post(upload.none(),
                         throw new Error("can not decode provided token: " + req.params.token);
                     }
                     if ((decoded as jwt.JwtPayload).id === req.params.id) {
-                        user.password = password;
+                        user.password = bcrypt.hashSync(password, 10);
                         user.save();
                         res.sendStatus(200);
                         // redirect to frontend home page
