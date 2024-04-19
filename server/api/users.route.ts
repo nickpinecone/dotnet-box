@@ -4,10 +4,12 @@ import multer from "multer";
 import jwt from "jsonwebtoken";
 import { MailerSend, Recipient, Sender, EmailParams } from "mailersend";
 import dotenv from "dotenv";
+import { body } from "express-validator";
 
 import auth from "../middlewares/auth.middleware";
 import User from "../models/user.model";
 import Portfolio from "../models/portfolio.model";
+import validation from "../middlewares/validate.middleware";
 
 dotenv.config();
 
@@ -19,92 +21,116 @@ const mailerSend = new MailerSend({
 });
 
 router.route("/").get(async (req, res) => {
-    const users = await User.find({});
-
-    res.status(200).send(users);
-});
-
-router.route("/register").post(upload.none(), async (req, res) => {
     try {
-        const username = req.body.username;
-        const password = bcrypt.hashSync(req.body.password, 10);
-        const email = req.body.email;
+        const users = await User.find({});
 
-        const existUser = await User.findOne({
-            $or: [
-                { email },
-                { username },
-            ]
-        });
-        if (existUser) {
-            throw new Error("user already exsits: " + username);
-        }
-
-        const portfolio = await Portfolio.create({});
-        const user = await User.create({ username, password, email });
-
-        portfolio.owner = user._id;
-        user.portfolio = portfolio._id;
-
-        portfolio.save();
-        user.save();
-
-        res.sendStatus(200);
+        res.status(200).send(users);
     }
     catch (err) {
         console.error(err);
-        res.status(500).send("could not register user");
+        res.status(500).send("could not get users: " + err);
     }
 });
 
-router.route("/login").post(upload.none(), async (req, res) => {
-    try {
-        const email = req.body.email;
-        const password: string = req.body.password;
+router.route("/register").post(
+    upload.none(),
+    body("email").notEmpty().isEmail(),
+    body("password").notEmpty(),
+    body("username").notEmpty(),
+    validation.validateForm,
+    async (req, res) => {
+        try {
+            const username = req.body.username;
+            const password = bcrypt.hashSync(req.body.password, 10);
+            const email = req.body.email;
 
-        const user = await User.findOne({ email });
-
-        if (!user)
-            throw new Error("could not find user with email: " + email);
-
-        if (!bcrypt.compareSync(password, user.password as string))
-            throw new Error("wrong password for user with email: " + email);
-
-        const token = jwt.sign(
-            { id: user.id },
-            process.env.LOGIN_SECRET as string,
-            {
-                algorithm: 'HS256',
-                allowInsecureKeySizes: true,
-                expiresIn: 86400 * 365, // 24 hours (* 365 days for testing)
+            const existUser = await User.findOne({
+                $or: [
+                    { email },
+                    { username },
+                ]
+            });
+            if (existUser) {
+                throw new Error("user already exsits: " + username);
             }
-        );
 
-        res.status(200).send({
-            user,
-            accessToken: token
-        });
+            const portfolio = await Portfolio.create({});
+            const user = await User.create({ username, password, email });
+
+            portfolio.owner = user._id;
+            user.portfolio = portfolio._id;
+
+            portfolio.save();
+            user.save();
+
+            res.sendStatus(200);
+        }
+        catch (err) {
+            console.error(err);
+            res.status(500).send("could not register user " + err);
+        }
     }
-    catch (err) {
-        console.error(err);
-        res.status(500).send("could not login user");
+);
+
+router.route("/login").post(
+    upload.none(),
+    body("email").notEmpty().isEmail(),
+    body("password").notEmpty(),
+    validation.validateForm,
+    async (req, res) => {
+        try {
+            const email = req.body.email;
+            const password: string = req.body.password;
+
+            const user = await User.findOne({ email });
+
+            if (!user)
+                throw new Error("could not find user with email: " + email);
+
+            if (!bcrypt.compareSync(password, user.password as string))
+                throw new Error("wrong password for user with email: " + email);
+
+            const token = jwt.sign(
+                { id: user.id },
+                process.env.LOGIN_SECRET as string,
+                {
+                    algorithm: 'HS256',
+                    allowInsecureKeySizes: true,
+                    expiresIn: 86400 * 365, // 24 hours (* 365 days for testing)
+                }
+            );
+
+            res.status(200).send({
+                user,
+                accessToken: token
+            });
+        }
+        catch (err) {
+            console.error(err);
+            res.status(500).send("could not login user" + err);
+        }
     }
-});
+);
 
 router.route("/me").get(auth.verifyToken, async (req, res) => {
-    const userId = res.locals.userId;
+    try {
+        const userId = res.locals.userId;
 
-    const user = await User.findOne({ _id: userId }).populate({
-        path: "portfolio",
-        populate: {
-            path: "projects certificates"
-        }
-    });
-    user?.portfolio
+        const user = await User.findOne({ _id: userId }).populate({
+            path: "portfolio",
+            populate: {
+                path: "projects certificates"
+            }
+        });
 
-    if (!user) throw new Error("could not authenticate user with id: " + userId);
+        if (!user) throw new Error("could not authenticate user with id: " + userId);
 
-    res.status(200).send(user);
+        res.status(200).send(user);
+    }
+    catch (err) {
+        console.error(err);
+        res.status(500).send("could not get user profile page: " + err)
+    }
 });
 
 router.route("/me").put(auth.verifyToken, async (req, res) => {
@@ -112,16 +138,17 @@ router.route("/me").put(auth.verifyToken, async (req, res) => {
         const userId = res.locals.userId;
 
         const user = await User.findOne({ _id: userId });
+        if (!user) throw new Error("could not authenticate user with id: " + userId);
 
         // Make some changes 
 
-        user?.save();
+        user.save();
 
         res.sendStatus(200);
     }
     catch (err) {
         console.error(err);
-        res.status(500).send("could not update user profile");
+        res.status(500).send("could not update user profile: " + err);
     }
 });
 
@@ -130,9 +157,10 @@ router.route("/me/verify").put(auth.verifyToken, async (req, res) => {
         const userId = res.locals.userId;
 
         const user = await User.findOne({ _id: userId });
+        if (!user) throw new Error("could not authenticate user with id: " + userId);
 
         const token = jwt.sign(
-            { id: user?.id },
+            { id: user.id },
             process.env.VERIFICATION_SECRET as string,
             {
                 algorithm: 'HS256',
@@ -141,47 +169,48 @@ router.route("/me/verify").put(auth.verifyToken, async (req, res) => {
             }
         );
 
-        if (user) {
-            const link = `http://localhost:4000/api/users/verify/${user.id}/${token}`;
+        const link = `http://localhost:4000/api/users/verify/${user.id}/${token}`;
 
-            const sender = new Sender(process.env.EMAIL_HOST as string, "Digital Portfolio");
-            const recipient = [new Recipient(user.email as string, user.username as string)];
+        const sender = new Sender(process.env.EMAIL_HOST as string, "Digital Portfolio");
+        const recipient = [new Recipient(user.email as string, user.username as string)];
 
-            const emailParams = new EmailParams()
-                .setFrom(sender)
-                .setTo(recipient)
-                .setSubject("Email verification")
-                .setHtml(`<section><h1>Click link below to verify email</h1><a>${link}</a></section>`);
+        const emailParams = new EmailParams()
+            .setFrom(sender)
+            .setTo(recipient)
+            .setSubject("Email verification")
+            .setHtml(`<section><h1>Click link below to verify email</h1><a>${link}</a></section>`);
 
-            await mailerSend.email.send(emailParams);
-        }
-
+        await mailerSend.email.send(emailParams);
 
         res.send(200);
     }
     catch (err) {
         console.error(err);
-        res.status(500).send("could not initiate verification for user");
+        res.status(500).send("could not initiate verification for user: " + err);
     }
 });
 
-router.route("/reset").post(upload.none(), async (req, res) => {
-    try {
-        const email = req.body.email;
+router.route("/reset").post(
+    upload.none(),
+    body("email").notEmpty().isEmail(),
+    validation.validateForm,
+    async (req, res) => {
+        try {
+            const email = req.body.email;
 
-        const user = await User.findOne({ email: email });
+            const user = await User.findOne({ email: email });
+            if (!user) throw new Error("could not find user with email: " + email);
 
-        const token = jwt.sign(
-            { id: user?.id },
-            process.env.VERIFICATION_SECRET as string,
-            {
-                algorithm: 'HS256',
-                allowInsecureKeySizes: true,
-                expiresIn: 3600, // 1 hour
-            }
-        );
+            const token = jwt.sign(
+                { id: user?.id },
+                process.env.VERIFICATION_SECRET as string,
+                {
+                    algorithm: 'HS256',
+                    allowInsecureKeySizes: true,
+                    expiresIn: 3600, // 1 hour
+                }
+            );
 
-        if (user) {
             // Link to the frontend password reset form, link reset token
             const link = `http://localhost:4000/api/users/reset/${user.id}/${token}`;
 
@@ -195,23 +224,21 @@ router.route("/reset").post(upload.none(), async (req, res) => {
                 .setHtml(`<section><h1>Click link below to reset your password</h1><a>${link}</a></section>`);
 
             await mailerSend.email.send(emailParams);
-        }
 
-        res.send(200);
+            res.send(200);
+        }
+        catch (err) {
+            console.error(err);
+            res.status(500).send("could not initiate password reset for user: " + err);
+        }
     }
-    catch (err) {
-        console.error(err);
-        res.status(500).send("could not initiate password reset for user");
-    }
-});
+);
 
 router.route("/verify/:id/:token").get(async (req, res) => {
     try {
         const user = await User.findOne({ _id: req.params.id });
 
-        if (!user) {
-            throw new Error();
-        }
+        if (!user) throw new Error("could not find user with id: " + req.params.id);
 
         jwt.verify(
             req.params.token as string,
@@ -236,44 +263,46 @@ router.route("/verify/:id/:token").get(async (req, res) => {
     }
     catch (err) {
         console.error(err);
-        res.status(500).send("could not verify user with id: " + req.params.id);
+        res.status(500).send("could not verify user: " + err);
     }
 });
 
-router.route("/reset/:id/:token").post(upload.none(), async (req, res) => {
-    try {
-        const user = await User.findOne({ _id: req.params.id });
-        const password = req.body.password;
+router.route("/reset/:id/:token").post(upload.none(),
+    body("password").notEmpty(),
+    validation.validateForm,
+    async (req, res) => {
+        try {
+            const user = await User.findOne({ _id: req.params.id });
+            const password = req.body.password;
 
-        if (!user) {
-            throw new Error();
+            if (!user) throw new Error("could not find user with id: " + req.params.id);
+
+            jwt.verify(
+                req.params.token as string,
+                process.env.VERIFICATION_SECRET as string,
+                (err, decoded) => {
+                    if (err) {
+                        throw new Error("can not decode provided token: " + req.params.token);
+                    }
+                    if ((decoded as jwt.JwtPayload).id === req.params.id) {
+                        user.password = password;
+                        user.save();
+                        res.sendStatus(200);
+                        // redirect to frontend home page
+                        //res.redirect()
+                    }
+                    else {
+                        throw new Error("token does not match user id");
+                    }
+                }
+            );
         }
-
-        jwt.verify(
-            req.params.token as string,
-            process.env.VERIFICATION_SECRET as string,
-            (err, decoded) => {
-                if (err) {
-                    throw new Error("can not decode provided token: " + req.params.token);
-                }
-                if ((decoded as jwt.JwtPayload).id === req.params.id) {
-                    user.password = password;
-                    user.save();
-                    res.sendStatus(200);
-                    // redirect to frontend home page
-                    //res.redirect()
-                }
-                else {
-                    throw new Error("token does not match user id");
-                }
-            }
-        );
+        catch (err) {
+            console.error(err);
+            res.status(500).send("could not reset password for user: " + err);
+        }
     }
-    catch (err) {
-        console.error(err);
-        res.status(500).send("could not reset password for user with id: " + req.params.id);
-    }
-});
+);
 
 router.route("/me/subscribe").get(auth.verifyToken, async (req, res) => {
     try {
@@ -286,11 +315,13 @@ router.route("/me/subscribe").get(auth.verifyToken, async (req, res) => {
             }
         });
 
+        if (!user) throw new Error("could not find user: " + userId);
+
         res.send(user?.subscriptions);
     }
     catch (err) {
         console.error(err);
-        res.status(500).send("could not get subscriptions for user");
+        res.status(500).send("could not get subscriptions for user: " + err);
     }
 });
 
@@ -301,18 +332,17 @@ router.route("/me/subscribe/:subId").put(auth.verifyToken, async (req, res) => {
         const user = await User.findOne({ _id: userId });
         const subUser = await User.findOne({ _id: req.params.subId });
 
-        if (subUser) {
-            user?.subscriptions.push(subUser._id);
-            user?.save();
-        }
-        else
-            throw new Error();
+        if (!user) throw new Error("could not find user: " + userId);
+        if (!subUser) throw new Error("could not find target user: " + req.params.subId);
+
+        user.subscriptions.push(subUser._id);
+        user.save();
 
         res.sendStatus(200);
     }
     catch (err) {
         console.error(err);
-        res.status(500).send("could not subscribe to user with id: " + req.params.subId);
+        res.status(500).send("could not subscribe to user: " + err);
     }
 });
 
@@ -325,11 +355,13 @@ router.route("/:id").get(async (req, res) => {
             }
         });
 
+        if (!user) throw new Error("could not find user: " + req.params.id);
+
         res.status(200).send(user);
     }
     catch (err) {
         console.error(err);
-        res.status(500).send("could not find user with id: " + req.params.id);
+        res.status(500).send("could not find user: " + err);
     }
 });
 

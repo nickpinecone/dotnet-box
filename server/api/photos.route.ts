@@ -6,6 +6,7 @@ import Certificate from "../models/certificate.model";
 
 const router = express.Router();
 
+// TODO: Rewrite to just use photo names
 // Get certificate photo
 router.route("/certificate/:certificateId").get(async (req, res) => {
     try {

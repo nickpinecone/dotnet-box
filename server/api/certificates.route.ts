@@ -7,6 +7,7 @@ import Portfolio from "../models/portfolio.model";
 import Certificate from "../models/certificate.model";
 import User from "../models/user.model";
 import auth from "../middlewares/auth.middleware";
+import validation from "../middlewares/validate.middleware";
 
 const router = express.Router();
 const upload = multer({ dest: path.resolve(__dirname, "..", "public/certificates/") });
@@ -16,86 +17,88 @@ router.route("/me/certificate").post(auth.verifyToken, async (req, res) => {
         const userId = res.locals.userId;
 
         const user = await User.findOne({ _id: userId });
-        const portfolio = await Portfolio.findOne({ _id: user?.portfolio?.toString() });
+        if (!user) throw new Error("could not find user: " + userId);
+
+        const portfolio = await Portfolio.findOne({ _id: user.portfolio?.toString() }).populate("owner projects certificates");
+        if (!portfolio) throw new Error("user doesnt have portfolio");
+
         const certificate = await Certificate.create({});
 
-        certificate.portfolio = portfolio?._id;
-        portfolio?.certificates.push(certificate._id);
+        certificate.portfolio = portfolio._id;
+        portfolio.certificates.push(certificate._id);
 
         await certificate.save();
-        await portfolio?.save();
+        await portfolio.save();
 
         res.send(certificate);
     }
     catch (err) {
         console.error(err);
-        res.status(500).send("could not create certificate in user portfolio");
+        res.status(500).send("could not create certificate in user portfolio: " + err);
     }
 });
 
-router.route("/me/certificate/:certificateId").put(auth.verifyToken, upload.single("certificate"), async (req, res) => {
-    try {
-        const userId = res.locals.userId;
-        const user = await User.findOne({ _id: userId });
+router.route("/me/certificate/:certificateId").put(
+    auth.verifyToken,
+    upload.single("certificate"),
+    validation.validateForm,
+    async (req, res) => {
+        try {
+            const userId = res.locals.userId;
+            const user = await User.findOne({ _id: userId });
+            if (!user) throw new Error("could not find user: " + userId);
 
-        const body = req.body;
-        const certificate = await Certificate.findOne({ _id: req.params.certificateId });
+            const certificate = await Certificate.findOne({ _id: req.params.certificateId, portfolio: user.portfolio });
+            if (!certificate) throw new Error("could not find certificate: " + req.params.certificateId);
 
-        if (certificate?.portfolio?._id.toString() != user?.portfolio?._id.toString())
-            throw new Error();
+            if (!req.file) throw new Error("did not provide certificate photo");
 
-        if (certificate && req.file) {
             if (certificate.photo) {
                 const photoName = path.resolve(__dirname, "..", "public/certificates/" + certificate?.photo);
                 fs.unlink(photoName, (err) => { if (err) console.error(err); });
             }
 
-            certificate.description = body.description;
+            certificate.description = req.body.description;
             certificate.photo = req.file.filename;
 
             certificate.save();
-        }
-        else {
-            throw new Error();
-        }
 
-        res.sendStatus(200);
-    }
-    catch (err) {
-        console.error(err);
-        res.status(500).send("could not update certificate with id: " + req.params.certificateId);
-    }
-});
+            res.sendStatus(200);
+        }
+        catch (err) {
+            console.error(err);
+            res.status(500).send("could not update certificate: " + err);
+        }
+    });
 
 router.route("/me/certificate/:certificatedId").delete(auth.verifyToken, async (req, res) => {
     try {
         const userId = res.locals.userId;
         const user = await User.findOne({ _id: userId });
+        if (!user) throw new Error("could not find user: " + userId);
 
-        const portfolio = await Portfolio.findOne({ _id: user?.portfolio?.toString() });
-        const certificate = await Certificate.findOne({ _id: req.params.certificatedId });
+        const portfolio = await Portfolio.findOne({ _id: user.portfolio?.toString() });
+        if (!portfolio) throw new Error("user doesnt have portfolio: " + userId);
 
-        if (certificate?.portfolio?._id.toString() != portfolio?._id.toString())
-            throw new Error();
+        const certificate = await Certificate.findOne({ _id: req.params.certificatedId, portfolio: user.portfolio });
+        if (!certificate) throw new Error("could not find certificate: " + req.params.certificatedId);
 
         await Certificate.deleteOne({ _id: req.params.certificatedId });
 
-        if (certificate?.photo) {
+        if (certificate.photo) {
             const photoName = path.resolve(__dirname, "..", "public/certificates/" + certificate?.photo);
             fs.unlink(photoName, (err) => { if (err) console.error(err); });
         }
 
-        if (portfolio && certificate) {
-            portfolio.certificates = portfolio?.certificates.filter((el) => el._id.toString() != certificate._id.toString());
-        }
+        portfolio.certificates = portfolio.certificates.filter((el) => el._id.toString() != certificate._id.toString());
 
-        await portfolio?.save();
+        await portfolio.save();
 
         res.sendStatus(200);
     }
     catch (err) {
         console.error(err);
-        res.status(500).send("could not delete certificate with id: " + req.params.certificatedId);
+        res.status(500).send("could not delete certificate: " + err);
     }
 });
 

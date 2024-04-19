@@ -7,13 +7,21 @@ import certificates from "./certificates.route";
 import multer from "multer";
 import User from "../models/user.model";
 
+import validation from "../middlewares/validate.middleware";
+
 const router = express.Router();
 const upload = multer();
 
 router.route("/").get(async (req, res) => {
-    const portfolios = await Portfolio.find({}).sort({ createdAt: -1 }).populate("owner projects certificates");
+    try {
+        const portfolios = await Portfolio.find({}).sort({ createdAt: -1 }).populate("owner projects certificates");
 
-    res.send(portfolios);
+        res.send(portfolios);
+    }
+    catch (err) {
+        console.error(err);
+        res.status(500).send("could not get portfolios: " + err);
+    }
 });
 
 router.route("/me").get(auth.verifyToken, async (req, res) => {
@@ -21,50 +29,56 @@ router.route("/me").get(auth.verifyToken, async (req, res) => {
         const userId = res.locals.userId;
 
         const user = await User.findOne({ _id: userId });
-        const portfolio = await Portfolio.findOne({ _id: user?.portfolio?.toString() }).populate("owner projects certificates");
+        if (!user) throw new Error("could not find user: " + userId);
 
-        if (portfolio == null) throw new Error();
+        const portfolio = await Portfolio.findOne({ _id: user.portfolio?.toString() }).populate("owner projects certificates");
+        if (!portfolio) throw new Error("user doesnt have portfolio");
 
         res.send(portfolio);
     }
     catch (err) {
         console.error(err);
-        res.status(500).send("could not get user portfolio");
+        res.status(500).send("could not get user portfolio: " + err);
     }
 });
 
-router.route("/me").put(auth.verifyToken, upload.none(), async (req, res) => {
-    try {
-        const description = req.body.description;
-        const userId = res.locals.userId;
+router.route("/me").put(
+    auth.verifyToken,
+    upload.none(),
+    validation.validateForm,
+    async (req, res) => {
+        try {
+            const description = req.body.description;
+            const userId = res.locals.userId;
 
-        const user = await User.findOne({ _id: userId });
-        const portfolio = await Portfolio.findOne({ _id: user?.portfolio?.toString() });
+            const user = await User.findOne({ _id: userId });
+            if (!user) throw new Error("could not find user: " + userId);
 
-        if (portfolio == null) throw new Error();
+            const portfolio = await Portfolio.findOne({ _id: user.portfolio?.toString() }).populate("owner projects certificates");
+            if (!portfolio) throw new Error("user doesnt have portfolio");
 
-        portfolio.description = description;
-        portfolio.save();
+            portfolio.description = description;
+            portfolio.save();
 
-        res.sendStatus(200);
-    }
-    catch (err) {
-        console.error(err);
-        res.status(500).send("could not update user portfolio");
-    }
-});
+            res.sendStatus(200);
+        }
+        catch (err) {
+            console.error(err);
+            res.status(500).send("could not update user portfolio: " + err);
+        }
+    });
 
 router.route("/:id").get(async (req, res) => {
     try {
         const portfolio = await Portfolio.findOne({ _id: req.params.id }).populate("owner projects certificates");
 
-        if (portfolio == null) throw new Error();
+        if (!portfolio) throw new Error("could not find portfolio with id: " + req.params.id);
 
         res.send(portfolio);
     }
     catch (err) {
         console.error(err);
-        res.status(500).send("could not find portfolio with id: " + req.params.id);
+        res.status(500).send("could not find portfolio: " + err);
     }
 });
 
