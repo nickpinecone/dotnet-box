@@ -140,7 +140,7 @@ router.route("/me").put(auth.verifyToken, async (req, res) => {
         const user = await User.findOne({ _id: userId });
         if (!user) throw new Error("could not authenticate user with id: " + userId);
 
-        // Make some changes 
+        // TODO Make some changes 
 
         user.save();
 
@@ -169,6 +169,7 @@ router.route("/me/verify").put(auth.verifyToken, async (req, res) => {
             }
         );
 
+        // TODO Link to the frontend verify account page
         const link = `http://localhost:4000/api/users/verify/${user.id}/${token}`;
 
         const sender = new Sender(process.env.EMAIL_HOST as string, "Digital Portfolio");
@@ -211,7 +212,7 @@ router.route("/reset").post(
                 }
             );
 
-            // Link to the frontend password reset form, link reset token
+            // TODO Link to the frontend password reset form, link reset token
             const link = `http://localhost:4000/api/users/reset/${user.id}/${token}`;
 
             const sender = new Sender(process.env.EMAIL_HOST as string, "Digital Portfolio");
@@ -258,8 +259,8 @@ router.route("/verify/:id/:token").get(async (req, res) => {
         );
 
         res.sendStatus(200);
-        // redirect to frontend home page
-        //res.redirect()
+        // TODO redirect to frontend home page
+        // res.redirect()
     }
     catch (err) {
         console.error(err);
@@ -288,8 +289,8 @@ router.route("/reset/:id/:token").post(upload.none(),
                         user.password = bcrypt.hashSync(password, 10);
                         user.save();
                         res.sendStatus(200);
-                        // redirect to frontend home page
-                        //res.redirect()
+                        // TODO redirect to frontend home page
+                        // res.redirect()
                     }
                     else {
                         throw new Error("token does not match user id");
