@@ -8,21 +8,26 @@ import multer from "multer";
 import User from "../models/user.model";
 
 import validation from "../middlewares/validate.middleware";
+import { query } from "express-validator";
 
 const router = express.Router();
 const upload = multer();
 
-router.route("/").get(async (req, res) => {
-    try {
-        const portfolios = await Portfolio.find({}).sort({ createdAt: -1 }).populate("owner projects certificates");
+router.route("/").get(
+    query("search").default("").escape(),
+    validation.validateForm, async (req, res) => {
+        try {
+            const searchKey = new RegExp(`${req.query.search}`, 'i');
+            const portfolios = await Portfolio.find({ "description": searchKey }).sort({ createdAt: -1 }).populate("owner projects certificates");
 
-        res.send(portfolios);
+            res.send(portfolios);
+        }
+        catch (err) {
+            console.error(err);
+            res.status(500).send("could not get portfolios: " + err);
+        }
     }
-    catch (err) {
-        console.error(err);
-        res.status(500).send("could not get portfolios: " + err);
-    }
-});
+);
 
 router.route("/me").get(auth.verifyToken, async (req, res) => {
     try {

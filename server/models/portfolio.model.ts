@@ -23,6 +23,9 @@ const PortfolioSchema = new Schema({
     }],
 });
 
+PortfolioSchema.index({ description: 'text' });
+
+
 const Portfolio = mongoose.model("portfolio", PortfolioSchema);
 
 export default Portfolio;
