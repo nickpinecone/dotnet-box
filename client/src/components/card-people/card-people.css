@@ -1,0 +1,115 @@
+a {
+    color: inherit;
+  }
+  
+  h1 {
+    color: #2196f3;
+    font-size: 40px;
+    margin-top: 10px;
+    margin-left: 10px;
+    margin-bottom: 12px;
+    margin-right: auto;
+    font-weight: 700;
+  }
+  
+  .profile-container {
+    margin: 0 auto;
+    width: 1160px;
+    height: 400px;
+    color: #FFFFFF;
+    background-color: #2196f3;
+    border-radius: 20px 20px 0 0;
+    display: flex;
+    font-weight: 700;
+    padding: 40px;
+  }
+  
+  .profile {
+    margin-left: 10px;
+  }
+  
+  .profile-image {
+    width: 400px;
+    height: 400px;
+  }
+  
+  .name {
+    font-size: 48px;
+    margin: 20px 82.5px 0 82.5px;
+    width: 585px;
+  }
+  
+  .login {
+    font-size: 20px;
+    margin: 30px 82.5px 0 82.5px;
+    display: block;
+    width: 585px;
+    text-align: center;
+  }
+  
+  .contact-list {
+    font-size: 20px;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .contact-list-item {
+    list-style: none;
+    margin: 30px 122.5px 0 92.5px;
+  }
+  
+  .phone {
+    text-decoration: none;
+  }
+  
+  .telegram {
+    text-decoration: none;
+  }
+  
+  .description {
+    margin: 0 auto;
+    width: 1140px;
+    padding: 50px;
+    height: auto;
+    background-color: #EEEEEE;
+    border-radius: 0 0 20px 20px;
+  }
+  
+  .about-me {
+    font-weight: 700;
+    font-size: 40px;
+    margin-top: 0;
+    margin-bottom: 10px;
+  }
+  
+  .text-about-me {
+    font-size: 32px;
+    font-weight: 300;
+    margin: 0;
+  }
+  
+  .achievments-header {
+    align-items: center;
+    height: auto;
+    margin: 30px 0;
+  }
+  
+  .achievments-header-container {
+    width: 1240px;
+    height: 70px;
+    margin: 0 auto;
+    align-items: center;
+    display: flex;
+  }
+  
+  .achievments {
+    margin-right: auto;
+  }
+  
+  .add {
+    border-radius: 100px;
+    font-size: 20px;
+    display: flex;
+    margin: 10px;
+    padding: 13px 36px;
+  }
