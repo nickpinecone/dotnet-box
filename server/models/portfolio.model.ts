@@ -13,18 +13,13 @@ const PortfolioSchema = new Schema({
         default: Date.now(),
     },
 
-    projects: [{
+    achievements: [{
         type: mongoose.Schema.Types.ObjectId,
-        ref: "project"
-    }],
-    certificates: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "certificate"
+        ref: "achievement"
     }],
 });
 
 PortfolioSchema.index({ description: 'text' });
-
 
 const Portfolio = mongoose.model("portfolio", PortfolioSchema);
 

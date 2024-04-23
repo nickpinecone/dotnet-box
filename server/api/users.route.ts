@@ -133,7 +133,7 @@ router.route("/me").get(auth.verifyToken, async (req, res) => {
         const user = await User.findOne({ _id: userId }).populate({
             path: "portfolio",
             populate: {
-                path: "projects certificates"
+                path: "achievements"
             }
         });
 
@@ -149,7 +149,9 @@ router.route("/me").get(auth.verifyToken, async (req, res) => {
 
 router.route("/me").put(
     auth.verifyToken,
+    upload.none(),
     body("bio").default(""),
+    validation.validateForm,
     async (req, res) => {
         try {
             const userId = res.locals.userId;
@@ -330,7 +332,7 @@ router.route("/me/subscribe").get(auth.verifyToken, async (req, res) => {
         const user = await User.findOne({ _id: userId }).populate({
             path: "subscriptions",
             populate: {
-                path: "portfolio", populate: { path: "projects certificates" },
+                path: "portfolio", populate: { path: "achievements" },
             }
         });
 
@@ -370,7 +372,7 @@ router.route("/:id").get(async (req, res) => {
         const user = await User.findOne({ _id: req.params.id }).populate({
             path: "portfolio",
             populate: {
-                path: "projects certificates"
+                path: "achievements"
             }
         });
 

@@ -1,8 +1,9 @@
 import mongoose, { Schema } from "mongoose";
 
-const ProjectSchema = new Schema({
-    url: String,
+const AchievementSchema = new Schema({
+    photo: String,
     description: String,
+    url: String,
 
     updatedAt: {
         type: Date,
@@ -15,6 +16,6 @@ const ProjectSchema = new Schema({
     },
 });
 
-const Project = mongoose.model("project", ProjectSchema);
+const Achievement = mongoose.model("achievement", AchievementSchema);
 
-export default Project;
+export default Achievement;

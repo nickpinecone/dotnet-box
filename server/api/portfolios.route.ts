@@ -2,15 +2,13 @@ import express from "express";
 
 import Portfolio from "../models/portfolio.model";
 import auth from "../middlewares/auth.middleware";
-import projects from "./projects.route";
-import certificates from "./certificates.route";
+import achievements from "./achievements.route";
 import multer from "multer";
 import User from "../models/user.model";
 
 import validation from "../middlewares/validate.middleware";
 import { query } from "express-validator";
-import Project from "../models/project.model";
-import Certificate from "../models/certificate.model";
+import Achievement from "../models/achievement.model";
 
 const router = express.Router();
 const upload = multer();
@@ -25,24 +23,16 @@ router.route("/").get(
                 const searchKey = new RegExp(`${req.query.search}`, 'i');
                 const searchSettings = { "description": searchKey };
 
-                const portfolios = await Portfolio.find(searchSettings).sort({ createdAt: -1 }).populate("owner projects certificates");
+                const portfolios = await Portfolio.find(searchSettings).sort({ createdAt: -1 }).populate("owner achievements");
                 for (let i = 0; i < portfolios.length; i++) {
                     const portfolio = portfolios[i];
                     searchList.push(portfolio);
                 }
 
-                const projects = await Project.find(searchSettings).sort({ createdAt: -1 });
-                for (let i = 0; i < projects.length; i++) {
-                    const project = projects[i];
-                    const portfolio = await Portfolio.findById(project.portfolio).populate("owner projects certificates");
-                    if (portfolio && searchList.every((item) => item._id.toString() !== portfolio._id.toString()))
-                        searchList.push(portfolio);
-                }
-
-                const certificates = await Certificate.find(searchSettings).sort({ createdAt: -1 });
-                for (let i = 0; i < certificates.length; i++) {
-                    const certificate = certificates[i];
-                    const portfolio = await Portfolio.findById(certificate.portfolio).populate("owner projects certificates");
+                const achievements = await Achievement.find(searchSettings).sort({ createdAt: -1 });
+                for (let i = 0; i < achievements.length; i++) {
+                    const achievement = achievements[i];
+                    const portfolio = await Portfolio.findById(achievement.portfolio).populate("owner achievements");
                     if (portfolio && searchList.every((item) => item._id.toString() !== portfolio._id.toString()))
                         searchList.push(portfolio);
                 }
@@ -50,7 +40,7 @@ router.route("/").get(
                 res.send([...searchList]);
             }
             else {
-                const portfolios = await Portfolio.find({}).sort({ createdAt: -1 }).populate("owner projects certificates");
+                const portfolios = await Portfolio.find({}).sort({ createdAt: -1 }).populate("owner achievements");
                 res.send(portfolios);
             }
         }
@@ -68,7 +58,7 @@ router.route("/me").get(auth.verifyToken, async (req, res) => {
         const user = await User.findOne({ _id: userId });
         if (!user) throw new Error("could not find user: " + userId);
 
-        const portfolio = await Portfolio.findOne({ _id: user.portfolio?.toString() }).populate("owner projects certificates");
+        const portfolio = await Portfolio.findOne({ _id: user.portfolio?.toString() }).populate("owner achievements");
         if (!portfolio) throw new Error("user doesnt have portfolio");
 
         res.send(portfolio);
@@ -91,7 +81,7 @@ router.route("/me").put(
             const user = await User.findOne({ _id: userId });
             if (!user) throw new Error("could not find user: " + userId);
 
-            const portfolio = await Portfolio.findOne({ _id: user.portfolio?.toString() }).populate("owner projects certificates");
+            const portfolio = await Portfolio.findOne({ _id: user.portfolio?.toString() }).populate("owner achievements");
             if (!portfolio) throw new Error("user doesnt have portfolio");
 
             portfolio.description = description;
@@ -107,7 +97,7 @@ router.route("/me").put(
 
 router.route("/:id").get(async (req, res) => {
     try {
-        const portfolio = await Portfolio.findOne({ _id: req.params.id }).populate("owner projects certificates");
+        const portfolio = await Portfolio.findOne({ _id: req.params.id }).populate("owner achievements");
 
         if (!portfolio) throw new Error("could not find portfolio with id: " + req.params.id);
 
@@ -119,7 +109,6 @@ router.route("/:id").get(async (req, res) => {
     }
 });
 
-router.use("/", projects);
-router.use("/", certificates);
+router.use("/", achievements);
 
 export default router;

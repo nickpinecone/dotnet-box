@@ -9,7 +9,7 @@ const router = express.Router();
 // Projects are in projects/
 router.route("/:name").get(async (req, res) => {
     try {
-        const photoName = path.resolve(__dirname, "..", "public/" + req.params.name);
+        const photoName = path.resolve(__dirname, "..", "public/photos/" + req.params.name);
         const readStream = fs.createReadStream(photoName);
         res.status(200);
         readStream.pipe(res);
