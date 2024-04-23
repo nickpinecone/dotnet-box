@@ -20,6 +20,11 @@ const mailerSend = new MailerSend({
     apiKey: process.env.EMAIL_API as string,
 });
 
+// @ts-expect-error user is Document
+function getFullName(user): string {
+    return `${user.name} ${user.surname} ${user.paternalName ?? ""}`;
+}
+
 router.route("/").get(async (req, res) => {
     try {
         const users = await User.find({});
@@ -40,22 +45,31 @@ router.route("/register").post(
     validation.validateForm,
     async (req, res) => {
         try {
-            const username = req.body.username;
-            const password = bcrypt.hashSync(req.body.password, 10);
+            const username: string[] = req.body.username.split(" ");
+            if (username.length < 2) {
+                throw new Error("incorrect username input");
+            }
+            const name = username[0];
+            const surname = username[1];
+            let paternalName: string | null = null;
+            if (username.length > 2)
+                paternalName = username[2];
+
+            const password = req.body.password;
             const email = req.body.email;
 
-            const existUser = await User.findOne({
-                $or: [
-                    { email },
-                    { username },
-                ]
-            });
+            const existUser = await User.findOne({ email });
+
             if (existUser) {
-                throw new Error("user already exsits: " + username);
+                throw new Error("user already exsits: " + email);
             }
 
             const portfolio = await Portfolio.create({});
-            const user = await User.create({ username, password, email });
+            const user = await User.create({ name, surname, password, email });
+
+            if (paternalName != null) {
+                user.paternalName = paternalName;
+            }
 
             portfolio.owner = user._id;
             user.portfolio = portfolio._id;
@@ -133,24 +147,28 @@ router.route("/me").get(auth.verifyToken, async (req, res) => {
     }
 });
 
-router.route("/me").put(auth.verifyToken, async (req, res) => {
-    try {
-        const userId = res.locals.userId;
+router.route("/me").put(
+    auth.verifyToken,
+    body("bio").default(""),
+    async (req, res) => {
+        try {
+            const userId = res.locals.userId;
+            const bio = req.body.bio;
 
-        const user = await User.findOne({ _id: userId });
-        if (!user) throw new Error("could not authenticate user with id: " + userId);
+            const user = await User.findOne({ _id: userId });
+            if (!user) throw new Error("could not authenticate user with id: " + userId);
 
-        // TODO Make some changes 
+            user.bio = bio;
 
-        user.save();
+            user.save();
 
-        res.sendStatus(200);
-    }
-    catch (err) {
-        console.error(err);
-        res.status(500).send("could not update user profile: " + err);
-    }
-});
+            res.sendStatus(200);
+        }
+        catch (err) {
+            console.error(err);
+            res.status(500).send("could not update user profile: " + err);
+        }
+    });
 
 router.route("/me/verify").put(auth.verifyToken, async (req, res) => {
     try {
@@ -173,7 +191,7 @@ router.route("/me/verify").put(auth.verifyToken, async (req, res) => {
         const link = `http://localhost:4000/api/users/verify/${user.id}/${token}`;
 
         const sender = new Sender(process.env.EMAIL_HOST as string, "Digital Portfolio");
-        const recipient = [new Recipient(user.email as string, user.username as string)];
+        const recipient = [new Recipient(user.email as string, getFullName(user))];
 
         const emailParams = new EmailParams()
             .setFrom(sender)
@@ -216,7 +234,7 @@ router.route("/reset").post(
             const link = `http://localhost:4000/api/users/reset/${user.id}/${token}`;
 
             const sender = new Sender(process.env.EMAIL_HOST as string, "Digital Portfolio");
-            const recipient = [new Recipient(user.email as string, user.username as string)];
+            const recipient = [new Recipient(user.email as string, user.name as string)];
 
             const emailParams = new EmailParams()
                 .setFrom(sender)
@@ -286,7 +304,7 @@ router.route("/reset/:id/:token").post(upload.none(),
                         throw new Error("can not decode provided token: " + req.params.token);
                     }
                     if ((decoded as jwt.JwtPayload).id === req.params.id) {
-                        user.password = bcrypt.hashSync(password, 10);
+                        user.password = password;
                         user.save();
                         res.sendStatus(200);
                         // TODO redirect to frontend home page
