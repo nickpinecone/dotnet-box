@@ -1,9 +1,19 @@
 import mongoose, { Schema } from "mongoose";
 
+const AchievementTypes = ["project", "certificate"];
+
 const AchievementSchema = new Schema({
+    type: String,
+    title: String,
     photo: String,
-    description: String,
+    shortDescription: String,
+    fullDescription: String,
     url: String,
+
+    members: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "user"
+    }],
 
     updatedAt: {
         type: Date,
@@ -14,6 +24,19 @@ const AchievementSchema = new Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "portfolio"
     },
+});
+
+AchievementSchema.pre("save", function (next) {
+    // @ts-expect-error somehow mongoose formats the date number
+    this.updatedAt = Date.now();
+
+    if (
+        this.type &&
+        this.isModified("type") &&
+        !AchievementTypes.includes(this.type)
+    ) return next(new Error("wrong achievement type"));
+
+    return next();
 });
 
 const Achievement = mongoose.model("achievement", AchievementSchema);

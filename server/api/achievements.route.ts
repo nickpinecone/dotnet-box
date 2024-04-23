@@ -8,39 +8,60 @@ import Achievement from "../models/achievement.model";
 import User from "../models/user.model";
 import auth from "../middlewares/auth.middleware";
 import validation from "../middlewares/validate.middleware";
+import { body } from "express-validator";
 
 const router = express.Router();
 const upload = multer({ dest: path.resolve(__dirname, "..", "public/photos/") });
 
-router.route("/me/achievement").post(auth.verifyToken, async (req, res) => {
-    try {
-        const userId = res.locals.userId;
+router.route("/me/achievement").post(
+    auth.verifyToken,
+    upload.single("photo"),
+    body("type").default(""),
+    body("title").default(""),
+    body("shortDescription").default(""),
+    body("fullDescription").default(""),
+    async (req, res) => {
+        try {
+            const userId = res.locals.userId;
 
-        const user = await User.findOne({ _id: userId });
-        if (!user) throw new Error("could not find user: " + userId);
+            const user = await User.findOne({ _id: userId });
+            if (!user) throw new Error("could not find user: " + userId);
 
-        const portfolio = await Portfolio.findOne({ _id: user.portfolio?.toString() }).populate("owner achievements");
-        if (!portfolio) throw new Error("user doesnt have portfolio");
+            const portfolio = await Portfolio.findOne({ _id: user.portfolio?.toString() }).populate("owner achievements");
+            if (!portfolio) throw new Error("user doesnt have portfolio");
 
-        const achievement = await Achievement.create({});
+            const type = req.body.type;
+            const title = req.body.title;
+            const shortDescription = req.body.shortDescription;
+            const fullDescription = req.body.fullDescription;
 
-        achievement.portfolio = portfolio._id;
-        portfolio.achievements.push(achievement._id);
+            const achievement = await Achievement.create({ type, title, shortDescription, fullDescription });
 
-        await achievement.save();
-        await portfolio.save();
+            if (req.file) {
+                achievement.photo = req.file.filename;
+            }
 
-        res.send(achievement);
-    }
-    catch (err) {
-        console.error(err);
-        res.status(500).send("could not create achievement in user portfolio: " + err);
-    }
-});
+            achievement.portfolio = portfolio._id;
+            portfolio.achievements.push(achievement._id);
+
+            await achievement.save();
+            await portfolio.save();
+
+            res.send(achievement);
+        }
+        catch (err) {
+            console.error(err);
+            res.status(500).send("could not create achievement in user portfolio: " + err);
+        }
+    });
 
 router.route("/me/achievement/:achievementId").put(
     auth.verifyToken,
     upload.single("photo"),
+    body("title").default(""),
+    body("shortDescription").default(""),
+    body("fullDescription").default(""),
+    body("url").default(""),
     validation.validateForm,
     async (req, res) => {
         try {
@@ -56,7 +77,11 @@ router.route("/me/achievement/:achievementId").put(
                 fs.unlink(photoName, (err) => { if (err) console.error(err); });
             }
 
-            achievement.description = req.body.description;
+            achievement.title = req.body.title;
+            achievement.shortDescription = req.body.shortDescription;
+            achievement.fullDescription = req.body.fullDescription;
+            achievement.url = req.body.url;
+
             if (req.file)
                 achievement.photo = req.file.filename;
 
