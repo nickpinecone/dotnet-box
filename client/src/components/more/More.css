@@ -1,0 +1,30 @@
+.more {
+  display: flex;
+  margin-bottom: 242px;
+}
+
+.more-button {
+  font-size: 20px;
+  display: flex;
+  margin: 0 auto;
+  padding: 17.5px 76px;
+  border-radius: 100px;
+  font-weight: 700;
+  font-size: 26px;
+  text-align: center;
+  color: #FFFFFF;
+  background-color: #2196f3;
+  border: none;
+  cursor: pointer;
+  transition: all 500ms ease;
+}
+
+.more-button:hover {
+  background-color: #0661A9;
+  color: #FFFFFF;
+}
+
+.more-button:active {
+  background-color: #11293D;
+  color: #FFFFFF;
+}

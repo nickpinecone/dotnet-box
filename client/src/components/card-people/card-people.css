@@ -12,6 +12,10 @@ a {
     font-weight: 700;
   }
   
+  .main {
+    margin-bottom: 30px;
+  }
+  
   .profile-container {
     margin: 0 auto;
     width: 1160px;

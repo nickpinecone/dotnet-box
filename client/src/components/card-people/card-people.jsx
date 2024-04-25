@@ -4,21 +4,7 @@ import { useEffect, useState } from 'react';
 import axios from 'axios'
 import { Link } from 'react-router-dom';
 
-function CardPeople() {
-
-    const [dataPeople, setDataPeple] = useState(null)
-
-    const handleGetData = async () => {
-        const {data} = await axios.get('http://localhost:4000/api/users/me',{
-            headers: { 'x-access-token' : localStorage.getItem('token')},
-          })
-        setDataPeple(data)
-    }
-
-    useEffect(() => {
-        handleGetData()
-    }, [])
-
+function CardPeople({dataPeople}) {
     
     if (!dataPeople){
         return <>loading...</>

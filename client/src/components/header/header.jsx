@@ -15,7 +15,7 @@ function Header() {
         </li>
 
         <li class="site-navigation-item">
-            <Link class="nav-link">Поиск</Link>
+            <Link to='/find' class="nav-link">Поиск</Link>
         </li>
 
         <li class="site-navigation-item">
