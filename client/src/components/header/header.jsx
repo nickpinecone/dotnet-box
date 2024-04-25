@@ -19,7 +19,7 @@ function Header() {
         </li>
 
         <li class="site-navigation-item">
-            <Link class="nav-link">Настройки профиля</Link>
+            <Link to="/setting" class="nav-link">Настройки профиля</Link>
         </li>
       </nav>
     </div>

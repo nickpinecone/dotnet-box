@@ -49,6 +49,12 @@ function Add() {
       <p className='achiv-header-text'>Полное описание</p>
       <textarea value={allDescr} onChange={(e)=>{setAllDescr(e.target.value)}} className='achiv-input achiv-full-description'></textarea>
 
+      <p className='achiv-header-text'>Ссылка на достижение</p>
+      <textarea className='achiv-input achiv-input-name'></textarea>
+      
+      <p className='achiv-header-text'>Участники</p>
+      <textarea className='achiv-input achiv-input-name'></textarea>
+
       <div className='centered-buttons'>
         <div className='button-sized button-corrected'>
           <p className="add-photo-text">Добавить фото</p>

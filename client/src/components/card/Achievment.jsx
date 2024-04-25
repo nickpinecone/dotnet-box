@@ -16,10 +16,8 @@ function Achievment({data}) {
   const [photo, setPhoto] = useState()
 
   const getPhoto = async() => {
-    const img = await axios.get(`http://localhost:4000/api/photos/${data.photo}`)
-    console.log(img)
-    let file  = new File(img.data ,{ type :"image/jpg"})
-    let url = URL.createObjectURL(file)
+    const img = await axios.get(`http://localhost:4000/api/photos/${data.photo}`, {responseType: "blob"})
+    let url = URL.createObjectURL(img.data)
     setPhoto(url)
   }
 
