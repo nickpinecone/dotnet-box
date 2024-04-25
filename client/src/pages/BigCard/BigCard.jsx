@@ -24,13 +24,7 @@ function BigCard({port, id}) {
 
   const handleGetData = async () => {
     const {data} = await axios.get(`http://localhost:4000/api/portfolios/${idPortfolio}`)
-    data.projects.forEach(element => {
-      if(element._id === idAchieve){
-        setAchieve(element)
-      }
-    });
-
-    data.certificates.forEach(element => {
+    data.achievements.forEach(element => {
       if(element._id === idAchieve){
         setAchieve(element)
       }

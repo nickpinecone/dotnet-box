@@ -14,13 +14,10 @@ function Main({data}) {
               <div className="achiv-top-main-info flex">
                 <img className="image-achiv" src={achievment} alt="achiv" />
                 <div className="achiv-top-main-info-text">
-                  <h2 className="achiv-title">{data.description}</h2>
+                  <h2 className="achiv-title">{data.title}</h2>
                   <p className="achiv-descr-title">Описание</p>
                   <p className="achiv-descr-text">
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur
-                    quis  massa nunc. Suspendisse porta metus sed sem aliquam,
-                    vitae rutrum turpis  maximus. Sed fermentum quis erat rhoncus
-                    rhoncus. Suspendisse dui.
+                    {data.shortDescription}
                   </p>
                   <button className="btn btn-like" type="button">Понравилось</button>
                 </div>
@@ -30,9 +27,7 @@ function Main({data}) {
                   <li className="achiv-top-add-info-item">
                     <p className="achiv-descr-title">Подробное описание</p>
                     <p className="achiv-descr-text">
-                      Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur quis  massa nunc. Suspendisse porta
-                      metus sed sem aliquam, vitae rutrum turpis  maximus. Sed fermentum quis erat rhoncus rhoncus.
-                      Suspendisse dui.
+                      {data.fullDescription}
                     </p>
                   </li>
                   <li className="achiv-top-add-info-item">

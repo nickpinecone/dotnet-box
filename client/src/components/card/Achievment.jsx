@@ -7,7 +7,10 @@ import { useEffect, useState } from 'react';
 function Achievment({data}) {
 
   useEffect(() =>{
-    getPhoto()
+    if (data.photo != undefined){
+      getPhoto()
+    }
+   
   }, [])
 
   const [photo, setPhoto] = useState()
