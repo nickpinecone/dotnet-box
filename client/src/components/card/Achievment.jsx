@@ -1,17 +1,34 @@
 import './Achievment.css';
 import image from "./../../img/achievment.png";
 import { NavLink } from 'react-router-dom';
+import axios from 'axios';
+import { useEffect, useState } from 'react';
 
 function Achievment({data}) {
+
+  useEffect(() =>{
+    getPhoto()
+  }, [])
+
+  const [photo, setPhoto] = useState()
+
+  const getPhoto = async() => {
+    const img = await axios.get(`http://localhost:4000/api/photos/${data.photo}`)
+    console.log(img)
+    let file  = new File(img.data ,{ type :"image/jpg"})
+    let url = URL.createObjectURL(file)
+    setPhoto(url)
+  }
+
   return (
     <main>
       <section className="achievment-container">
-        <img className="achievment-image" src={image} alt="Achievment image" />
+        <img className="achievment-image" src={photo} alt="Achievment image" />
         <section className="achievment-words">
-          <h2 className="achievment-name">{data.description}</h2>
-          <h3 className="achievment-description">{data.url}</h3>
+          <h2 className="achievment-name">{data.title}</h2>
+          <h3 className="achievment-description">{data.shortDescription}</h3>
           <p className="achievment-text">
-            {data.url}
+            {data.fullDescription}
           </p>
           <NavLink className="details" to={`/${data.portfolio}/${data._id}`}>Подробнее</NavLink>
         </section>

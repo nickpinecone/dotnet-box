@@ -15,61 +15,92 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const portfolio_model_1 = __importDefault(require("../models/portfolio.model"));
 const auth_middleware_1 = __importDefault(require("../middlewares/auth.middleware"));
-const projects_route_1 = __importDefault(require("./projects.route"));
-const certificates_route_1 = __importDefault(require("./certificates.route"));
+const achievements_route_1 = __importDefault(require("./achievements.route"));
 const multer_1 = __importDefault(require("multer"));
 const user_model_1 = __importDefault(require("../models/user.model"));
+const validate_middleware_1 = __importDefault(require("../middlewares/validate.middleware"));
+const express_validator_1 = require("express-validator");
+const achievement_model_1 = __importDefault(require("../models/achievement.model"));
 const router = express_1.default.Router();
 const upload = (0, multer_1.default)();
-router.route("/").get((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const portfolios = yield portfolio_model_1.default.find({}).sort({ createdAt: -1 }).populate("owner projects certificates");
-    res.send(portfolios);
+router.route("/").get((0, express_validator_1.query)("search").optional().escape(), validate_middleware_1.default.validateForm, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        if (req.query.search) {
+            const searchList = [];
+            const searchKey = new RegExp(`${req.query.search}`, 'i');
+            const searchSettings = { "description": searchKey };
+            const portfolios = yield portfolio_model_1.default.find(searchSettings).sort({ createdAt: -1 }).populate("owner achievements");
+            for (let i = 0; i < portfolios.length; i++) {
+                const portfolio = portfolios[i];
+                searchList.push(portfolio);
+            }
+            const achievements = yield achievement_model_1.default.find(searchSettings).sort({ createdAt: -1 });
+            for (let i = 0; i < achievements.length; i++) {
+                const achievement = achievements[i];
+                const portfolio = yield portfolio_model_1.default.findById(achievement.portfolio).populate("owner achievements");
+                if (portfolio && searchList.every((item) => item._id.toString() !== portfolio._id.toString()))
+                    searchList.push(portfolio);
+            }
+            res.send([...searchList]);
+        }
+        else {
+            const portfolios = yield portfolio_model_1.default.find({}).sort({ createdAt: -1 }).populate("owner achievements");
+            res.send(portfolios);
+        }
+    }
+    catch (err) {
+        console.error(err);
+        res.status(500).send("could not get portfolios: " + err);
+    }
 }));
 router.route("/me").get(auth_middleware_1.default.verifyToken, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     try {
         const userId = res.locals.userId;
         const user = yield user_model_1.default.findOne({ _id: userId });
-        const portfolio = yield portfolio_model_1.default.findOne({ _id: (_a = user === null || user === void 0 ? void 0 : user.portfolio) === null || _a === void 0 ? void 0 : _a.toString() }).populate("owner projects certificates");
-        if (portfolio == null)
-            throw new Error();
+        if (!user)
+            throw new Error("could not find user: " + userId);
+        const portfolio = yield portfolio_model_1.default.findOne({ _id: (_a = user.portfolio) === null || _a === void 0 ? void 0 : _a.toString() }).populate("owner achievements");
+        if (!portfolio)
+            throw new Error("user doesnt have portfolio");
         res.send(portfolio);
     }
     catch (err) {
         console.error(err);
-        res.status(500).send("could not get user portfolio");
+        res.status(500).send("could not get user portfolio: " + err);
     }
 }));
-router.route("/me").put(auth_middleware_1.default.verifyToken, upload.none(), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.route("/me").put(auth_middleware_1.default.verifyToken, upload.none(), validate_middleware_1.default.validateForm, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _b;
     try {
         const description = req.body.description;
         const userId = res.locals.userId;
         const user = yield user_model_1.default.findOne({ _id: userId });
-        const portfolio = yield portfolio_model_1.default.findOne({ _id: (_b = user === null || user === void 0 ? void 0 : user.portfolio) === null || _b === void 0 ? void 0 : _b.toString() });
-        if (portfolio == null)
-            throw new Error();
+        if (!user)
+            throw new Error("could not find user: " + userId);
+        const portfolio = yield portfolio_model_1.default.findOne({ _id: (_b = user.portfolio) === null || _b === void 0 ? void 0 : _b.toString() }).populate("owner achievements");
+        if (!portfolio)
+            throw new Error("user doesnt have portfolio");
         portfolio.description = description;
         portfolio.save();
         res.sendStatus(200);
     }
     catch (err) {
         console.error(err);
-        res.status(500).send("could not update user portfolio");
+        res.status(500).send("could not update user portfolio: " + err);
     }
 }));
 router.route("/:id").get((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const portfolio = yield portfolio_model_1.default.findOne({ _id: req.params.id }).populate("owner projects certificates");
-        if (portfolio == null)
-            throw new Error();
+        const portfolio = yield portfolio_model_1.default.findOne({ _id: req.params.id }).populate("owner achievements");
+        if (!portfolio)
+            throw new Error("could not find portfolio with id: " + req.params.id);
         res.send(portfolio);
     }
     catch (err) {
         console.error(err);
-        res.status(500).send("could not find portfolio with id: " + req.params.id);
+        res.status(500).send("could not find portfolio: " + err);
     }
 }));
-router.use("/", projects_route_1.default);
-router.use("/", certificates_route_1.default);
+router.use("/", achievements_route_1.default);
 exports.default = router;

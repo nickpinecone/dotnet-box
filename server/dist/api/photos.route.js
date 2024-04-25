@@ -15,22 +15,20 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const path_1 = __importDefault(require("path"));
 const fs_1 = __importDefault(require("fs"));
-const certificate_model_1 = __importDefault(require("../models/certificate.model"));
 const router = express_1.default.Router();
-// Get certificate photo
-router.route("/certificate/:certificateId").get((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+// Separate name with backslashes
+// Certificates are in certificates/
+// Projects are in projects/
+router.route("/:name").get((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const certificate = yield certificate_model_1.default.findOne({ _id: req.params.certificateId });
-        if (!certificate)
-            throw new Error();
-        const photoName = path_1.default.resolve(__dirname, "..", "public/certificates/" + (certificate === null || certificate === void 0 ? void 0 : certificate.photo));
+        const photoName = path_1.default.resolve(__dirname, "..", "public/photos/" + req.params.name);
         const readStream = fs_1.default.createReadStream(photoName);
         res.status(200);
         readStream.pipe(res);
     }
     catch (err) {
         console.error(err);
-        res.status(500).send("could not get photo for certificate with id: " + req.params.certificateId);
+        res.status(500).send("could not get photo with name: " + req.params.name);
     }
 }));
 exports.default = router;

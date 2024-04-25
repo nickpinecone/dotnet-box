@@ -24,21 +24,35 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = __importStar(require("mongoose"));
-const PortfolioSchema = new mongoose_1.Schema({
-    owner: {
-        type: mongoose_1.default.Schema.Types.ObjectId,
-        ref: "user"
-    },
-    description: String,
+const AchievementTypes = ["project", "certificate"];
+const AchievementSchema = new mongoose_1.Schema({
+    type: String,
+    title: String,
+    photo: String,
+    shortDescription: String,
+    fullDescription: String,
+    url: String,
+    members: [{
+            type: mongoose_1.default.Schema.Types.ObjectId,
+            ref: "user"
+        }],
     updatedAt: {
         type: Date,
         default: Date.now(),
     },
-    achievements: [{
-            type: mongoose_1.default.Schema.Types.ObjectId,
-            ref: "achievement"
-        }],
+    portfolio: {
+        type: mongoose_1.default.Schema.Types.ObjectId,
+        ref: "portfolio"
+    },
 });
-PortfolioSchema.index({ description: 'text' });
-const Portfolio = mongoose_1.default.model("portfolio", PortfolioSchema);
-exports.default = Portfolio;
+AchievementSchema.pre("save", function (next) {
+    // @ts-expect-error somehow mongoose formats the date number
+    this.updatedAt = Date.now();
+    if (this.type &&
+        this.isModified("type") &&
+        !AchievementTypes.includes(this.type))
+        return next(new Error("wrong achievement type"));
+    return next();
+});
+const Achievement = mongoose_1.default.model("achievement", AchievementSchema);
+exports.default = Achievement;

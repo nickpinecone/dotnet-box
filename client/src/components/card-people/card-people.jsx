@@ -15,7 +15,7 @@ function CardPeople({dataPeople}) {
             <img class="profile-image" src={profile} alt="ProfileImage" />
 
             <div class="profile">
-                <h2 class="name">{dataPeople.username}</h2>
+                <h2 class="name">{dataPeople.name} {dataPeople.surname}</h2>
 
                 <a class="login">{dataPeople._id}</a>
 

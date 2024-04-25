@@ -32,7 +32,7 @@ function MyPortfolio() {
             headers: { 'x-access-token' : localStorage.getItem('token')},
           })
         setDataPeple(data)
-        setDataProjects(data.portfolio.projects)
+        setDataProjects(data.portfolio.achievements)
     }
 
     return (

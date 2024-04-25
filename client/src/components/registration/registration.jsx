@@ -14,6 +14,7 @@ function Registration() {
   const onLogin = async () => {
     if(isValidEmail(login) && isValidPassword(password)){
       try{
+        console.log(name, password, login)
         const {user} = await axios.post('http://localhost:4000/api/users/register',{
           username: name,
           password: password,
