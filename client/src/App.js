@@ -1,34 +1,32 @@
 import './App.css';
-import { useEffect, useState } from "react";
-import Entrance from './pages/Enterance/Enterance'
-import Registration from './pages/Registration/Registration';
-import MyPortfolio from './pages/MyPortfolio/MyPortfolio'
-import AddAchiv from './pages/AddAchiv/AddAchiv'
-import BigCard from './pages/BigCard/BigCard';
-import Find from './pages/Find/Find'
-import Setting from './pages/Setting/Setting';
+import LoginPage from './pages/LoginPage'
+import RegistrationPage from './pages/RegistrationPage';
+import Portfolio from './pages/Portfolio'
+import AddPage from './pages/AddPage'
+import BigCardPage from './pages/BigCardPage';
+import Search from './pages/SearchPage'
+import Settings from './pages/SettingsPage';
 
 import {
   BrowserRouter as Router,
   Routes,
   Route,
-  Link,
 } from 'react-router-dom';
+import SubscriptionsPage from './pages/SubscriptionsPage';
 
 
 function App() {
-  let port;
-  let id;
   return (
     <Router>
       <Routes>
-        <Route path="/login" element={<Entrance/>}/>
-        <Route path="/registration" element={<Registration/>}/>
-        <Route path="/" element={<MyPortfolio/>}/>
-        <Route path="/add" element={<AddAchiv/>}/>
-        <Route path="/find" element={<Find/>}/>
-        <Route path="/setting" element={<Setting/>}/>
-        <Route path="/:idPortfolio/:idAchieve" element={<BigCard />}/>
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/registration" element={<RegistrationPage />} />
+        <Route path="/" element={<Portfolio />} />
+        <Route path="/add" element={<AddPage />} />
+        <Route path="/search" element={<Search />} />
+        <Route path="/settings" element={<Settings />} />
+        <Route path="/:idPortfolio/:idAchieve" element={<BigCardPage />} />
+        <Route path='subscriptions' element={<SubscriptionsPage />} />
       </Routes>
     </Router>
   );

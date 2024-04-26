@@ -1,29 +1,32 @@
-import './header.css';
-import logo from "../../img/logo.svg";
-import { Link } from 'react-router-dom';
+import m from './header.module.css';
+import logo from "./../../img/logo.svg"
+import { NavLink } from 'react-router-dom';
 
 function Header() {
   return (
-    <header class="header">
-    <div class="header-container flex">
-      <Link to='/login' class="logo-link">
-        <img class="image-logo" src={logo} alt="Logo" />
-      </Link>
-      <nav class="list-reset header-nav flex">
-        <li class="site-navigation-item">
-            <Link to='/' class="nav-link" >Главная</Link>
-        </li>
-
-        <li class="site-navigation-item">
-            <Link to='/find' class="nav-link">Поиск</Link>
-        </li>
-
-        <li class="site-navigation-item">
-            <Link to="/setting" class="nav-link">Настройки профиля</Link>
-        </li>
-      </nav>
-    </div>
-  </header>
+    <header className={m.header}>
+      <section className={m.header_container}>
+        <NavLink className={m.logo_link} to="/login">
+          <img className={m.logo} src={logo} alt="Logo" />
+        </NavLink>
+        <nav className={m.header_nav}>
+          <ul className={m.site_navigation}>
+            <li className={m.site_navigation_item}>
+              <NavLink className={m.nav_link} to="/">Главная</NavLink>
+            </li>
+            <li className={m.site_navigation_item}>
+              <NavLink className={m.nav_link} to="/search">Поиск</NavLink>
+            </li>
+            <li className={m.site_navigation_item}>
+              <NavLink className={m.nav_link} to="/settings">Настройки профиля</NavLink>
+            </li>
+            <li className={m.site_navigation_item}>
+              <NavLink className={m.nav_link} to="/subscriptions">Подписки</NavLink>
+            </li>
+          </ul>
+        </nav>
+      </section>
+    </header>
   );
 }
 

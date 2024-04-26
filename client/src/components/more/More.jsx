@@ -1,9 +1,9 @@
-import './More.css';
+import m from './more.module.css';
 
 function More() {
   return (
-    <div className="more">
-      <button className="more-button">Показать ещё</button>
+    <div className={m.more}>
+      <button className={m.more_button}>Показать ещё</button>
     </div>
   );
 }

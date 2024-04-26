@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import './registration.css'
+import m from './registration.module.css'
 import axios from 'axios'
 import { useNavigate } from 'react-router-dom';
 
@@ -12,25 +12,25 @@ function Registration() {
   const [password, setPassowrd] = useState('')
 
   const onLogin = async () => {
-    if(isValidEmail(login) && isValidPassword(password)){
-      try{
+    if (isValidEmail(login) && isValidPassword(password)) {
+      try {
         console.log(name, password, login)
-        const {user} = await axios.post('http://localhost:4000/api/users/register',{
+        const { user } = await axios.post('http://localhost:4000/api/users/register', {
           username: name,
           password: password,
           email: login
         })
 
-        const {data} = await axios.post('http://localhost:4000/api/users/login',{
+        const { data } = await axios.post('http://localhost:4000/api/users/login', {
           email: login,
           password: password
         })
         localStorage.setItem("token", data.accessToken)
         navigate('/')
-      } catch (error){
+      } catch (error) {
         console.log(error)
       }
-    } 
+    }
   }
 
   function isValidEmail(email) {
@@ -43,42 +43,28 @@ function Registration() {
 
 
   return (
-    <div class="container enter-container flex">
-          <form class="container-login flex">
-            <h2 class="login-title">
-              Авторизация
-            </h2>
-
-            <ul class=" list-reset list-inputs">
-              <li class="inputs-item flex">
-                <p class="inputs-item-text">
-                  ФИО
-                </p>
-                <input name='name' value={name} onChange={(e)=>{setName(e.target.value)}} class="inputs-item-input" type="text" />
-              </li>
-
-              <li class="inputs-item flex">
-                <p class="inputs-item-text">
-                  Почта
-                </p>
-                <input value={login} onChange={(e)=>{setLogin(e.target.value)}} class="inputs-item-input" type="email" />
-              </li>
-
-              <li class="inputs-item flex">
-                <p class="inputs-item-text">
-                  Пароль
-                </p>
-                <input value={password} onChange={(e)=>{setPassowrd(e.target.value)}} class="inputs-item-input" type="password" minlength="8" maxLength='16'/>
-              </li>
-            </ul>
-
-            <div class="container-button-enter">
-              <button onClick={()=>{onLogin()}} class="bth-enter" type="button">
-                Войти
-              </button>
-            </div>
-          </form>
+    <div className={m.enter_container}>
+      <form className={m.container_login}>
+        <h2 className={m.login_title}>Регистрация</h2>
+        <ul className={m.inputs}>
+          <li className={m.inputs_item}>
+            <p className={m.inputs_item_text}>ФИО</p>
+            <input className={m.inputs_item_input} value={name} onChange={(e) => { setName(e.target.value) }} type="text" />
+          </li>
+          <li className={m.inputs_item}>
+            <p className={m.inputs_item_text}>Почта</p>
+            <input className={m.inputs_item_input} value={login} onChange={(e) => { setLogin(e.target.value) }} type="text" />
+          </li>
+          <li className={m.inputs_item}>
+            <p className={m.inputs_item_text}>Пароль</p>
+            <input className={m.inputs_item_input} value={password} onChange={(e) => { setPassowrd(e.target.value) }} type="text" />
+          </li>
+        </ul>
+        <div className={m.container_button_enter}>
+          <button class={m.bth_enter} onClick={() => { onLogin() }} type="button">Войти</button>
         </div>
+      </form>
+    </div>
   );
 }
 
