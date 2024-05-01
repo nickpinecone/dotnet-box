@@ -9,9 +9,24 @@ import User from "../models/user.model";
 import auth from "../middlewares/auth.middleware";
 import validation from "../middlewares/validate.middleware";
 import { body, query } from "express-validator";
+import comments from "./comments.route";
 
 const router = express.Router();
 const upload = multer({ dest: path.resolve(__dirname, "..", "public/photos/") });
+
+router.route("/achievement/:achievementId").get(async (req, res) => {
+    try {
+        const achievement = await Achievement.findOne({ _id: req.params.achievementId })
+            .populate("members").populate({ path: "comments", populate: "author" }).populate("portfolio");
+        if (!achievement) throw new Error("no achievement with id: " + req.params.achievementId);
+
+        res.send(achievement);
+    }
+    catch (err) {
+        console.error(err);
+        res.status(500).send("could not find achievement: " + err);
+    }
+});
 
 router.route("/me/achievement").post(
     auth.verifyToken,
@@ -58,7 +73,7 @@ router.route("/me/achievement").post(
             await achievement.save();
             await portfolio.save();
 
-            res.send(achievement);
+            res.sendStatus(200);
         }
         catch (err) {
             console.error(err);
@@ -106,7 +121,7 @@ router.route("/me/achievement/:achievementId").put(
             if (req.file)
                 achievement.photo = req.file.filename;
 
-            achievement.save();
+            await achievement.save();
 
             res.sendStatus(200);
         }
@@ -147,5 +162,7 @@ router.route("/me/achievement/:achievementId").delete(auth.verifyToken, async (r
         res.status(500).send("could not delete achievement: " + err);
     }
 });
+
+router.use("/", comments);
 
 export default router;

@@ -20,10 +20,20 @@ const AchievementSchema = new Schema({
         default: Date.now(),
     },
 
+    createdAt: {
+        type: Date,
+        default: Date.now(),
+    },
+
     portfolio: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "portfolio"
     },
+
+    comments: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "comment"
+    }],
 });
 
 AchievementSchema.pre("save", function (next) {

@@ -13,6 +13,11 @@ const PortfolioSchema = new Schema({
         default: Date.now(),
     },
 
+    createdAt: {
+        type: Date,
+        default: Date.now(),
+    },
+
     achievements: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: "achievement"

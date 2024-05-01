@@ -35,7 +35,7 @@ router.route("/").get(
                 };
 
                 const portfolios = await Portfolio.find(searchSettings).sort({ createdAt: -1 }).limit(limit)
-                    .populate("owner").populate({ path: "achievements", populate: { path: "members" } });
+                    .populate("owner").populate({ path: "achievements" });
                 for (let i = 0; i < portfolios.length; i++) {
                     const portfolio = portfolios[i];
                     searchList.push(portfolio);
@@ -45,7 +45,7 @@ router.route("/").get(
                 for (let i = 0; i < achievements.length; i++) {
                     const achievement = achievements[i];
                     const portfolio = await Portfolio.findById(achievement.portfolio)
-                        .populate("owner").populate({ path: "achievements", populate: { path: "members" } });
+                        .populate("owner").populate({ path: "achievements" });
                     if (portfolio && searchList.every((item) => item._id.toString() !== portfolio._id.toString()))
                         searchList.push(portfolio);
                 }
@@ -54,7 +54,7 @@ router.route("/").get(
             }
             else {
                 const portfolios = await Portfolio.find({}).sort({ createdAt: -1 }).limit(limit)
-                    .populate("owner").populate({ path: "achievements", populate: { path: "members" } });
+                    .populate("owner").populate({ path: "achievements" });
                 res.send(portfolios);
             }
         }
@@ -73,7 +73,7 @@ router.route("/me").get(auth.verifyToken, async (req, res) => {
         if (!user) throw new Error("could not find user: " + userId);
 
         const portfolio = await Portfolio.findOne({ _id: user.portfolio?.toString() })
-            .populate("owner").populate({ path: "achievements", populate: { path: "members" } });
+            .populate("owner").populate({ path: "achievements" });
         if (!portfolio) throw new Error("user doesnt have portfolio");
 
         res.send(portfolio);
@@ -113,7 +113,7 @@ router.route("/me").put(
 router.route("/:id").get(async (req, res) => {
     try {
         const portfolio = await Portfolio.findOne({ _id: req.params.id })
-            .populate("owner").populate({ path: "achievements", populate: { path: "members" } });
+            .populate("owner").populate({ path: "achievements" });
 
         if (!portfolio) throw new Error("could not find portfolio with id: " + req.params.id);
 

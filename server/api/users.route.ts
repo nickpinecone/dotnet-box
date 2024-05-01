@@ -74,8 +74,8 @@ router.route("/register").post(
             portfolio.owner = user._id;
             user.portfolio = portfolio._id;
 
-            portfolio.save();
-            user.save();
+            await portfolio.save();
+            await user.save();
 
             res.sendStatus(200);
         }
@@ -182,7 +182,7 @@ router.route("/me").put(
 
             user.bio = bio;
 
-            user.save();
+            await user.save();
 
             res.sendStatus(200);
         }
@@ -378,7 +378,7 @@ router.route("/me/subscribe/:subId").put(auth.verifyToken, async (req, res) => {
         if (!subUser) throw new Error("could not find target user: " + req.params.subId);
 
         user.subscriptions.push(subUser._id);
-        user.save();
+        await user.save();
 
         res.sendStatus(200);
     }
