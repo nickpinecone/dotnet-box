@@ -87,6 +87,8 @@ router.route("/comment/:commentId").delete(
 
             achievement.comments = achievement.comments.filter((el) => el._id.toString() != comment._id.toString());
 
+            await achievement.save();
+
             res.sendStatus(200);
         }
         catch (err) {
