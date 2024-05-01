@@ -85,7 +85,7 @@ router.route("/me/achievement/:achievementId").put(
             if (!achievement) throw new Error("could not find achievement: " + req.params.achievementId);
 
             if (achievement.photo) {
-                const photoName = path.resolve(__dirname, "..", "public/photos/" + achievement?.photo);
+                const photoName = path.resolve(__dirname, "..", "public/photos/" + achievement.photo);
                 fs.unlink(photoName, (err) => { if (err) console.error(err); });
             }
 

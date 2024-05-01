@@ -15,22 +15,33 @@ const upload = multer();
 
 router.route("/").get(
     query("search").optional().escape(),
-    validation.validateForm, async (req, res) => {
+    query("limit").default("10").escape(),
+    validation.validateForm,
+    async (req, res) => {
         try {
+            const limit = Number(req.query.limit as string);
+
             if (req.query.search) {
                 const searchList = [];
 
                 const searchKey = new RegExp(`${req.query.search}`, 'i');
-                const searchSettings = { "description": searchKey };
+                const searchSettings = {
+                    $or: [
+                        { "title": searchKey },
+                        { "shortDescription": searchKey },
+                        { "fullDescription": searchKey },
+                        { "url": searchKey },
+                    ]
+                };
 
-                const portfolios = await Portfolio.find(searchSettings).sort({ createdAt: -1 })
+                const portfolios = await Portfolio.find(searchSettings).sort({ createdAt: -1 }).limit(limit)
                     .populate("owner").populate({ path: "achievements", populate: { path: "members" } });
                 for (let i = 0; i < portfolios.length; i++) {
                     const portfolio = portfolios[i];
                     searchList.push(portfolio);
                 }
 
-                const achievements = await Achievement.find(searchSettings).sort({ createdAt: -1 });
+                const achievements = await Achievement.find(searchSettings).sort({ createdAt: -1 }).limit(limit);
                 for (let i = 0; i < achievements.length; i++) {
                     const achievement = achievements[i];
                     const portfolio = await Portfolio.findById(achievement.portfolio)
@@ -42,7 +53,7 @@ router.route("/").get(
                 res.send([...searchList]);
             }
             else {
-                const portfolios = await Portfolio.find({}).sort({ createdAt: -1 })
+                const portfolios = await Portfolio.find({}).sort({ createdAt: -1 }).limit(limit)
                     .populate("owner").populate({ path: "achievements", populate: { path: "members" } });
                 res.send(portfolios);
             }
