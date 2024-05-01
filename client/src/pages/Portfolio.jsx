@@ -3,7 +3,8 @@ import Header from '../components/header/header';
 import UserCard from '../components/user-card/user-card';
 import AddHeader from '../components/add-header/add-achievment'
 import Card from '../components/card/card'
-import More from '../components/more/more'
+import More from "../components/more/More"
+
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 

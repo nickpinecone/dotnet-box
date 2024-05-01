@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import Header from '../components/header/header';
-import BigCard from '../components/big-card/big-card'
+// import BigCard from '../components/big-card/big-card'
+import BigCard from "../components/big-card/Big-card";
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 

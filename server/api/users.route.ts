@@ -147,6 +147,26 @@ router.route("/me").get(auth.verifyToken, async (req, res) => {
     }
 });
 
+router.route("/byEmail").get(
+    body("email").notEmpty().isEmail(),
+    validation.validateForm,
+    async (req, res) => {
+        try {
+            const email = req.body.email;
+
+            const user = await User.findOne({ email: email });
+
+            if (!user) throw new Error("no user with email: " + email);
+
+            res.status(200).send(user);
+        }
+        catch (err) {
+            console.error(err);
+            res.status(500).send("could not find user: " + err);
+        }
+    }
+);
+
 router.route("/me").put(
     auth.verifyToken,
     upload.none(),
@@ -170,7 +190,8 @@ router.route("/me").put(
             console.error(err);
             res.status(500).send("could not update user profile: " + err);
         }
-    });
+    }
+);
 
 router.route("/me/verify").put(auth.verifyToken, async (req, res) => {
     try {
@@ -376,7 +397,7 @@ router.route("/:id").get(async (req, res) => {
             }
         });
 
-        if (!user) throw new Error("could not find user: " + req.params.id);
+        if (!user) throw new Error("no user with id: " + req.params.id);
 
         res.status(200).send(user);
     }
@@ -385,5 +406,6 @@ router.route("/:id").get(async (req, res) => {
         res.status(500).send("could not find user: " + err);
     }
 });
+
 
 export default router;
