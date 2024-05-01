@@ -100,7 +100,7 @@ router.route("/me").put(
             if (!portfolio) throw new Error("user doesnt have portfolio");
 
             portfolio.description = description;
-            portfolio.save();
+            await portfolio.save();
 
             res.sendStatus(200);
         }

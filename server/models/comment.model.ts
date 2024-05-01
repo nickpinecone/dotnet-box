@@ -6,6 +6,11 @@ const CommentSchema = new Schema({
         ref: "user"
     },
 
+    achievement: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "achievement"
+    },
+
     content: String,
 
     updatedAt: {
