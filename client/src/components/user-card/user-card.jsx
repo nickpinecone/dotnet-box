@@ -1,5 +1,6 @@
 import m from './user-card.module.css';
 import profile from "./../../img/avatar.png"
+import { Link, NavLink } from 'react-router-dom';
 
 function UserCard({ userData }) {
 
@@ -9,7 +10,8 @@ function UserCard({ userData }) {
   return (
     <main className={m.main}>
       <section className={m.profile_container}>
-        <img className={m.profile_image} src={profile} alt={m.ProfileImage} />
+        <NavLink className={m.back} to='/login'>Назад</NavLink>
+        <img className={m.profile_image} src={profile} alt={profile} />
         <section className={m.profile}>
           <h2 className={m.name}>{userData.name} {userData.surname}</h2>
           <a className={m.login}>{userData._id}</a>
@@ -22,6 +24,10 @@ function UserCard({ userData }) {
             </li>
             <li className={m.contact_list_item}>
               <a className={m.telegram}>@telegram</a>
+            </li>
+            <li className={`${m.contact_list_item} ${m.buttons}`}>
+              <Link className={m.subscribe}>Подписаться</Link>
+              <Link className={m.unsubscribe}>Отписаться</Link>
             </li>
           </ul>
         </section>

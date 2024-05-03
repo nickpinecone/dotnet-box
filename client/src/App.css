@@ -15,6 +15,12 @@ p {
   padding: 0;
 }
 
+input,
+textarea {
+  font-family: "Inter", sans-serif;
+  font-size: 16px;
+}
+
 button {
   padding: 10px 25px;
   border-radius: 100px;

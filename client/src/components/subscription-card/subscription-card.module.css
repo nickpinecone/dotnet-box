@@ -1,0 +1,52 @@
+.card {
+  width: 1240px;
+  min-height: 213px;
+  margin: 0 auto;
+  font-family: "Inter", sans-serif;
+  font-size: 24px;
+  font-weight: 400;
+  margin-bottom: 30px;
+}
+
+.element {
+  background: #EEEEEE;
+  border-radius: 20px;
+  padding: 30px;
+  display: flex;
+}
+
+.picture {
+  width: 153px;
+  height: 153px;
+}
+
+.text {
+  width: 689px;
+  min-height: 94px;
+  margin: auto 20px;
+}
+
+.unsubscribe {
+  margin: auto 0;
+  display: block;
+  text-align: center;
+  width: 146px;
+  height: 29px;
+  padding: 12.5px 76px;
+  border-radius: 100px;
+  color: #FFFFFF;
+  background-color: #2196f3;
+  border: none;
+  cursor: pointer;
+  transition: all 500ms ease;
+}
+
+.unsubscribe:hover {
+  background-color: #0661A9;
+  color: #FFFFFF;
+}
+
+.unsubscribe:active {
+  background-color: #11293D;
+  color: #FFFFFF;
+}

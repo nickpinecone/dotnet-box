@@ -1,4 +1,5 @@
 .profile_container {
+  position: relative;
   margin: 0 auto;
   width: 1160px;
   height: 400px;
@@ -10,13 +11,32 @@
   padding: 40px;
 }
 
-.profile {
-  margin-left: 10px;
+.back {
+  width: 100px;
+  padding-left: 25px;
+  left: 30px;
+  top: 30px;
+  position: absolute;
+  font-weight: 700;
+  font-size: 24px;
+  color: #FFFFFF;
+  background-image: url("./../../img/back.png");
+  background-repeat: no-repeat;
+  background-position: left center;
+}
+
+.back:hover {
+  background-image: url("./../../img/back-alt.png");
+  color: #0661A9;
 }
 
 .profile_image {
   width: 400px;
   height: 400px;
+}
+
+.profile {
+  margin-left: 10px;
 }
 
 .name {
@@ -50,6 +70,27 @@
 
 .telegram {
   text-decoration: none;
+}
+
+.buttons {
+  display: flex;
+}
+
+.subscribe, .unsubscribe {
+  display: block;
+  width: 135px;
+  height: 24px;
+  padding: 10px 25px;
+  background-color: #FFFFFF;
+  color: #2196f3;
+  text-align: center;
+  border-radius: 20px;
+  margin-right: auto;
+  line-height: 24.2px;
+}
+
+.subscribe{
+  margin-right: 30px;
 }
 
 .description {
