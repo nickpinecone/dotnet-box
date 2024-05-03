@@ -13,10 +13,13 @@ function MyPortfolio() {
 
   useEffect(() => {
     try {
-      if (!localStorage.getItem('token')) {
+      if (localStorage.getItem('token')) {
+        handleGetData()
+        
+      }
+      else{
         navigate('/login')
       }
-      handleGetData()
     }
     catch {
       navigate('/login')
@@ -39,8 +42,7 @@ function MyPortfolio() {
       <Header />
       <UserCard userData={userData} />
       <AddHeader />
-      {dataProjects.map(project => <Card data={project} />)}
-      <More />
+      {dataProjects.map(project => <Card data={project} change={true} />)}
     </main>
   );
 }

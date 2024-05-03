@@ -18,10 +18,10 @@ function UserCard({ userData }) {
               <a className={m.email} href={`mailto:${userData.email}`}>{userData.email}</a>
             </li>
             <li className={m.contact_list_item}>
-              <a className={m.phone} href="tel:+79120000000">8 (912) 000 00 00</a>
+              <a className={m.phone} href="tel:+79120000000"></a>
             </li>
             <li className={m.contact_list_item}>
-              <a className={m.telegram}>@telegram</a>
+              <a className={m.telegram}></a>
             </li>
           </ul>
         </section>
@@ -29,9 +29,7 @@ function UserCard({ userData }) {
       <section className={m.description}>
         <h3 className={m.about_me}>О себе</h3>
         <p className={m.text_about_me}>
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur quis
-          massa nunc. Suspendisse porta metus sed sem aliquam, vitae rutrum turpis
-          maximus. Sed fermentum quis erat rhoncus rhoncus. Suspendisse dui.
+          Привет! Я только зарегистрировался
         </p>
       </section>
     </main>

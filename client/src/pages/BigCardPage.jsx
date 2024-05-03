@@ -4,7 +4,7 @@ import BigCard from '../components/big-card/big-card'
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 
-function BigCardPage({ port, id }) {
+function BigCardPage() {
 
   const params = useParams();
   const idPortfolio = params.idPortfolio;
@@ -20,20 +20,32 @@ function BigCardPage({ port, id }) {
 
 
   const [achieve, setAchieve] = useState([]);
+  const [photo, setPhoto] = useState()
 
   const handleGetData = async () => {
     const { data } = await axios.get(`http://localhost:4000/api/portfolios/${idPortfolio}`)
     data.achievements.forEach(element => {
       if (element._id === idAchieve) {
         setAchieve(element)
+        console.log(element)
+        if (element.photo !== undefined) {
+          getPhoto(element)
+        }
       }
     });
+  }
+
+  const getPhoto = async (data) => {
+    console.log(data.photo)
+    const img = await axios.get(`http://localhost:4000/api/photos/${data.photo}`, { responseType: "blob" })
+    let url = URL.createObjectURL(img.data)
+    setPhoto(url)
   }
 
   return (
     <main class="container">
       <Header />
-      <BigCard data={achieve} />
+      <BigCard data={achieve} photo={photo}/>
     </main>
   );
 }

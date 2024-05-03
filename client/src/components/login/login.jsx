@@ -29,10 +29,10 @@ function Login() {
   return (
     <div className={m.enter_container}>
       <form className={m.container_login}>
-        <h2 className={m.login_title}>Авторизация</h2>
+        <h2 className={m.login_title}>Вход</h2>
         <ul className={m.list_inputs}>
           <li className={m.inputs_item}>
-            <p className={m.inputs_item_text}>Почта</p>
+            <p className={m.inputs_item_text}>Email</p>
             <input value={login} onChange={(e) => { setLogin(e.target.value); setError(false) }} className={`${m.inputs_item_input} ${error ? m.inputs_item_input_error : ''} `} type="text" />
           </li>
           <li className={m.inputs_item}>

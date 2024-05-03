@@ -9,7 +9,7 @@ function Registration() {
 
   const [name, setName] = useState('')
   const [login, setLogin] = useState('')
-  const [password, setPassowrd] = useState('')
+  const [password, setPassowrd] = useState([])
 
   const onLogin = async () => {
     if (isValidEmail(login) && isValidPassword(password)) {
@@ -38,7 +38,7 @@ function Registration() {
   }
 
   function isValidPassword(password) {
-    return true;
+    return password.length >= 8;
   }
 
 
@@ -52,12 +52,12 @@ function Registration() {
             <input className={m.inputs_item_input} value={name} onChange={(e) => { setName(e.target.value) }} type="text" />
           </li>
           <li className={m.inputs_item}>
-            <p className={m.inputs_item_text}>Почта</p>
+            <p className={m.inputs_item_text}>Email</p>
             <input className={m.inputs_item_input} value={login} onChange={(e) => { setLogin(e.target.value) }} type="text" />
           </li>
           <li className={m.inputs_item}>
             <p className={m.inputs_item_text}>Пароль</p>
-            <input className={m.inputs_item_input} value={password} onChange={(e) => { setPassowrd(e.target.value) }} type="text" />
+            <input className={m.inputs_item_input} value={password} onChange={(e) => { setPassowrd(e.target.value) }} type="password" />
           </li>
         </ul>
         <div className={m.container_button_enter}>

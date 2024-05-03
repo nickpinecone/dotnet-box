@@ -2,8 +2,11 @@ import m from './big-card.module.css';
 import people from "./../../img/people.png"
 import achievment from "./../../img/achievment.png"
 import { NavLink } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import axios from 'axios';
 
-function BigCard({ data }) {
+function BigCard({ data, photo}) {
+
   return (
     <main className={m.main}>
       <section className={m.container}>
@@ -12,7 +15,7 @@ function BigCard({ data }) {
           <div className={m.big_card_achiv_main_information}>
             <div className={m.achiv_top}>
               <div className={m.achiv_top_main_info}>
-                <img className={m.image_achiv} src={achievment} alt="achievment" />
+                <img className={m.image_achiv} src={photo} alt="achievment" />
                 <div className={m.achiv_top_main_info_text}>
                   <h2 className={m.achiv_title}>{data.title}</h2>
                   <p className={m.achiv_descr_title}>Описание</p>

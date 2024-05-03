@@ -6,7 +6,7 @@ function Header() {
   return (
     <header className={m.header}>
       <section className={m.header_container}>
-        <NavLink className={m.logo_link} to="/login">
+        <NavLink className={m.logo_link} to="/">
           <img className={m.logo} src={logo} alt="Logo" />
         </NavLink>
         <nav className={m.header_nav}>
