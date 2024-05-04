@@ -6,11 +6,12 @@ import Card from '../components/card/card'
 // import More from "../components/more/More"
 import More from "../components/more/more"
 
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 
-function MyPortfolio() {
-
+function Portfolio() {
+    const params = useParams();
+    const idUser = params.idUser;
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -32,9 +33,7 @@ function MyPortfolio() {
   const [dataProjects, setDataProjects] = useState([])
 
   const handleGetData = async () => {
-    const { data } = await axios.get('http://localhost:4000/api/users/me', {
-      headers: { 'x-access-token': localStorage.getItem('token') },
-    })
+    const { data } = await axios.get(`http://localhost:4000/api/users/${idUser}`)
     setDataPeple(data)
     setDataProjects(data.portfolio.achievements)
   }
@@ -43,10 +42,10 @@ function MyPortfolio() {
     <main class="container">
       <Header />
       <UserCard userData={userData} />
-      <AddHeader isAdd={true}/>
+      <AddHeader />
       {dataProjects.map(project => <Card idUser={userData._id} data={project} change={true} />)}
     </main>
   );
 }
 
-export default MyPortfolio;
+export default Portfolio;

@@ -178,11 +178,11 @@
   background-image: url("./../../img/exit.svg");
   background-repeat: no-repeat;
   background-position: left center;
-  transition: all 500ms ease;
 }
 
 .link_exit:hover {
   background-image: url("./../../img/push-exit.svg");
+  color: #0661A9;
 }
 
 .achiv_comment_item_image {

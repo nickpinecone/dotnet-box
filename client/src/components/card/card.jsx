@@ -3,7 +3,7 @@ import { NavLink } from 'react-router-dom';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
 
-function Card({ data, change }) {
+function Card({ idUser, data, change}) {
 
   useEffect(() => {
     if (data.photo != undefined) {
@@ -13,6 +13,8 @@ function Card({ data, change }) {
   }, [])
 
   const [photo, setPhoto] = useState()
+
+  console.log(data)
 
   const getPhoto = async () => {
     const img = await axios.get(`http://localhost:4000/api/photos/${data.photo}`, { responseType: "blob" })
@@ -48,7 +50,7 @@ function Card({ data, change }) {
         <h2 className={m.achievment_name}>{data.title}</h2>
         <h3 className={m.achievment_description}>Описание</h3>
         <p className={m.achievment_text}>{data.shortDescription}</p>
-        <NavLink className={m.details} to={`/${data.portfolio}/${data._id}`}>Подробнее</NavLink>
+        <NavLink className={m.details} to={`/${idUser}/${data._id}`}>Подробнее</NavLink>
         {changeCom()}
       </section>
     </div >

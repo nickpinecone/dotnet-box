@@ -20,6 +20,7 @@ function Add() {
       formData.append('shortDescription', descr)
       formData.append('fullDescription', allDescr)
       formData.append('photo', img)
+      formData.append('url', link)
 
       const { data } = await axios.post('http://localhost:4000/api/portfolios/me/achievement', formData,
         {

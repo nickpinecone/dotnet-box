@@ -20,8 +20,7 @@
 .achiv_input_choose {
   display: flex;
   width: 1140px;
-  height: auto;
-  background-color: #FFFFFF;
+  height: 42px;
   border-radius: 10px;
   margin-bottom: 20px;
   cursor: pointer;
@@ -31,7 +30,6 @@
   background: #FFFFFF url('./../../img/more.png') no-repeat right center;
   background-position: 1100px 16px;
   appearance: none;
-  font-weight: 500;
   font-size: 16px;
 }
 
@@ -50,8 +48,6 @@
   border: 0;
   outline: 0;
   margin-bottom: 20px;
-  font-weight: 500;
-  font-size: 16px;
 }
 
 .achiv_input_name {

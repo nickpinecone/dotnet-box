@@ -11,7 +11,7 @@ function BigCard({ data, photo}) {
     <main className={m.main}>
       <section className={m.container}>
         <div className={m.container_big_card_achiv}>
-          <NavLink className={m.link_exit} to="/">Назад</NavLink>
+          <NavLink className={m.link_exit} to={-1} >Назад</NavLink>
           <div className={m.big_card_achiv_main_information}>
             <div className={m.achiv_top}>
               <div className={m.achiv_top_main_info}>

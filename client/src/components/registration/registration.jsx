@@ -26,6 +26,7 @@ function Registration() {
           password: password
         })
         localStorage.setItem("token", data.accessToken)
+        localStorage.setItem("id", data.user._id)
         navigate('/')
       } catch (error) {
         console.log(error)

@@ -1,13 +1,14 @@
 import { useEffect, useState } from 'react';
 import Header from '../components/header/header';
-import BigCard from '../components/big-card/big-card'
+// import BigCard from '../components/big-card/Big-card'
+import BigCard from "../components/big-card/big-card";
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 
 function BigCardPage() {
 
   const params = useParams();
-  const idPortfolio = params.idPortfolio;
+  const idUser = params.idUser;
   const idAchieve = params.idAchieve;
   const navigate = useNavigate()
 
@@ -23,8 +24,8 @@ function BigCardPage() {
   const [photo, setPhoto] = useState()
 
   const handleGetData = async () => {
-    const { data } = await axios.get(`http://localhost:4000/api/portfolios/${idPortfolio}`)
-    data.achievements.forEach(element => {
+    const { data } = await axios.get(`http://localhost:4000/api/users/${idUser}`)
+    data.portfolio.achievements.forEach(element => {
       if (element._id === idAchieve) {
         setAchieve(element)
         console.log(element)

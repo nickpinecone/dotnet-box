@@ -6,6 +6,7 @@ import AddPage from './pages/AddPage'
 import BigCardPage from './pages/BigCardPage';
 import Search from './pages/SearchPage'
 import Settings from './pages/SettingsPage';
+import UserPage from './pages/UserPage'
 
 import {
   BrowserRouter as Router,
@@ -25,8 +26,9 @@ function App() {
         <Route path="/add" element={<AddPage />} />
         <Route path="/search" element={<Search />} />
         <Route path="/settings" element={<Settings />} />
-        <Route path="/:idPortfolio/:idAchieve" element={<BigCardPage />} />
+        <Route path="/:idUser/:idAchieve" element={<BigCardPage />} />
         <Route path='subscriptions' element={<SubscriptionsPage />} />
+        <Route path="/:idUser" element={<UserPage />} />
       </Routes>
     </Router>
   );

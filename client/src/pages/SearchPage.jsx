@@ -21,7 +21,7 @@ function SearchPage() {
     <div>
       <Header />
       <Search />
-      {data.map(portfolio => portfolio.achievements.map(achieve => <Card data={achieve} />))}
+      {data.map(portfolio => portfolio.achievements.map(achieve => <Card idUser={portfolio.owner._id} data={achieve} />))}
     </div>
   );
 }
