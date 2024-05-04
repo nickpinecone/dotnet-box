@@ -24,7 +24,7 @@ function BigCardPage() {
   const [photo, setPhoto] = useState()
 
   const handleGetData = async () => {
-    const { data } = await axios.get(`http://localhost:4000/api/users/${idUser}`)
+    const { data } = await axios.get(`http://localhost:4000/api/portfolios/achievement/${idAchieve}`)
     data.portfolio.achievements.forEach(element => {
       if (element._id === idAchieve) {
         setAchieve(element)
@@ -46,7 +46,7 @@ function BigCardPage() {
   return (
     <main class="container">
       <Header />
-      <BigCard data={achieve} photo={photo}/>
+      <BigCard dataCard={achieve} photo={photo}/>
     </main>
   );
 }

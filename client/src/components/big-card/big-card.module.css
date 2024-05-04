@@ -33,7 +33,7 @@
 
 .achiv_top_main_info_text {
   width: 800px;
-  height: 300px;
+  min-height: 300px;
   margin-bottom: 20px;
 }
 
@@ -46,7 +46,8 @@
 }
 
 .achiv_title {
-  margin-top: 10.5px;
+  max-width: 420px;
+  margin-top: 0;
   margin-bottom: 20px;
   font-weight: 400;
   font-size: 32px;
@@ -59,6 +60,7 @@
 }
 
 .achiv_descr_text {
+  min-height: 120px;
   margin-bottom: 20px;
   font-weight: 400;
   font-size: 24px;
@@ -183,6 +185,70 @@
 .link_exit:hover {
   background-image: url("./../../img/push-exit.svg");
   color: #0661A9;
+}
+
+.steps {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  width: 900px;
+  position: absolute;
+  top: 95px;
+  right: 70px;
+}
+
+.link_to_step_achieve {
+  padding-left: 20px;
+  font-weight: 700;
+  font-size: 24px;
+  color: #2196f3;
+  background-image: url("../../img/view_step.svg");
+  background-repeat: no-repeat;
+  background-position: left center;
+  transition: color .3s ease-in-out, background-image .3s ease-in-out;
+}
+
+.link_to_step_achieve:hover {
+  background-image: url("../../img/view_step_hover.svg");
+}
+
+.link_to_step_achieve:focus ~ .step_to_achieve {
+  display: block;
+}
+
+.step_to_achieve {
+  list-style: none;
+  padding: 40px;
+  display: none;
+  border-radius: 20px;
+  background-color: #fff;
+  border: 3px solid #2196f3;
+}
+
+.step {
+  padding: 20px;
+  border-radius: 10px;
+  background-color: #eee;
+  font-family: "Inter", sans-serif;
+  font-size: 24px;
+  font-weight: 400;
+  line-height: 29.05px;
+}
+
+.step_loading {
+  width: 815px;
+  padding: 20px;
+  border-radius: 10px;
+  background-color: #eee;
+  font-family: "Inter", sans-serif;
+  font-size: 24px;
+  font-weight: 400;
+  line-height: 29.05px;
+  color: #2196f3;
+}
+
+.step:not(:last-child) {
+  margin-bottom: 10px;
 }
 
 .achiv_comment_item_image {

@@ -43,7 +43,7 @@ function Portfolio() {
       <Header />
       <UserCard userData={userData} />
       <AddHeader />
-      {dataProjects.map(project => <Card idUser={userData._id} data={project} change={true} />)}
+      {dataProjects.map(project => <Card idUser={userData._id} data={project}/>)}
     </main>
   );
 }

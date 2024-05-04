@@ -5,21 +5,52 @@ import { NavLink } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 
-function BigCard({ data, photo}) {
+function BigCard({ dataCard, photo}) {
+
+  const [steps, setSteps] = useState([])
+
+  const findStep = async() => {
+    if(localStorage.getItem(dataCard._id)){
+      setSteps(JSON.parse(localStorage.getItem(dataCard._id)))
+    }
+    else{
+      const { data } = await axios.post('https://goblin.tools/api/todo/', 
+      {"text": `Как достичь ${dataCard.title}`, "spiciness": 0, "ancestors": []})
+      localStorage.setItem(dataCard._id, JSON.stringify(data))
+      setSteps(data)
+    }
+  }
+
+  const viewSteps = () => {
+    if(steps.length === 0){
+      return <li className={m.step_loading}>loading...</li>
+    }
+    else{
+      return steps.map(step => <li className={m.step}>{step}</li>)
+    }
+  }
 
   return (
     <main className={m.main}>
       <section className={m.container}>
         <div className={m.container_big_card_achiv}>
           <NavLink className={m.link_exit} to={-1} >Назад</NavLink>
+          <div className={m.steps}>
+            <NavLink className={m.link_to_step_achieve} onClick={findStep}>Шаги к достижению цели</NavLink>
+
+            <ul className={m.step_to_achieve}>
+              {viewSteps()}
+            </ul>
+          </div>
+          
           <div className={m.big_card_achiv_main_information}>
             <div className={m.achiv_top}>
               <div className={m.achiv_top_main_info}>
                 <img className={m.image_achiv} src={photo} alt="achievment" />
                 <div className={m.achiv_top_main_info_text}>
-                  <h2 className={m.achiv_title}>{data.title}</h2>
+                  <h2 className={m.achiv_title}>{dataCard.title}</h2>
                   <p className={m.achiv_descr_title}>Описание</p>
-                  <p className={m.achiv_descr_text}>{data.shortDescription}</p>
+                  <p className={m.achiv_descr_text}>{dataCard.shortDescription}</p>
                   <button className={m.btn_like} type="button">Понравилось</button>
                 </div>
               </div>
@@ -27,7 +58,7 @@ function BigCard({ data, photo}) {
                 <ul className={m.achiv_top_add_info_list}>
                   <li className={m.achiv_top_add_info_item}>
                     <p className={m.achiv_descr_title}>Подробное описание</p>
-                    <p className={m.achiv_descr_text}>{data.fullDescription}</p>
+                    <p className={m.achiv_descr_text}>{dataCard.fullDescription}</p>
                   </li>
                   <li className={m.achiv_top_add_info_item}>
                     <p className={m.achiv_descr_title}>Ссылки</p>

@@ -17,7 +17,6 @@ function MyPortfolio() {
     try {
       if (localStorage.getItem('token')) {
         handleGetData()
-        
       }
       else{
         navigate('/login')

@@ -1,7 +1,7 @@
 .achievment_container {
   margin: 0 auto;
   width: 1140px;
-  height: 300px;
+  min-height: 300px;
   border-radius: 20px;
   padding: 50px;
   background-color: #EEEEEE;
@@ -16,15 +16,17 @@
 }
 
 .achievment_words {
+  display: flex;
+  flex-direction: column;
   position: relative;
   margin: 0.5px 0;
   margin-left: 40px;
   width: 800px;
-  height: 300px;
+  min-height: 300px;
 }
 
 .achievment_name {
-  height: 39px;
+  min-height: 39px;
   font-size: 32px;
   font-weight: 400;
   margin: 0;
@@ -32,14 +34,14 @@
 }
 
 .achievment_description {
-  height: 34px;
+  min-height: 34px;
   font-size: 28px;
   font-weight: 400;
   margin: 20px 0;
 }
 
 .achievment_text {
-  height: 116px;
+  min-height: 116px;
   font-size: 24px;
   font-weight: 400;
   margin: 0;
