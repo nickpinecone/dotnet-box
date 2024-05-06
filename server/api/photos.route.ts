@@ -5,8 +5,6 @@ import fs from "fs";
 const router = express.Router();
 
 // Separate name with backslashes
-// Certificates are in certificates/
-// Projects are in projects/
 router.route("/:name").get(async (req, res) => {
     try {
         const photoName = path.resolve(__dirname, "..", "public/photos/" + req.params.name);

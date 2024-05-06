@@ -11,6 +11,8 @@ const UserSchema = new Schema({
     socials: [String],
     bio: String,
 
+    avatar: String,
+
     password: String,
     email: String,
     verified: { type: Boolean, default: false },

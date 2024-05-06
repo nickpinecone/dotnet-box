@@ -99,10 +99,13 @@ router.route("/me/achievement/:achievementId").put(
             const achievement = await Achievement.findOne({ _id: req.params.achievementId, portfolio: user.portfolio });
             if (!achievement) throw new Error("could not find achievement: " + req.params.achievementId);
 
-            if (achievement.photo) {
+            if (req.file && achievement.photo) {
                 const photoName = path.resolve(__dirname, "..", "public/photos/" + achievement.photo);
                 fs.unlink(photoName, (err) => { if (err) console.error(err); });
             }
+
+            if (req.file)
+                achievement.photo = req.file.filename;
 
             achievement.title = req.body.title;
             achievement.shortDescription = req.body.shortDescription;
@@ -117,9 +120,6 @@ router.route("/me/achievement/:achievementId").put(
                 if (!member) throw new Error("could not find member with id: " + memberId);
                 achievement.members.push(member._id);
             }
-
-            if (req.file)
-                achievement.photo = req.file.filename;
 
             await achievement.save();
 

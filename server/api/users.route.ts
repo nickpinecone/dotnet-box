@@ -4,6 +4,8 @@ import multer from "multer";
 import jwt from "jsonwebtoken";
 import { MailerSend, Recipient, Sender, EmailParams } from "mailersend";
 import dotenv from "dotenv";
+import path from "path";
+import fs from "fs";
 import { body } from "express-validator";
 
 import auth from "../middlewares/auth.middleware";
@@ -11,10 +13,11 @@ import User from "../models/user.model";
 import Portfolio from "../models/portfolio.model";
 import validation from "../middlewares/validate.middleware";
 
+
 dotenv.config();
 
 const router = express.Router();
-const upload = multer();
+const upload = multer({ dest: path.resolve(__dirname, "..", "public/photos/") });
 
 const mailerSend = new MailerSend({
     apiKey: process.env.EMAIL_API as string,
@@ -169,7 +172,7 @@ router.route("/byEmail").get(
 
 router.route("/me").put(
     auth.verifyToken,
-    upload.none(),
+    upload.single("avatar"),
     body("bio").default(""),
     validation.validateForm,
     async (req, res) => {
@@ -179,6 +182,16 @@ router.route("/me").put(
 
             const user = await User.findOne({ _id: userId });
             if (!user) throw new Error("could not authenticate user with id: " + userId);
+
+            if (req.file && user.avatar) {
+                const photoName = path.resolve(__dirname, "..", "public/photos/" + user.avatar);
+                fs.unlink(photoName, (err) => { if (err) console.error(err); });
+            }
+
+            if (req.file) {
+                user.avatar = req.file.filename;
+
+            }
 
             user.bio = bio;
 
