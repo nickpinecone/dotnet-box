@@ -67,6 +67,7 @@
 }
 
 .btn_like {
+  margin-right: 10px;
   padding: 11px 30px;
   border-radius: 100px;
   color: #fff;
@@ -88,6 +89,10 @@
 
 .achiv_top_add_info_item:not(:last-child) {
   margin-bottom: 40px;
+}
+
+.achieve_link {
+  width: 800px;
 }
 
 .big_card_image_people {

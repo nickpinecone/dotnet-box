@@ -13,22 +13,24 @@ function BigCardPage() {
   const navigate = useNavigate()
 
   useEffect(() => {
-    if (!localStorage.getItem('token')) {
-      navigate('/login')
+    if (localStorage.getItem('token')) {
+      handleGetData();
     }
-    handleGetData();
   }, []);
 
 
   const [achieve, setAchieve] = useState([]);
   const [photo, setPhoto] = useState()
 
-  const handleGetData = async () => {
-    const { data } = await axios.get(`http://localhost:4000/api/portfolios/achievement/${idAchieve}`)
+  const handleGetData = () => {
+    getDataPhoto();
+    getDataAchieve();
+  }
+
+  const getDataPhoto = async () => {
+    const { data } = await axios.get(`http://localhost:4000/api/users/${idUser}`)
     data.portfolio.achievements.forEach(element => {
       if (element._id === idAchieve) {
-        setAchieve(element)
-        console.log(element)
         if (element.photo !== undefined) {
           getPhoto(element)
         }
@@ -36,17 +38,27 @@ function BigCardPage() {
     });
   }
 
+  const getDataAchieve = async() => {
+    const {data} = await axios.get(`http://localhost:4000/api/portfolios/achievement/${idAchieve}`)
+    setAchieve(data)
+  }
+
   const getPhoto = async (data) => {
-    console.log(data.photo)
     const img = await axios.get(`http://localhost:4000/api/photos/${data.photo}`, { responseType: "blob" })
     let url = URL.createObjectURL(img.data)
     setPhoto(url)
   }
 
+  const viewBigCard = () => {
+    if(achieve.length !== 0){
+      return <BigCard dataCard={achieve} photo={photo} userId={idUser}/>
+    }
+  }
+
   return (
     <main class="container">
       <Header />
-      <BigCard dataCard={achieve} photo={photo}/>
+      {viewBigCard()}
     </main>
   );
 }

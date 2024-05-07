@@ -3,7 +3,7 @@ import { NavLink } from 'react-router-dom';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
 
-function Card({ idUser, data, change}) {
+function Card({ idUser, data, change, img}) {
 
   useEffect(() => {
     if (data.photo != undefined) {
@@ -14,7 +14,6 @@ function Card({ idUser, data, change}) {
 
   const [photo, setPhoto] = useState()
 
-  console.log(data)
 
   const getPhoto = async () => {
     const img = await axios.get(`http://localhost:4000/api/photos/${data.photo}`, { responseType: "blob" })
@@ -43,6 +42,15 @@ function Card({ idUser, data, change}) {
     }
   }
 
+  const linkTo = () => {
+    if(idUser === null){
+      return <NavLink className={m.details}>Подробнее</NavLink>
+    }
+    else{
+      return <NavLink className={m.details} to={`/${idUser}/${data._id}`}>Подробнее</NavLink>
+    }
+  }
+
   return (
     <div className={m.achievment_container}>
       <img className={m.achievment_image} src={photo} alt="Achievment image" />
@@ -50,7 +58,7 @@ function Card({ idUser, data, change}) {
         <h2 className={m.achievment_name}>{data.title}</h2>
         <h3 className={m.achievment_description}>Описание</h3>
         <p className={m.achievment_text}>{data.shortDescription}</p>
-        <NavLink className={m.details} to={`/${idUser}/${data._id}`}>Подробнее</NavLink>
+        {linkTo()}
         {changeCom()}
       </section>
     </div >
