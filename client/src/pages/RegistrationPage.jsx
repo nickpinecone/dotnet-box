@@ -1,7 +1,7 @@
 import EnterHeader from '../components/enter-header/enter-header'
 import Registration from '../components/registration/registration'
 
-function Entrance() {
+function RegistrationPage() {
   return (
     <div>
       <EnterHeader />
@@ -10,4 +10,4 @@ function Entrance() {
   );
 }
 
-export default Entrance;
+export default RegistrationPage;

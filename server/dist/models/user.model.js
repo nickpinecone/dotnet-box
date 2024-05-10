@@ -45,6 +45,7 @@ const UserSchema = new mongoose_1.Schema({
     phoneNumber: String,
     socials: [String],
     bio: String,
+    avatar: String,
     password: String,
     email: String,
     verified: { type: Boolean, default: false },

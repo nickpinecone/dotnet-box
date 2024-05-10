@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import Header from '../components/header/header';
-// import BigCard from '../components/big-card/Big-card'
 import BigCard from "../components/big-card/big-card";
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
@@ -38,8 +37,8 @@ function BigCardPage() {
     });
   }
 
-  const getDataAchieve = async() => {
-    const {data} = await axios.get(`http://localhost:4000/api/portfolios/achievement/${idAchieve}`)
+  const getDataAchieve = async () => {
+    const { data } = await axios.get(`http://localhost:4000/api/portfolios/achievement/${idAchieve}`)
     setAchieve(data)
   }
 
@@ -50,8 +49,8 @@ function BigCardPage() {
   }
 
   const viewBigCard = () => {
-    if(achieve.length !== 0){
-      return <BigCard dataCard={achieve} photo={photo} userId={idUser}/>
+    if (achieve.length !== 0) {
+      return <BigCard dataCard={achieve} photo={photo} userId={idUser} />
     }
   }
 

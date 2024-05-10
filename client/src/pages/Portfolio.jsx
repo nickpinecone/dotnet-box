@@ -3,7 +3,6 @@ import Header from '../components/header/header';
 import UserCard from '../components/user-card/user-card';
 import AddHeader from '../components/add-header/add-achievment'
 import Card from '../components/card/card'
-// import More from "../components/more/More"
 import More from "../components/more/more"
 
 import { useNavigate } from 'react-router-dom';
@@ -18,7 +17,7 @@ function MyPortfolio() {
       if (localStorage.getItem('token')) {
         handleGetData()
       }
-      else{
+      else {
         navigate('/login')
       }
     }
@@ -42,7 +41,7 @@ function MyPortfolio() {
     <main class="container">
       <Header />
       <UserCard userData={userData} />
-      <AddHeader isAdd={true}/>
+      <AddHeader isAdd={true} />
       {dataProjects.map(project => <Card idUser={userData._id} data={project} change={true} />)}
     </main>
   );

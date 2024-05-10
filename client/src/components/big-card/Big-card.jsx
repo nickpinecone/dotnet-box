@@ -6,57 +6,57 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 import Microlink from '@microlink/react';
 
-function BigCard({ dataCard, photo, fromAdd, userId}) {
+function BigCard({ dataCard, photo, fromAdd, userId }) {
   const [steps, setSteps] = useState([])
   const [comment, setComment] = useState()
   const [comments, setComments] = useState(dataCard.comments)
   const navigate = useNavigate()
 
-  const findStep = async() => {
-    if(localStorage.getItem(dataCard._id)){
+  const findStep = async () => {
+    if (localStorage.getItem(dataCard._id)) {
       setSteps(JSON.parse(localStorage.getItem(dataCard._id)))
     }
-    else{
-      const { data } = await axios.post('https://goblin.tools/api/todo/', 
-      {"text": `Как достичь ${dataCard.title}`, "spiciness": 0, "ancestors": []})
+    else {
+      const { data } = await axios.post('https://goblin.tools/api/todo/',
+        { "text": `Как достичь ${dataCard.title}`, "spiciness": 0, "ancestors": [] })
       localStorage.setItem(dataCard._id, JSON.stringify(data))
       setSteps(data)
     }
   }
 
   const viewSteps = () => {
-    if(steps.length === 0){
+    if (steps.length === 0) {
       return <li className={m.step_loading}>loading...</li>
     }
-    else{
+    else {
       return steps.map(step => <li className={m.step}>{step}</li>)
     }
   }
 
   const viewExit = () => {
-    if(!fromAdd){
+    if (!fromAdd) {
       return <NavLink className={m.link_exit} to={-1} >Назад</NavLink>
     }
   }
 
   const viewFindStep = () => {
-    if(!fromAdd){
+    if (!fromAdd) {
       return <NavLink className={m.link_to_step_achieve} onClick={findStep}>Шаги к достижению цели</NavLink>
     }
   }
 
   const viewLikeOrEdit = () => {
-    if(userId != localStorage.getItem("id"))
+    if (userId != localStorage.getItem("id"))
       return <button className={m.btn_like} type="button">Понравилось</button>
     else
       return (
-    <div>
-      <button className={m.btn_like} type="button" >Редактировать</button>
-      <button className={m.btn_like} type="button" onClick={delAchieve} >Удалить</button>
-    </div>)
+        <div>
+          <button className={m.btn_like} type="button" >Редактировать</button>
+          <button className={m.btn_like} type="button" onClick={delAchieve} >Удалить</button>
+        </div>)
   }
 
-  const delAchieve = async() => {
+  const delAchieve = async () => {
     const del = await axios.delete(`http://localhost:4000/api/portfolios/me/achievement/${dataCard._id}`, {
       headers: { 'x-access-token': localStorage.getItem('token') },
     })
@@ -64,19 +64,19 @@ function BigCard({ dataCard, photo, fromAdd, userId}) {
   }
 
   const viewLink = () => {
-    if(dataCard.url){
+    if (dataCard.url) {
       return (
         <li className={m.achiv_top_add_info_item}>
           <p className={m.achiv_descr_title}>Ссылка</p>
-          <Microlink url={dataCard.url} size="large"/>
+          <Microlink url={dataCard.url} size="large" />
         </li>
       )
     }
   }
-  
+
   const viewComment = () => {
-    try{
-      return comments.map(({content}) => 
+    try {
+      return comments.map(({ content }) =>
         <li className={m.achiv_comment_item}>
           <img className={m.achiv_comment_item_image} src={people} alt="user" />
           <p className={m.achiv_comment_item_text}>
@@ -85,15 +85,15 @@ function BigCard({ dataCard, photo, fromAdd, userId}) {
         </li>
       )
     }
-    catch{
+    catch {
     }
   }
 
-  const addComment = async() => {
-    const add = await axios.post(`http://localhost:4000/api/portfolios/achievement/${dataCard._id}/comment`, {"content": comment}, {
+  const addComment = async () => {
+    const add = await axios.post(`http://localhost:4000/api/portfolios/achievement/${dataCard._id}/comment`, { "content": comment }, {
       headers: { 'x-access-token': localStorage.getItem('token') },
     })
-    const {data} = await axios.get(`http://localhost:4000/api/portfolios/achievement/${dataCard._id}`)
+    const { data } = await axios.get(`http://localhost:4000/api/portfolios/achievement/${dataCard._id}`)
     setComments(data.comments)
     setComment("")
   }
@@ -110,7 +110,7 @@ function BigCard({ dataCard, photo, fromAdd, userId}) {
               {viewSteps()}
             </ul>
           </div>
-          
+
           <div className={m.big_card_achiv_main_information}>
             <div className={m.achiv_top}>
               <div className={m.achiv_top_main_info}>
@@ -141,7 +141,7 @@ function BigCard({ dataCard, photo, fromAdd, userId}) {
           <div className={m.achiv_comment}>
             <h2 className={m.achiv_comment_title}>Комментарии</h2>
             <ul className={m.achiv_comment_list}>
-            {viewComment()}
+              {viewComment()}
             </ul>
             <form className={m.achiv_comment_add}>
               <textarea className={m.achiv_comment_add_text} name="comment" autoFocus="none" placeholder='Комментарий' value={comment} onChange={(e) => { setComment(e.target.value) }}></textarea>

@@ -14,6 +14,7 @@ import {
   Route,
 } from 'react-router-dom';
 import SubscriptionsPage from './pages/SubscriptionsPage';
+import Recovery from './pages/Recovery';
 
 
 function App() {
@@ -29,6 +30,7 @@ function App() {
         <Route path="/:idUser/:idAchieve" element={<BigCardPage />} />
         <Route path='subscriptions' element={<SubscriptionsPage />} />
         <Route path="/:idUser" element={<UserPage />} />
+        <Route path="/login/restore_password" element={<Recovery />} />
       </Routes>
     </Router>
   );

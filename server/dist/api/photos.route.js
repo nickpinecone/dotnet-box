@@ -17,8 +17,6 @@ const path_1 = __importDefault(require("path"));
 const fs_1 = __importDefault(require("fs"));
 const router = express_1.default.Router();
 // Separate name with backslashes
-// Certificates are in certificates/
-// Projects are in projects/
 router.route("/:name").get((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const photoName = path_1.default.resolve(__dirname, "..", "public/photos/" + req.params.name);

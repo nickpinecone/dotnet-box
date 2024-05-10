@@ -24,18 +24,16 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = __importStar(require("mongoose"));
-const AchievementTypes = ["project", "certificate"];
-const AchievementSchema = new mongoose_1.Schema({
-    type: String,
-    title: String,
-    photo: String,
-    shortDescription: String,
-    fullDescription: String,
-    url: String,
-    members: [{
-            type: mongoose_1.default.Schema.Types.ObjectId,
-            ref: "user"
-        }],
+const CommentSchema = new mongoose_1.Schema({
+    author: {
+        type: mongoose_1.default.Schema.Types.ObjectId,
+        ref: "user"
+    },
+    achievement: {
+        type: mongoose_1.default.Schema.Types.ObjectId,
+        ref: "achievement"
+    },
+    content: String,
     updatedAt: {
         type: Date,
         default: Date.now(),
@@ -44,23 +42,11 @@ const AchievementSchema = new mongoose_1.Schema({
         type: Date,
         default: Date.now(),
     },
-    portfolio: {
-        type: mongoose_1.default.Schema.Types.ObjectId,
-        ref: "portfolio"
-    },
-    comments: [{
-            type: mongoose_1.default.Schema.Types.ObjectId,
-            ref: "comment"
-        }],
 });
-AchievementSchema.pre("save", function (next) {
+const Comment = mongoose_1.default.model("comment", CommentSchema);
+CommentSchema.pre("save", function (next) {
     // @ts-expect-error somehow mongoose formats the date number
     this.updatedAt = Date.now();
-    if (this.type &&
-        this.isModified("type") &&
-        !AchievementTypes.includes(this.type))
-        return next(new Error("wrong achievement type"));
     return next();
 });
-const Achievement = mongoose_1.default.model("achievement", AchievementSchema);
-exports.default = Achievement;
+exports.default = Comment;

@@ -23,28 +23,39 @@ const express_validator_1 = require("express-validator");
 const achievement_model_1 = __importDefault(require("../models/achievement.model"));
 const router = express_1.default.Router();
 const upload = (0, multer_1.default)();
-router.route("/").get((0, express_validator_1.query)("search").optional().escape(), validate_middleware_1.default.validateForm, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.route("/").get((0, express_validator_1.query)("search").optional().escape(), (0, express_validator_1.query)("limit").default("10").escape(), validate_middleware_1.default.validateForm, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
+        const limit = Number(req.query.limit);
         if (req.query.search) {
             const searchList = [];
             const searchKey = new RegExp(`${req.query.search}`, 'i');
-            const searchSettings = { "description": searchKey };
-            const portfolios = yield portfolio_model_1.default.find(searchSettings).sort({ createdAt: -1 }).populate("owner achievements");
+            const searchSettings = {
+                $or: [
+                    { "title": searchKey },
+                    { "shortDescription": searchKey },
+                    { "fullDescription": searchKey },
+                    { "url": searchKey },
+                ]
+            };
+            const portfolios = yield portfolio_model_1.default.find(searchSettings).sort({ createdAt: -1 }).limit(limit)
+                .populate("owner").populate({ path: "achievements" });
             for (let i = 0; i < portfolios.length; i++) {
                 const portfolio = portfolios[i];
                 searchList.push(portfolio);
             }
-            const achievements = yield achievement_model_1.default.find(searchSettings).sort({ createdAt: -1 });
+            const achievements = yield achievement_model_1.default.find(searchSettings).sort({ createdAt: -1 }).limit(limit);
             for (let i = 0; i < achievements.length; i++) {
                 const achievement = achievements[i];
-                const portfolio = yield portfolio_model_1.default.findById(achievement.portfolio).populate("owner achievements");
+                const portfolio = yield portfolio_model_1.default.findById(achievement.portfolio)
+                    .populate("owner").populate({ path: "achievements" });
                 if (portfolio && searchList.every((item) => item._id.toString() !== portfolio._id.toString()))
                     searchList.push(portfolio);
             }
             res.send([...searchList]);
         }
         else {
-            const portfolios = yield portfolio_model_1.default.find({}).sort({ createdAt: -1 }).populate("owner achievements");
+            const portfolios = yield portfolio_model_1.default.find({}).sort({ createdAt: -1 }).limit(limit)
+                .populate("owner").populate({ path: "achievements" });
             res.send(portfolios);
         }
     }
@@ -60,7 +71,8 @@ router.route("/me").get(auth_middleware_1.default.verifyToken, (req, res) => __a
         const user = yield user_model_1.default.findOne({ _id: userId });
         if (!user)
             throw new Error("could not find user: " + userId);
-        const portfolio = yield portfolio_model_1.default.findOne({ _id: (_a = user.portfolio) === null || _a === void 0 ? void 0 : _a.toString() }).populate("owner achievements");
+        const portfolio = yield portfolio_model_1.default.findOne({ _id: (_a = user.portfolio) === null || _a === void 0 ? void 0 : _a.toString() })
+            .populate("owner").populate({ path: "achievements" });
         if (!portfolio)
             throw new Error("user doesnt have portfolio");
         res.send(portfolio);
@@ -78,11 +90,11 @@ router.route("/me").put(auth_middleware_1.default.verifyToken, upload.none(), va
         const user = yield user_model_1.default.findOne({ _id: userId });
         if (!user)
             throw new Error("could not find user: " + userId);
-        const portfolio = yield portfolio_model_1.default.findOne({ _id: (_b = user.portfolio) === null || _b === void 0 ? void 0 : _b.toString() }).populate("owner achievements");
+        const portfolio = yield portfolio_model_1.default.findOne({ _id: (_b = user.portfolio) === null || _b === void 0 ? void 0 : _b.toString() });
         if (!portfolio)
             throw new Error("user doesnt have portfolio");
         portfolio.description = description;
-        portfolio.save();
+        yield portfolio.save();
         res.sendStatus(200);
     }
     catch (err) {
@@ -92,7 +104,8 @@ router.route("/me").put(auth_middleware_1.default.verifyToken, upload.none(), va
 }));
 router.route("/:id").get((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const portfolio = yield portfolio_model_1.default.findOne({ _id: req.params.id }).populate("owner achievements");
+        const portfolio = yield portfolio_model_1.default.findOne({ _id: req.params.id })
+            .populate("owner").populate({ path: "achievements" });
         if (!portfolio)
             throw new Error("could not find portfolio with id: " + req.params.id);
         res.send(portfolio);

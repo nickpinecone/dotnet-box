@@ -36,13 +36,13 @@ function Add() {
   }
 
   const viewAchieve = () => {
-    const dataAchieve = {"type": type, 'title': name, 'shortDescription': descr, 'fullDescription': allDescr, 'url': link, 'photo': img}
+    const dataAchieve = { "type": type, 'title': name, 'shortDescription': descr, 'fullDescription': allDescr, 'url': link, 'photo': img }
     return (
       <div>
-        <Card idUser={null} data={dataAchieve}/>
-        <BigCard dataCard={dataAchieve} fromAdd={true}/>
-      </div> 
-  )
+        <Card idUser={null} data={dataAchieve} />
+        <BigCard dataCard={dataAchieve} fromAdd={true} />
+      </div>
+    )
   }
 
   return (
