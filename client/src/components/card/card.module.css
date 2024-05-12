@@ -7,12 +7,14 @@
   background-color: #EEEEEE;
   display: flex;
   margin-bottom: 30px;
+  align-items: center
 }
 
 .achievment_image {
   width: 300px;
   height: 300px;
   border-radius: 20px;
+  object-fit: cover;
 }
 
 .achievment_words {

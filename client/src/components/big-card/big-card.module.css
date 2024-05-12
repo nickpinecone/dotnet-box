@@ -43,6 +43,7 @@
   margin-right: 40px;
   margin-bottom: 20px;
   border-radius: 20px;
+  object-fit: cover;
 }
 
 .achiv_title {
@@ -96,6 +97,8 @@
 }
 
 .big_card_image_people {
+  width: 150px;
+  height: 150px;
   margin-right: 20px;
   border-radius: 50%;
   margin-bottom: 40px;

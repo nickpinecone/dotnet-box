@@ -26,6 +26,11 @@
   margin: auto 20px;
 }
 
+.text_title {
+  font-size: 36px;
+  margin-bottom: 10px;
+}
+
 .unsubscribe {
   margin: auto 0;
   display: block;
@@ -33,6 +38,7 @@
   width: 146px;
   height: 29px;
   padding: 12.5px 76px;
+  font-weight: 700;
   border-radius: 100px;
   color: #FFFFFF;
   background-color: #2196f3;

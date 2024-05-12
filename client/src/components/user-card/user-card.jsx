@@ -1,8 +1,9 @@
 import m from './user-card.module.css';
-import profile from "./../../img/avatar.png"
 import { Link, NavLink } from 'react-router-dom';
+import axios from 'axios';
+import { useEffect, useState } from 'react';
 
-function UserCard({ userData }) {
+function UserCard({ userData, photo }) {
 
   let isMy = () => {
     return userData._id === localStorage.getItem("id")
@@ -31,7 +32,7 @@ function UserCard({ userData }) {
     <main className={m.main}>
       <section className={m.profile_container}>
         {back()}
-        <img className={m.profile_image} src={profile} alt={profile} />
+        <img className={m.profile_image} src={photo} alt="avatar"/>
         <section className={m.profile}>
           <h2 className={m.name}>{userData.name} {userData.surname}</h2>
           <a className={m.login}>{userData._id}</a>

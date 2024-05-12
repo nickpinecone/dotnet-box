@@ -9,9 +9,7 @@ function SubscriptionsPage() {
       <Header />
       <Subscriptions />
       <SubscriptionCard />
-      <SubscriptionCard />
-      <SubscriptionCard />
-      <More />
+
     </div>
   );
 }

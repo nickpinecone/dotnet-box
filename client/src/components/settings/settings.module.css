@@ -14,9 +14,41 @@
   margin-left: 10px;
 }
 
-.profile_image {
+.profile_img {
+  position: relative;
   width: 400px;
   height: 400px;
+  border-radius: 50%;
+}
+
+.profile_input_img {
+  position: absolute;
+  width: 400px;
+  height: 400px;
+  border-radius: 50%;
+  opacity: 0;
+}
+
+.profile_img:hover .profile_image_dowload {
+  opacity: 1;
+}
+
+.profile_image {
+  position: absolute;
+  width: 400px;
+  height: 400px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.profile_image_dowload {
+  position: absolute;
+  left: 100px;
+  top: 100px;
+  width: 200px;
+  height: 200px;
+  opacity: 0;
+  transition: opacity .3s ease-in-out;
 }
 
 .name {

@@ -25,24 +25,17 @@ function Add() {
       formData.append('photo', img)
       formData.append('url', link)
 
+      let members = localStorage.getItem('id')
+
       const { data } = await axios.post('http://localhost:4000/api/portfolios/me/achievement', formData,
         {
+          params: {members, members},
           headers: { 'x-access-token': localStorage.getItem('token') },
         })
     }
     catch {
       console.log('Error add-achieve')
     }
-  }
-
-  const viewAchieve = () => {
-    const dataAchieve = {"type": type, 'title': name, 'shortDescription': descr, 'fullDescription': allDescr, 'url': link, 'photo': img}
-    return (
-      <div>
-        <Card idUser={null} data={dataAchieve}/>
-        <BigCard dataCard={dataAchieve} fromAdd={true}/>
-      </div> 
-  )
   }
 
   return (
@@ -79,8 +72,6 @@ function Add() {
           <div className={m.button_sized}><a className={m.publish} href='/' onClick={() => { onAdd() }}>Опубликовать</a></div>
         </div>
       </section>
-
-      {viewAchieve()}
     </div>
   );
 }

@@ -6,7 +6,10 @@ function SubscriptionCard() {
     <div className={m.card}>
       <section className={m.element}>
         <img className={m.picture} src={profile} />
-        <p className={m.text}>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur quis massa nunc.</p>
+        <div className={m.text}>
+          <p className={m.text_title}>Попов Андрей</p>
+          <p >Всем привет! Люблю занималься аналитикой!</p>
+        </div>
         <a className={m.unsubscribe}>Отписаться</a>
       </section>
     </div>

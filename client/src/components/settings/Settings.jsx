@@ -1,41 +1,38 @@
 import m from './settings.module.css';
 import profile from "./../../img/avatar.png"
+import download from '../../img/download.svg'
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 
-function Settings() {
+function Settings({userData, photo}) {
 
-  const navigate = useNavigate()
+  const [img, setImg] = useState()
+  const [avatar, setAvatar] = useState()
 
-  useEffect(() => {
+  const onUpdate = async() => {
     try {
-      if (localStorage.getItem('token')) {
-        handleGetData()
-      }
-      else{
-        navigate('/login')
-      }
+      let formData = new FormData();
+      formData.append('avatar', img)
+      const { data } = await axios.put('http://localhost:4000/api/users/me', formData,
+        {
+          headers: { 'x-access-token': localStorage.getItem('token') },
+        })
     }
     catch {
-      navigate('/login')
+      console.log('Error update-achieve')
     }
-  }, []);
-
-  const [userData, setDataPeple] = useState([])
-
-  const handleGetData = async () => {
-    const { data } = await axios.get('http://localhost:4000/api/users/me', {
-      headers: { 'x-access-token': localStorage.getItem('token') },
-    })
-    setDataPeple(data)
-    console.log(data)
   }
 
   return (
     <main>
       <section className={m.profile_container}>
-        <img className={m.profile_image} src={profile} alt="ProfileImage" />
+        <div className={m.profile_img}> 
+          <img className={m.profile_image} src={photo} alt="ProfileImage" />
+          <img className={m.profile_image_dowload} src={download} alt="ProfileImage" />
+          <input className={m.profile_input_img} type="file" accept=".png,.jpg" onChange={(e) => { setImg(e.target.files[0])}}/>
+        </div>
+
         <section className={m.profile}>
           <h2 className={m.name}>{userData.name} {userData.surname}</h2>
           <a className={m.login}>{userData._id}</a>
@@ -52,6 +49,7 @@ function Settings() {
           </ul>
         </section>
       </section>
+
       <section className={m.profile_settings}>
         <h2 className={m.settings_main_text}>Основное</h2>
         <ul className={m.settings_list}>
@@ -89,7 +87,7 @@ function Settings() {
             <textarea className={m.settings_text_input} placeholder='@telegram'></textarea>
           </li>
         </ul>
-        <button className={m.save_settings}>Сохранить</button>
+        <button className={m.save_settings} onClick={() => { onUpdate() }}>Сохранить</button>
       </section>
     </main>
   );

@@ -1,5 +1,5 @@
 import m from './big-card.module.css';
-import people from "./../../img/people.png"
+import people from "../../img/avatar.png"
 import achievment from "./../../img/achievment.png"
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
@@ -68,7 +68,7 @@ function BigCard({ dataCard, photo, fromAdd, userId}) {
       return (
         <li className={m.achiv_top_add_info_item}>
           <p className={m.achiv_descr_title}>Ссылка</p>
-          <Microlink url={dataCard.url} size="large"/>
+          <Microlink url={dataCard.url} />
         </li>
       )
     }
@@ -96,6 +96,18 @@ function BigCard({ dataCard, photo, fromAdd, userId}) {
     const {data} = await axios.get(`http://localhost:4000/api/portfolios/achievement/${dataCard._id}`)
     setComments(data.comments)
     setComment("")
+  }
+
+  const[photos, setPhotos] = useState()
+
+  const viewMembers = () =>{
+    return <img className={m.big_card_image_people} src={photos} alt="Фото участника" />
+  }
+
+  const getPhoto = async(id) => {
+    const img = await axios.get(`http://localhost:4000/api/photos/${id}`, { responseType: "blob" })
+    const url = URL.createObjectURL(img.data)
+    setPhotos(url)
   }
 
   return (
