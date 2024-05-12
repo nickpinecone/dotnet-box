@@ -18,6 +18,8 @@ const multer_1 = __importDefault(require("multer"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const mailersend_1 = require("mailersend");
 const dotenv_1 = __importDefault(require("dotenv"));
+const path_1 = __importDefault(require("path"));
+const fs_1 = __importDefault(require("fs"));
 const express_validator_1 = require("express-validator");
 const auth_middleware_1 = __importDefault(require("../middlewares/auth.middleware"));
 const user_model_1 = __importDefault(require("../models/user.model"));
@@ -25,7 +27,7 @@ const portfolio_model_1 = __importDefault(require("../models/portfolio.model"));
 const validate_middleware_1 = __importDefault(require("../middlewares/validate.middleware"));
 dotenv_1.default.config();
 const router = express_1.default.Router();
-const upload = (0, multer_1.default)();
+const upload = (0, multer_1.default)({ dest: path_1.default.resolve(__dirname, "..", "public/photos/") });
 const mailerSend = new mailersend_1.MailerSend({
     apiKey: process.env.EMAIL_API,
 });
@@ -68,8 +70,8 @@ router.route("/register").post(upload.none(), (0, express_validator_1.body)("ema
         }
         portfolio.owner = user._id;
         user.portfolio = portfolio._id;
-        portfolio.save();
-        user.save();
+        yield portfolio.save();
+        yield user.save();
         res.sendStatus(200);
     }
     catch (err) {
@@ -119,15 +121,36 @@ router.route("/me").get(auth_middleware_1.default.verifyToken, (req, res) => __a
         res.status(500).send("could not get user profile page: " + err);
     }
 }));
-router.route("/me").put(auth_middleware_1.default.verifyToken, upload.none(), (0, express_validator_1.body)("bio").default(""), validate_middleware_1.default.validateForm, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.route("/byEmail").get((0, express_validator_1.body)("email").notEmpty().isEmail(), validate_middleware_1.default.validateForm, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const email = req.body.email;
+        const user = yield user_model_1.default.findOne({ email: email });
+        if (!user)
+            throw new Error("no user with email: " + email);
+        res.status(200).send(user);
+    }
+    catch (err) {
+        console.error(err);
+        res.status(500).send("could not find user: " + err);
+    }
+}));
+router.route("/me").put(auth_middleware_1.default.verifyToken, upload.single("avatar"), (0, express_validator_1.body)("bio").default(""), validate_middleware_1.default.validateForm, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const userId = res.locals.userId;
         const bio = req.body.bio;
         const user = yield user_model_1.default.findOne({ _id: userId });
         if (!user)
             throw new Error("could not authenticate user with id: " + userId);
+        if (req.file && user.avatar) {
+            const photoName = path_1.default.resolve(__dirname, "..", "public/photos/" + user.avatar);
+            fs_1.default.unlink(photoName, (err) => { if (err)
+                console.error(err); });
+        }
+        if (req.file) {
+            user.avatar = req.file.filename;
+        }
         user.bio = bio;
-        user.save();
+        yield user.save();
         res.sendStatus(200);
     }
     catch (err) {
@@ -272,7 +295,7 @@ router.route("/me/subscribe/:subId").put(auth_middleware_1.default.verifyToken, 
         if (!subUser)
             throw new Error("could not find target user: " + req.params.subId);
         user.subscriptions.push(subUser._id);
-        user.save();
+        yield user.save();
         res.sendStatus(200);
     }
     catch (err) {
@@ -289,7 +312,7 @@ router.route("/:id").get((req, res) => __awaiter(void 0, void 0, void 0, functio
             }
         });
         if (!user)
-            throw new Error("could not find user: " + req.params.id);
+            throw new Error("no user with id: " + req.params.id);
         res.status(200).send(user);
     }
     catch (err) {

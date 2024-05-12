@@ -22,23 +22,46 @@ const user_model_1 = __importDefault(require("../models/user.model"));
 const auth_middleware_1 = __importDefault(require("../middlewares/auth.middleware"));
 const validate_middleware_1 = __importDefault(require("../middlewares/validate.middleware"));
 const express_validator_1 = require("express-validator");
+const comments_route_1 = __importDefault(require("./comments.route"));
 const router = express_1.default.Router();
 const upload = (0, multer_1.default)({ dest: path_1.default.resolve(__dirname, "..", "public/photos/") });
-router.route("/me/achievement").post(auth_middleware_1.default.verifyToken, upload.single("photo"), (0, express_validator_1.body)("type").default(""), (0, express_validator_1.body)("title").default(""), (0, express_validator_1.body)("shortDescription").default(""), (0, express_validator_1.body)("fullDescription").default(""), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.route("/achievement/:achievementId").get((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const achievement = yield achievement_model_1.default.findOne({ _id: req.params.achievementId })
+            .populate("members").populate({ path: "comments", populate: "author" }).populate("portfolio");
+        if (!achievement)
+            throw new Error("no achievement with id: " + req.params.achievementId);
+        res.send(achievement);
+    }
+    catch (err) {
+        console.error(err);
+        res.status(500).send("could not find achievement: " + err);
+    }
+}));
+router.route("/me/achievement").post(auth_middleware_1.default.verifyToken, upload.single("photo"), (0, express_validator_1.body)("type").default(""), (0, express_validator_1.body)("title").default(""), (0, express_validator_1.body)("shortDescription").default(""), (0, express_validator_1.body)("fullDescription").default(""), (0, express_validator_1.body)("url").default(""), (0, express_validator_1.query)("members").toArray().default([]), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     try {
         const userId = res.locals.userId;
         const user = yield user_model_1.default.findOne({ _id: userId });
         if (!user)
             throw new Error("could not find user: " + userId);
-        const portfolio = yield portfolio_model_1.default.findOne({ _id: (_a = user.portfolio) === null || _a === void 0 ? void 0 : _a.toString() }).populate("owner achievements");
+        const portfolio = yield portfolio_model_1.default.findOne({ _id: (_a = user.portfolio) === null || _a === void 0 ? void 0 : _a.toString() });
         if (!portfolio)
             throw new Error("user doesnt have portfolio");
         const type = req.body.type;
         const title = req.body.title;
         const shortDescription = req.body.shortDescription;
         const fullDescription = req.body.fullDescription;
-        const achievement = yield achievement_model_1.default.create({ type, title, shortDescription, fullDescription });
+        const url = req.body.url;
+        const members = req.query.members;
+        const achievement = yield achievement_model_1.default.create({ type, title, shortDescription, fullDescription, url });
+        for (let i = 0; i < members.length; i++) {
+            const memberId = members[i];
+            const member = yield user_model_1.default.findById(memberId);
+            if (!member)
+                throw new Error("could not find member with id: " + memberId);
+            achievement.members.push(member._id);
+        }
         if (req.file) {
             achievement.photo = req.file.filename;
         }
@@ -46,14 +69,14 @@ router.route("/me/achievement").post(auth_middleware_1.default.verifyToken, uplo
         portfolio.achievements.push(achievement._id);
         yield achievement.save();
         yield portfolio.save();
-        res.send(achievement);
+        res.sendStatus(200);
     }
     catch (err) {
         console.error(err);
         res.status(500).send("could not create achievement in user portfolio: " + err);
     }
 }));
-router.route("/me/achievement/:achievementId").put(auth_middleware_1.default.verifyToken, upload.single("photo"), (0, express_validator_1.body)("title").default(""), (0, express_validator_1.body)("shortDescription").default(""), (0, express_validator_1.body)("fullDescription").default(""), (0, express_validator_1.body)("url").default(""), validate_middleware_1.default.validateForm, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.route("/me/achievement/:achievementId").put(auth_middleware_1.default.verifyToken, upload.single("photo"), (0, express_validator_1.body)("title").default(""), (0, express_validator_1.body)("shortDescription").default(""), (0, express_validator_1.body)("fullDescription").default(""), (0, express_validator_1.body)("url").default(""), (0, express_validator_1.query)("members").toArray().default([]), validate_middleware_1.default.validateForm, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const userId = res.locals.userId;
         const user = yield user_model_1.default.findOne({ _id: userId });
@@ -62,18 +85,27 @@ router.route("/me/achievement/:achievementId").put(auth_middleware_1.default.ver
         const achievement = yield achievement_model_1.default.findOne({ _id: req.params.achievementId, portfolio: user.portfolio });
         if (!achievement)
             throw new Error("could not find achievement: " + req.params.achievementId);
-        if (achievement.photo) {
-            const photoName = path_1.default.resolve(__dirname, "..", "public/photos/" + (achievement === null || achievement === void 0 ? void 0 : achievement.photo));
+        if (req.file && achievement.photo) {
+            const photoName = path_1.default.resolve(__dirname, "..", "public/photos/" + achievement.photo);
             fs_1.default.unlink(photoName, (err) => { if (err)
                 console.error(err); });
         }
+        if (req.file)
+            achievement.photo = req.file.filename;
         achievement.title = req.body.title;
         achievement.shortDescription = req.body.shortDescription;
         achievement.fullDescription = req.body.fullDescription;
         achievement.url = req.body.url;
-        if (req.file)
-            achievement.photo = req.file.filename;
-        achievement.save();
+        const members = req.query.members;
+        achievement.members = [];
+        for (let i = 0; i < members.length; i++) {
+            const memberId = members[i];
+            const member = yield user_model_1.default.findById(memberId);
+            if (!member)
+                throw new Error("could not find member with id: " + memberId);
+            achievement.members.push(member._id);
+        }
+        yield achievement.save();
         res.sendStatus(200);
     }
     catch (err) {
@@ -109,4 +141,5 @@ router.route("/me/achievement/:achievementId").delete(auth_middleware_1.default.
         res.status(500).send("could not delete achievement: " + err);
     }
 }));
+router.use("/", comments_route_1.default);
 exports.default = router;
