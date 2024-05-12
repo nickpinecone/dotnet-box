@@ -42,7 +42,6 @@ function Registration() {
     return password.length >= 8;
   }
 
-
   return (
     <div className={m.enter_container}>
       <form className={m.container_login}>

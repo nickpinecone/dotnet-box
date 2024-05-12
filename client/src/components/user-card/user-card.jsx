@@ -9,13 +9,13 @@ function UserCard({ userData, photo }) {
     return userData._id === localStorage.getItem("id")
   }
   const back = () => {
-    if(!isMy()) {
+    if (!isMy()) {
       return <NavLink className={m.back} to={-1}>Назад</NavLink>
     }
   }
 
   const sub = () => {
-    if(!isMy()) {
+    if (!isMy()) {
       return (
         <li className={`${m.contact_list_item} ${m.buttons}`}>
           <Link className={m.subscribe}>Подписаться</Link>

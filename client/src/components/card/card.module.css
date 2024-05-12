@@ -75,7 +75,7 @@
   color: #FFFFFF;
 }
 
-.chenge {
+.change {
   position: absolute;
   top: 0;
   right: 0;
@@ -86,11 +86,11 @@
   background-position: center;
 }
 
-.chenge:hover .chenge_list{
+.change:hover .change_list{
   display: flex;
 }
 
-.chenge_list {
+.change_list {
   flex-direction: column;
   position: absolute;
   top: 0;
@@ -102,12 +102,13 @@
   display: none;
 }
 
-.chenge_list_item {
+.change_list_item {
   font-weight: 500;
   font-size: 22px;
   color: #2196f3;
+  cursor: pointer;
 }
 
-.chenge_list_item:not(:last-child) {
+.change_list_item:not(:last-child) {
   margin-bottom: 10px;
 }

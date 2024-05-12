@@ -1,9 +1,9 @@
 import m from './add-achievment.module.css';
 import { NavLink } from 'react-router-dom';
 
-function AddHeader({isAdd}) {
+function AddHeader({ isAdd }) {
   const add = () => {
-    if(isAdd){
+    if (isAdd) {
       return <NavLink className={m.add} to="/add">Добавить достижение</NavLink>
     }
   }

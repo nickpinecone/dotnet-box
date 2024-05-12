@@ -3,24 +3,23 @@ import Header from '../components/header/header';
 import UserCard from '../components/user-card/user-card';
 import AddHeader from '../components/add-header/add-achievment'
 import Card from '../components/card/card'
-// import More from "../components/more/More"
 import More from "../components/more/more"
 
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 
 function Portfolio() {
-    const params = useParams();
-    const idUser = params.idUser;
+  const params = useParams();
+  const idUser = params.idUser;
   const navigate = useNavigate()
 
   useEffect(() => {
     try {
       if (localStorage.getItem('token')) {
         handleGetData()
-        
+
       }
-      else{
+      else {
         navigate('/login')
       }
     }
@@ -43,7 +42,7 @@ function Portfolio() {
       <Header />
       <UserCard userData={userData} />
       <AddHeader />
-      {dataProjects.map(project => <Card idUser={userData._id} data={project}/>)}
+      {dataProjects.map(project => <Card idUser={userData._id} data={project} />)}
     </main>
   );
 }

@@ -3,7 +3,7 @@ import { NavLink } from 'react-router-dom';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
 
-function Card({ idUser, data, change, img}) {
+function Card({ idUser, data, change, img }) {
 
   useEffect(() => {
     if (data.photo != undefined) {
@@ -21,32 +21,32 @@ function Card({ idUser, data, change, img}) {
     setPhoto(url)
   }
 
-  const delAchieve = async() => {
+  const delAchieve = async () => {
     const del = await axios.delete(`http://localhost:4000/api/portfolios/me/achievement/${data._id}`, {
       headers: { 'x-access-token': localStorage.getItem('token') },
     })
   }
 
   const changeCom = () => {
-    if (change){
+    if (change) {
       return (
-        <div className={m.chenge}>
-          <div className={m.chenge_list}>
-            <a className={m.chenge_list_item}>Редактировать</a>
-            <a onClick={delAchieve} href='/' className={m.chenge_list_item}>Удалить</a>
+        <div className={m.change}>
+          <div className={m.change_list}>
+            <a className={m.change_list_item}>Редактировать</a>
+            <a onClick={delAchieve} href='/' className={m.change_list_item}>Удалить</a>
           </div>
         </div>);
     }
-    else{
-      return ;
+    else {
+      return;
     }
   }
 
   const linkTo = () => {
-    if(idUser === null){
+    if (idUser === null) {
       return <NavLink className={m.details}>Подробнее</NavLink>
     }
-    else{
+    else {
       return <NavLink className={m.details} to={`/${idUser}/${data._id}`}>Подробнее</NavLink>
     }
   }
