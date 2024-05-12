@@ -1,7 +1,7 @@
 import EnterHeader from '../components/enter-header/enter-header'
 import Recovery from '../components/recovery/recovery'
 
-function RecoveryCard() {
+function RecoveryPage() {
   return (
     <div>
       <EnterHeader />
@@ -10,4 +10,4 @@ function RecoveryCard() {
   );
 }
 
-export default RecoveryCard;
+export default RecoveryPage;

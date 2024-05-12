@@ -30,10 +30,10 @@ function Card({ idUser, data, change, img }) {
   const changeCom = () => {
     if (change) {
       return (
-        <div className={m.chenge}>
-          <div className={m.chenge_list}>
-            <a className={m.chenge_list_item}>Редактировать</a>
-            <a onClick={delAchieve} href='/' className={m.chenge_list_item}>Удалить</a>
+        <div className={m.change}>
+          <div className={m.change_list}>
+            <a className={m.change_list_item}>Редактировать</a>
+            <a onClick={delAchieve} href='/' className={m.change_list_item}>Удалить</a>
           </div>
         </div>);
     }

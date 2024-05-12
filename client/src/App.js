@@ -7,14 +7,15 @@ import BigCardPage from './pages/BigCardPage';
 import Search from './pages/SearchPage'
 import Settings from './pages/SettingsPage';
 import UserPage from './pages/UserPage'
+import SubscriptionsPage from './pages/SubscriptionsPage';
+import Recovery from './pages/Recovery';
+import RecoverPasswordPage from './pages/RecoverPassword';
 
 import {
   BrowserRouter as Router,
   Routes,
   Route,
 } from 'react-router-dom';
-import SubscriptionsPage from './pages/SubscriptionsPage';
-import Recovery from './pages/Recovery';
 
 
 function App() {
@@ -31,6 +32,7 @@ function App() {
         <Route path='subscriptions' element={<SubscriptionsPage />} />
         <Route path="/:idUser" element={<UserPage />} />
         <Route path="/login/restore_password" element={<Recovery />} />
+        <Route path="/login/restore_password/:idUser/:token" element={<RecoverPasswordPage />} />
       </Routes>
     </Router>
   );
