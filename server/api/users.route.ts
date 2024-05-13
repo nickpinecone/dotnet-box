@@ -13,11 +13,13 @@ import User from "../models/user.model";
 import Portfolio from "../models/portfolio.model";
 import validation from "../middlewares/validate.middleware";
 
-
 dotenv.config();
 
 const router = express.Router();
 const upload = multer({ dest: path.resolve(__dirname, "..", "public/photos/") });
+
+const serverUrl: string = "http://localhost:4000";
+const siteUrl: string = "http://localhost:3000";
 
 const mailerSend = new MailerSend({
     apiKey: process.env.EMAIL_API as string,
@@ -223,8 +225,7 @@ router.route("/me/verify").put(auth.verifyToken, async (req, res) => {
             }
         );
 
-        // TODO Link to the frontend verify account page
-        const link = `http://localhost:4000/api/users/verify/${user.id}/${token}`;
+        const link = `${serverUrl}/api/users/verify/${user.id}/${token}`;
 
         const sender = new Sender(process.env.EMAIL_HOST as string, "Digital Portfolio");
         const recipient = [new Recipient(user.email as string, getFullName(user))];
@@ -237,7 +238,7 @@ router.route("/me/verify").put(auth.verifyToken, async (req, res) => {
 
         await mailerSend.email.send(emailParams);
 
-        res.send(200);
+        res.sendStatus(200);
     }
     catch (err) {
         console.error(err);
@@ -266,8 +267,7 @@ router.route("/reset").post(
                 }
             );
 
-            // TODO Link to the frontend password reset form, link reset token
-            const link = `http://localhost:4000/api/users/reset/${user.id}/${token}`;
+            const link = `${siteUrl}/login/restore_password/${user.id}/${token}`;
 
             const sender = new Sender(process.env.EMAIL_HOST as string, "Digital Portfolio");
             const recipient = [new Recipient(user.email as string, user.name as string)];
@@ -312,9 +312,7 @@ router.route("/verify/:id/:token").get(async (req, res) => {
             }
         );
 
-        res.sendStatus(200);
-        // TODO redirect to frontend home page
-        // res.redirect()
+        res.status(200).redirect(siteUrl);
     }
     catch (err) {
         console.error(err);
@@ -343,8 +341,6 @@ router.route("/reset/:id/:token").post(upload.none(),
                         user.password = password;
                         user.save();
                         res.sendStatus(200);
-                        // TODO redirect to frontend home page
-                        // res.redirect()
                     }
                     else {
                         throw new Error("token does not match user id");
