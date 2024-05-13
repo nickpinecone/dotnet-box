@@ -153,6 +153,7 @@ router.route("/me").get(auth.verifyToken, async (req, res) => {
 });
 
 router.route("/byEmail").get(
+    upload.none(),
     body("email").notEmpty().isEmail(),
     validation.validateForm,
     async (req, res) => {
