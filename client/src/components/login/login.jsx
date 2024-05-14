@@ -1,14 +1,13 @@
 import { useState } from 'react';
 import m from './login.module.css'
 import axios from 'axios'
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 
 import * as VKID from '@vkid/sdk';
 
 VKID.Config.set({
   app: 51923617, // Идентификатор приложения.
-  redirectUrl: "https://threedotsellipsis.github.io/digital-portfolio/vk_auth", // Адрес для перехода после авторизации.
-  state: "asdf" // Произвольная строка состояния приложения.
+  redirectUrl: "https://threedotsellipsis.github.io/digital-portfolio", // Адрес для перехода после авторизации.
 });
 
 function Login() {

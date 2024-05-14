@@ -30,6 +30,18 @@ function getFullName(user): string {
     return `${user.name} ${user.surname} ${user.paternalName ?? ""}`;
 }
 
+function makeid(length: number): string {
+    let result = "";
+    const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    const charactersLength = characters.length;
+    let counter = 0;
+    while (counter < length) {
+        result += characters.charAt(Math.floor(Math.random() * charactersLength));
+        counter += 1;
+    }
+    return result;
+}
+
 router.route("/").get(async (req, res) => {
     try {
         const users = await User.find({});
@@ -127,6 +139,82 @@ router.route("/login").post(
         catch (err) {
             console.error(err);
             res.status(500).send("could not login user" + err);
+        }
+    }
+);
+
+router.route("/loginVK").post(
+    upload.none(),
+    body("silentToken").notEmpty(),
+    body("uuid").notEmpty(),
+    validation.validateForm,
+    async (req, res) => {
+        try {
+            const silentToken = req.body.silentToken;
+            const uuid = req.body.uuid;
+            const vkApi = process.env.VK_API;
+            const url = "https://api.vk.com/method/auth.exchangeSilentAuthToken?" + `v=5.131&token=${silentToken}&access_token=${vkApi}&uuid=${uuid}`;
+
+            const resp = await fetch(url);
+            const data = await resp.json();
+            const info = data.response;
+
+            console.log(data);
+
+            const url2 = "https://api.vk.com/method/account.getProfileInfo?" + `v=5.131&access_token=${info.access_token}`;
+            const profileResp = await fetch(url2);
+            const profileData = await profileResp.json();
+            const profileInfo = profileData.response;
+
+            const user = await User.findOne({ email: info.email });
+
+            if (user != null) {
+                console.log("here");
+
+                const token = jwt.sign(
+                    { id: user.id },
+                    process.env.LOGIN_SECRET as string,
+                    {
+                        algorithm: 'HS256',
+                        allowInsecureKeySizes: true,
+                        expiresIn: 86400 * 365, // 24 hours (* 365 days for testing)
+                    }
+                );
+
+                res.status(200).send({
+                    user,
+                    accessToken: token
+                });
+            }
+            else {
+                const portfolio = await Portfolio.create({});
+                const user = await User.create({ name: profileInfo.first_name, surname: profileInfo.last_name, password: makeid(10), email: info.email });
+
+                const token = jwt.sign(
+                    { id: user.id },
+                    process.env.LOGIN_SECRET as string,
+                    {
+                        algorithm: 'HS256',
+                        allowInsecureKeySizes: true,
+                        expiresIn: 86400 * 365, // 24 hours (* 365 days for testing)
+                    }
+                );
+
+                portfolio.owner = user._id;
+                user.portfolio = portfolio._id;
+
+                await portfolio.save();
+                await user.save();
+
+                res.status(200).send({
+                    user,
+                    accessToken: token
+                });
+            }
+        }
+        catch (err) {
+            console.error(err);
+            res.status(500).send("could not login user through VK" + err);
         }
     }
 );

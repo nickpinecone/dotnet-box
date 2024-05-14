@@ -11,16 +11,25 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 function MyPortfolio() {
-
   const navigate = useNavigate()
+  const query = new URLSearchParams(window.location.href);
 
   useEffect(() => {
     try {
-      if (localStorage.getItem('token')) {
-        handleGetData()
+      let payload = "";
+
+      query.forEach((value) => {
+        payload = value;
+      });
+
+      if (payload !== "") {
+        handleVkPayload(payload);
+      }
+      if (localStorage.getItem("token")) {
+        handleGetData();
       }
       else {
-        navigate('/login')
+        navigate("/login");
       }
     }
     catch {
@@ -32,6 +41,18 @@ function MyPortfolio() {
   const [dataProjects, setDataProjects] = useState([])
   const [photo, setPhoto] = useState();
 
+  const handleVkPayload = async (payload) => {
+    let payloadData = JSON.parse(payload);
+    const { data } = await axios.post('http://localhost:4000/api/users/loginVK', {
+      silentToken: payloadData.token,
+      uuid: payloadData.uuid,
+    });
+    localStorage.setItem("token", data.accessToken);
+    localStorage.setItem("id", data.user._id);
+
+    handleGetData();
+  }
+
   const handleGetData = async () => {
     const { data } = await axios.get('http://localhost:4000/api/users/me', {
       headers: { 'x-access-token': localStorage.getItem('token') },
@@ -41,13 +62,13 @@ function MyPortfolio() {
     getPhoto(data)
   }
 
-  const getPhoto = async(info) => {
-    if(info.avatar){
+  const getPhoto = async (info) => {
+    if (info.avatar) {
       const img = await axios.get(`http://localhost:4000/api/photos/${info.avatar}`, { responseType: "blob" })
       let url = URL.createObjectURL(img.data)
       setPhoto(url)
     }
-    else{
+    else {
       setPhoto(profile)
     }
   }
@@ -55,8 +76,8 @@ function MyPortfolio() {
   return (
     <main class="container">
       <Header />
-      <UserCard userData={userData} photo={photo}/>
-      <AddHeader isAdd={true}/>
+      <UserCard userData={userData} photo={photo} />
+      <AddHeader isAdd={true} />
       {dataProjects.map(project => <Card idUser={userData._id} data={project} change={true} />)}
     </main>
   );

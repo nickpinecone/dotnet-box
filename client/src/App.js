@@ -10,18 +10,16 @@ import UserPage from './pages/UserPage'
 import SubscriptionsPage from './pages/SubscriptionsPage';
 import Recovery from './pages/Recovery';
 import RecoverPasswordPage from './pages/RecoverPassword';
-import VkAuth from "./pages/VkAuth";
 
 import {
-  BrowserRouter as Router,
+  HashRouter as Router,
   Routes,
   Route,
 } from 'react-router-dom';
 
-
 function App() {
   return (
-    <Router>
+    <Router basename="">
       <Routes>
         <Route path="/login" element={<LoginPage />} />
         <Route path="/registration" element={<RegistrationPage />} />
@@ -34,7 +32,6 @@ function App() {
         <Route path="/:idUser" element={<UserPage />} />
         <Route path="/login/restore_password" element={<Recovery />} />
         <Route path="/login/restore_password/:idUser/:token" element={<RecoverPasswordPage />} />
-        <Route path="/vk_auth" element={<VkAuth />} />
       </Routes>
     </Router>
   );
