@@ -10,6 +10,7 @@ import UserPage from './pages/UserPage'
 import SubscriptionsPage from './pages/SubscriptionsPage';
 import Recovery from './pages/Recovery';
 import RecoverPasswordPage from './pages/RecoverPassword';
+import VkAuth from "./pages/VkAuth";
 
 import {
   BrowserRouter as Router,
@@ -33,6 +34,7 @@ function App() {
         <Route path="/:idUser" element={<UserPage />} />
         <Route path="/login/restore_password" element={<Recovery />} />
         <Route path="/login/restore_password/:idUser/:token" element={<RecoverPasswordPage />} />
+        <Route path="/vk_auth" element={<VkAuth />} />
       </Routes>
     </Router>
   );

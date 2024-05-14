@@ -3,6 +3,14 @@ import m from './login.module.css'
 import axios from 'axios'
 import { Link, useNavigate } from 'react-router-dom';
 
+import * as VKID from '@vkid/sdk';
+
+VKID.Config.set({
+  app: 51923617, // Идентификатор приложения.
+  redirectUrl: "https://threedotsellipsis.github.io/digital-portfolio/vk_auth", // Адрес для перехода после авторизации.
+  state: "asdf" // Произвольная строка состояния приложения.
+});
+
 function Login() {
 
   const navigate = useNavigate()
@@ -27,6 +35,20 @@ function Login() {
     }
   }
 
+  const init = async (container) => {
+    // Создание экземпляра кнопки.
+    const oneTap = new VKID.OneTap();
+
+    console.log(container);
+
+    // Проверка наличия кнопки в разметке.
+    if (container) {
+      // Отрисовка кнопки в контейнере с именем приложения APP_NAME, светлой темой и на русском языке.
+      oneTap.render({ container: container, scheme: VKID.Scheme.LIGHT, lang: VKID.Languages.RUS });
+    }
+  }
+
+
   return (
     <div className={m.enter_container}>
       <form className={m.container_login}>
@@ -46,7 +68,7 @@ function Login() {
         </div>
       </form>
       <Link className={m.login_recover_password} to="./restore_password">Забыл пароль?</Link>
-      <div className={m.container_icon_enter}>
+      <div className={m.container_icon_enter} ref={(element) => { init(element) }}>
         <svg className={m.icon} width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
           <g clip-path="url(#clip0_1529_369)">
             <path d="M0 23.04C0 12.1788 0 6.74826 3.37413 3.37413C6.74826 0 12.1788 0 23.04 0H24.96C35.8212 0 41.2517 0 44.6259 3.37413C48 6.74826 48 12.1788 48 23.04V24.96C48 35.8212 48 41.2517 44.6259 44.6259C41.2517 48 35.8212 48 24.96 48H23.04C12.1788 48 6.74826 48 3.37413 44.6259C0 41.2517 0 35.8212 0 24.96V23.04Z" fill="#0077FF" />
