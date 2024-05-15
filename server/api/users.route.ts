@@ -143,6 +143,17 @@ router.route("/login").post(
     }
 );
 
+async function fetchData(url: string): Promise<any> {
+    const response = await fetch(url);
+    const data = await response.json();
+
+    if (!data.response) {
+        throw new Error("could not fetch data with url: " + url);
+    }
+
+    return data.response;
+}
+
 router.route("/loginVK").post(
     upload.none(),
     body("silentToken").notEmpty(),
@@ -153,64 +164,40 @@ router.route("/loginVK").post(
             const silentToken = req.body.silentToken;
             const uuid = req.body.uuid;
             const vkApi = process.env.VK_API;
-            const url = "https://api.vk.com/method/auth.exchangeSilentAuthToken?" + `v=5.131&token=${silentToken}&access_token=${vkApi}&uuid=${uuid}`;
 
-            const resp = await fetch(url);
-            const data = await resp.json();
-            const info = data.response;
+            let url = "https://api.vk.com/method/auth.exchangeSilentAuthToken?" + `v=5.131&token=${silentToken}&access_token=${vkApi}&uuid=${uuid}`;
+            const generalData = await fetchData(url);
 
-            console.log(data);
+            url = "https://api.vk.com/method/account.getProfileInfo?" + `v=5.131&access_token=${generalData.access_token}`;
+            const profileData = await fetchData(url);
 
-            const url2 = "https://api.vk.com/method/account.getProfileInfo?" + `v=5.131&access_token=${info.access_token}`;
-            const profileResp = await fetch(url2);
-            const profileData = await profileResp.json();
-            const profileInfo = profileData.response;
+            let user = await User.findOne({ email: generalData.email });
 
-            const user = await User.findOne({ email: info.email });
-
-            if (user != null) {
-                console.log("here");
-
-                const token = jwt.sign(
-                    { id: user.id },
-                    process.env.LOGIN_SECRET as string,
-                    {
-                        algorithm: 'HS256',
-                        allowInsecureKeySizes: true,
-                        expiresIn: 86400 * 365, // 24 hours (* 365 days for testing)
-                    }
-                );
-
-                res.status(200).send({
-                    user,
-                    accessToken: token
-                });
-            }
-            else {
+            if (!user) {
                 const portfolio = await Portfolio.create({});
-                const user = await User.create({ name: profileInfo.first_name, surname: profileInfo.last_name, password: makeid(10), email: info.email });
-
-                const token = jwt.sign(
-                    { id: user.id },
-                    process.env.LOGIN_SECRET as string,
-                    {
-                        algorithm: 'HS256',
-                        allowInsecureKeySizes: true,
-                        expiresIn: 86400 * 365, // 24 hours (* 365 days for testing)
-                    }
-                );
+                user = await User.create({ name: profileData.first_name, surname: profileData.last_name, password: makeid(10), email: generalData.email });
 
                 portfolio.owner = user._id;
                 user.portfolio = portfolio._id;
 
                 await portfolio.save();
                 await user.save();
-
-                res.status(200).send({
-                    user,
-                    accessToken: token
-                });
             }
+
+            const token = jwt.sign(
+                { id: user.id },
+                process.env.LOGIN_SECRET as string,
+                {
+                    algorithm: 'HS256',
+                    allowInsecureKeySizes: true,
+                    expiresIn: 86400 * 365, // 24 hours (* 365 days for testing)
+                }
+            );
+
+            res.status(200).send({
+                user,
+                accessToken: token
+            });
         }
         catch (err) {
             console.error(err);

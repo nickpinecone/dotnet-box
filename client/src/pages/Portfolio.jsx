@@ -16,20 +16,22 @@ function MyPortfolio() {
 
   useEffect(() => {
     try {
-      let payload = "";
-
-      query.forEach((value) => {
-        payload = value;
-      });
-
-      if (payload !== "") {
-        handleVkPayload(payload);
-      }
       if (localStorage.getItem("token")) {
         handleGetData();
       }
       else {
-        navigate("/login");
+        let payload = "";
+
+        query.forEach((value) => {
+          payload = value;
+        });
+
+        if (payload !== "") {
+          handleVkPayload(payload);
+        }
+        else {
+          navigate("/login");
+        }
       }
     }
     catch {
