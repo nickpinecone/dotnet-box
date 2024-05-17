@@ -76,6 +76,35 @@ router.route("/me/achievement").post(auth_middleware_1.default.verifyToken, uplo
         res.status(500).send("could not create achievement in user portfolio: " + err);
     }
 }));
+router.route("/me/achievement/like/:achievementId").put(auth_middleware_1.default.verifyToken, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const userId = res.locals.userId;
+        const user = yield user_model_1.default.findOne({ _id: userId });
+        if (!user)
+            throw new Error("could not find user: " + userId);
+        const achievement = yield achievement_model_1.default.findOne({ _id: req.params.achievementId });
+        if (!achievement)
+            throw new Error("could not find achievement: " + req.params.achievementId);
+        if (user.liked.every((post) => post._id.toString() != achievement._id.toString())) {
+            if (!achievement.likeAmount) {
+                achievement.likeAmount = 0;
+            }
+            achievement.likeAmount += 1;
+            user.liked.push(achievement._id);
+        }
+        else {
+            if (achievement.likeAmount) {
+                achievement.likeAmount -= 1;
+            }
+            user.liked = user.liked.filter((post) => post._id.toString() != achievement._id.toString());
+        }
+        res.sendStatus(200);
+    }
+    catch (err) {
+        console.error(err);
+        res.status(500).send("Could not like achievement: " + err);
+    }
+}));
 router.route("/me/achievement/:achievementId").put(auth_middleware_1.default.verifyToken, upload.single("photo"), (0, express_validator_1.body)("title").default(""), (0, express_validator_1.body)("shortDescription").default(""), (0, express_validator_1.body)("fullDescription").default(""), (0, express_validator_1.body)("url").default(""), (0, express_validator_1.query)("members").toArray().default([]), validate_middleware_1.default.validateForm, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const userId = res.locals.userId;
@@ -143,3 +172,4 @@ router.route("/me/achievement/:achievementId").delete(auth_middleware_1.default.
 }));
 router.use("/", comments_route_1.default);
 exports.default = router;
+//# sourceMappingURL=achievements.route.js.map

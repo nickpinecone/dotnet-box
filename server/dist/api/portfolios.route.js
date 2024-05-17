@@ -117,3 +117,4 @@ router.route("/:id").get((req, res) => __awaiter(void 0, void 0, void 0, functio
 }));
 router.use("/", achievements_route_1.default);
 exports.default = router;
+//# sourceMappingURL=portfolios.route.js.map

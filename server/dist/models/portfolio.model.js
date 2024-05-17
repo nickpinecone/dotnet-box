@@ -46,3 +46,4 @@ const PortfolioSchema = new mongoose_1.Schema({
 PortfolioSchema.index({ description: 'text' });
 const Portfolio = mongoose_1.default.model("portfolio", PortfolioSchema);
 exports.default = Portfolio;
+//# sourceMappingURL=portfolio.model.js.map

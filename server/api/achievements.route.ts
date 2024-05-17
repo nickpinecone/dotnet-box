@@ -79,7 +79,49 @@ router.route("/me/achievement").post(
             console.error(err);
             res.status(500).send("could not create achievement in user portfolio: " + err);
         }
-    });
+    }
+);
+
+router.route("/me/achievement/like/:achievementId").put(
+    auth.verifyToken,
+    async (req, res) => {
+        try {
+            const userId = res.locals.userId;
+            const user = await User.findOne({ _id: userId });
+            if (!user) throw new Error("could not find user: " + userId);
+
+            const achievement = await Achievement.findOne({ _id: req.params.achievementId });
+            if (!achievement) throw new Error("could not find achievement: " + req.params.achievementId);
+
+            if (user.liked.every((post) => post._id.toString() != achievement._id.toString())) {
+                if (!achievement.likeAmount) {
+                    achievement.likeAmount = 0;
+                }
+
+                achievement.likeAmount += 1;
+                user.liked.push(achievement._id);
+
+
+            }
+            else {
+                if (achievement.likeAmount) {
+                    achievement.likeAmount -= 1;
+                }
+
+                user.liked = user.liked.filter((post) => post._id.toString() != achievement._id.toString());
+            }
+
+            await achievement.save();
+            await user.save();
+
+            res.sendStatus(200);
+        }
+        catch (err) {
+            console.error(err);
+            res.status(500).send("Could not like achievement: " + err);
+        }
+    }
+);
 
 router.route("/me/achievement/:achievementId").put(
     auth.verifyToken,

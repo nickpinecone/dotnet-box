@@ -18,3 +18,4 @@ function verifyToken(req, res, next) {
     });
 }
 exports.default = { verifyToken };
+//# sourceMappingURL=auth.middleware.js.map

@@ -57,6 +57,10 @@ const UserSchema = new mongoose_1.Schema({
             type: mongoose_1.default.Schema.Types.ObjectId,
             ref: "user",
         }],
+    liked: [{
+            type: mongoose_1.default.Schema.Types.ObjectId,
+            ref: "achievement",
+        }],
 });
 UserSchema.pre("save", function (next) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -75,3 +79,4 @@ UserSchema.pre("save", function (next) {
 });
 const User = mongoose_1.default.model("user", UserSchema);
 exports.default = User;
+//# sourceMappingURL=user.model.js.map

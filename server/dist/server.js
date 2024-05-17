@@ -19,3 +19,4 @@ app.use("*", (req, res) => {
     res.status(404).json({ error: "page not found" });
 });
 exports.default = app;
+//# sourceMappingURL=server.js.map

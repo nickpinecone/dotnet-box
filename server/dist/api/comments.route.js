@@ -85,3 +85,4 @@ router.route("/comment/:commentId").delete(auth_middleware_1.default.verifyToken
     }
 }));
 exports.default = router;
+//# sourceMappingURL=comments.route.js.map

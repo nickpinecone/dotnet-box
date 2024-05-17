@@ -12,3 +12,4 @@ const port = process.env.PORT || 4000;
 server_1.default.listen(port, () => {
     console.log("server is running on port: " + port);
 });
+//# sourceMappingURL=index.js.map

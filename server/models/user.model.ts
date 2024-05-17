@@ -26,6 +26,11 @@ const UserSchema = new Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "user",
     }],
+
+    liked: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "achievement",
+    }],
 });
 
 UserSchema.pre("save", async function (next) {
