@@ -98,6 +98,8 @@ router.route("/me/achievement/like/:achievementId").put(auth_middleware_1.defaul
             }
             user.liked = user.liked.filter((post) => post._id.toString() != achievement._id.toString());
         }
+        yield achievement.save();
+        yield user.save();
         res.sendStatus(200);
     }
     catch (err) {
