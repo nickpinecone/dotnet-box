@@ -12,15 +12,14 @@ import Recovery from './pages/Recovery';
 import RecoverPasswordPage from './pages/RecoverPassword';
 
 import {
-  BrowserRouter as Router,
+  HashRouter as Router,
   Routes,
   Route,
 } from 'react-router-dom';
 
-
 function App() {
   return (
-    <Router>
+    <Router basename="">
       <Routes>
         <Route path="/login" element={<LoginPage />} />
         <Route path="/registration" element={<RegistrationPage />} />

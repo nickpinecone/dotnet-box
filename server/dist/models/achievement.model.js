@@ -32,6 +32,7 @@ const AchievementSchema = new mongoose_1.Schema({
     shortDescription: String,
     fullDescription: String,
     url: String,
+    likeAmount: Number,
     members: [{
             type: mongoose_1.default.Schema.Types.ObjectId,
             ref: "user"
@@ -64,3 +65,4 @@ AchievementSchema.pre("save", function (next) {
 });
 const Achievement = mongoose_1.default.model("achievement", AchievementSchema);
 exports.default = Achievement;
+//# sourceMappingURL=achievement.model.js.map

@@ -9,6 +9,7 @@ const AchievementSchema = new Schema({
     shortDescription: String,
     fullDescription: String,
     url: String,
+    likeAmount: Number,
 
     members: [{
         type: mongoose.Schema.Types.ObjectId,

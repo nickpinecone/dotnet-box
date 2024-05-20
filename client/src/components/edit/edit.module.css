@@ -149,15 +149,13 @@
 }
 
 .add_photo:hover,
-.publish:hover,
-.confirm:hover {
+.publish:hover {
   background-color: #0661A9;
   color: #FFFFFF;
 }
 
 .add_photo:active,
-.publish:active,
-.confirm:active {
+.publish:active {
   background-color: #11293D;
   color: #FFFFFF;
 }

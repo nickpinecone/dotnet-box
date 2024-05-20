@@ -9,3 +9,4 @@ function validateForm(req, res, next) {
     next();
 }
 exports.default = { validateForm };
+//# sourceMappingURL=validate.middleware.js.map

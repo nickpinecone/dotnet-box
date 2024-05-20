@@ -1,10 +1,10 @@
-import m from './add.module.css';
+import m from './edit.module.css';
 import Card from '../card/card';
 import BigCard from '../big-card/big-card';
 import { useState } from 'react';
 import axios from 'axios';
 
-function Add() {
+function Edit({ dataCard, photo, fromAdd, userId }) {
 
   const [type, setType] = useState('')
   const [name, setName] = useState('')
@@ -14,11 +14,10 @@ function Add() {
   const [img, setImg] = useState(null)
   console.log(img)
 
-  const onAdd = async () => {
+  const onEdit = async () => {
     try {
       let formData = new FormData();
       console.log(img)
-      formData.append('type', type)
       formData.append('title', name)
       formData.append('shortDescription', descr)
       formData.append('fullDescription', allDescr)
@@ -27,25 +26,15 @@ function Add() {
 
       let members = localStorage.getItem('id')
 
-      const { data } = await axios.post('http://localhost:4000/api/portfolios/me/achievement', formData,
+      const { data } = await axios.put('http://localhost:4000/api/portfolios/me/achievement/66328449d557727a7c7e9f95', formData,
         {
           params: { members, members },
           headers: { 'x-access-token': localStorage.getItem('token') },
         })
     }
     catch {
-      console.log('Error add-achieve')
+      console.log('Error edit-achieve')
     }
-  }
-
-  const viewAchieve = () => {
-    const dataAchieve = { "type": type, 'title': name, 'shortDescription': descr, 'fullDescription': allDescr, 'url': link, 'photo': img }
-    return (
-      <div>
-        <Card idUser={null} data={dataAchieve} />
-        <BigCard dataCard={dataAchieve} fromAdd={true} />
-      </div>
-    )
   }
 
   return (
@@ -60,15 +49,15 @@ function Add() {
         <ul className={m.list}>
           <li>
             <p className={m.achiv_header_text}>Название</p>
-            <input className={`${m.achiv_input} ${m.achiv_input_short}`} value={name} onChange={(e) => { setName(e.target.value) }}></input>
+            <input className={`${m.achiv_input} ${m.achiv_input_short}`} value={dataCard.title} onChange={(e) => { setName(e.target.value) }}></input>
           </li>
           <li>
             <p className={m.achiv_header_text}>Краткое описание</p>
-            <textarea className={`${m.achiv_input} ${m.achiv_description}`} value={descr} onChange={(e) => { setDescr(e.target.value) }}></textarea>
+            <textarea className={`${m.achiv_input} ${m.achiv_description}`} value={dataCard.shortDescription} onChange={(e) => { setDescr(e.target.value) }}></textarea>
           </li>
           <li>
             <p className={m.achiv_header_text}>Полное описание</p>
-            <textarea className={`${m.achiv_input} ${m.achiv_full_description}`} value={allDescr} onChange={(e) => { setAllDescr(e.target.value) }}></textarea>
+            <textarea className={`${m.achiv_input} ${m.achiv_full_description}`} value={dataCard.fullDescription} onChange={(e) => { setAllDescr(e.target.value) }}></textarea>
           </li>
           <li>
             <p className={m.achiv_header_text}>Ссылка на достижение</p>
@@ -109,12 +98,12 @@ function Add() {
               <span>Добавить фото</span>
             </form>
           </div>
-          <div className={`${m.button_sized} ${m.button_corrected}`}><a className={m.confirm} href='/' onClick={() => { onAdd() }}>Подтердить подлинность</a></div>
-          <div className={m.button_sized}><a className={m.publish} href='/' onClick={() => { onAdd() }}>Опубликовать</a></div>
+          <div className={`${m.button_sized} ${m.button_corrected}`}><a className={m.confirm} href='/' onClick={() => { onEdit() }}>Подтердить подлинность</a></div>
+          <div className={m.button_sized}><a className={m.publish} href='/' onClick={() => { onEdit() }}>Сохранить</a></div>
         </div>
       </section>
     </div>
   );
 }
 
-export default Add;
+export default Edit;

@@ -28,6 +28,8 @@ const validate_middleware_1 = __importDefault(require("../middlewares/validate.m
 dotenv_1.default.config();
 const router = express_1.default.Router();
 const upload = (0, multer_1.default)({ dest: path_1.default.resolve(__dirname, "..", "public/photos/") });
+const serverUrl = "http://localhost:4000";
+const siteUrl = "http://localhost:3000";
 const mailerSend = new mailersend_1.MailerSend({
     apiKey: process.env.EMAIL_API,
 });
@@ -35,6 +37,17 @@ const mailerSend = new mailersend_1.MailerSend({
 function getFullName(user) {
     var _a;
     return `${user.name} ${user.surname} ${(_a = user.paternalName) !== null && _a !== void 0 ? _a : ""}`;
+}
+function makeid(length) {
+    let result = "";
+    const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    const charactersLength = characters.length;
+    let counter = 0;
+    while (counter < length) {
+        result += characters.charAt(Math.floor(Math.random() * charactersLength));
+        counter += 1;
+    }
+    return result;
 }
 router.route("/").get((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -103,6 +116,49 @@ router.route("/login").post(upload.none(), (0, express_validator_1.body)("email"
         res.status(500).send("could not login user" + err);
     }
 }));
+function fetchData(url) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const response = yield fetch(url);
+        const data = yield response.json();
+        if (!data.response) {
+            throw new Error("could not fetch data with url: " + url);
+        }
+        return data.response;
+    });
+}
+router.route("/loginVK").post(upload.none(), (0, express_validator_1.body)("silentToken").notEmpty(), (0, express_validator_1.body)("uuid").notEmpty(), validate_middleware_1.default.validateForm, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const silentToken = req.body.silentToken;
+        const uuid = req.body.uuid;
+        const vkApi = process.env.VK_API;
+        let url = "https://api.vk.com/method/auth.exchangeSilentAuthToken?" + `v=5.131&token=${silentToken}&access_token=${vkApi}&uuid=${uuid}`;
+        const generalData = yield fetchData(url);
+        url = "https://api.vk.com/method/account.getProfileInfo?" + `v=5.131&access_token=${generalData.access_token}`;
+        const profileData = yield fetchData(url);
+        let user = yield user_model_1.default.findOne({ email: generalData.email });
+        if (!user) {
+            const portfolio = yield portfolio_model_1.default.create({});
+            user = yield user_model_1.default.create({ name: profileData.first_name, surname: profileData.last_name, password: makeid(10), email: generalData.email });
+            portfolio.owner = user._id;
+            user.portfolio = portfolio._id;
+            yield portfolio.save();
+            yield user.save();
+        }
+        const token = jsonwebtoken_1.default.sign({ id: user.id }, process.env.LOGIN_SECRET, {
+            algorithm: 'HS256',
+            allowInsecureKeySizes: true,
+            expiresIn: 86400 * 365, // 24 hours (* 365 days for testing)
+        });
+        res.status(200).send({
+            user,
+            accessToken: token
+        });
+    }
+    catch (err) {
+        console.error(err);
+        res.status(500).send("could not login user through VK" + err);
+    }
+}));
 router.route("/me").get(auth_middleware_1.default.verifyToken, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const userId = res.locals.userId;
@@ -121,7 +177,7 @@ router.route("/me").get(auth_middleware_1.default.verifyToken, (req, res) => __a
         res.status(500).send("could not get user profile page: " + err);
     }
 }));
-router.route("/byEmail").get((0, express_validator_1.body)("email").notEmpty().isEmail(), validate_middleware_1.default.validateForm, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.route("/byEmail").get(upload.none(), (0, express_validator_1.body)("email").notEmpty().isEmail(), validate_middleware_1.default.validateForm, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const email = req.body.email;
         const user = yield user_model_1.default.findOne({ email: email });
@@ -169,8 +225,7 @@ router.route("/me/verify").put(auth_middleware_1.default.verifyToken, (req, res)
             allowInsecureKeySizes: true,
             expiresIn: 3600, // 1 hour
         });
-        // TODO Link to the frontend verify account page
-        const link = `http://localhost:4000/api/users/verify/${user.id}/${token}`;
+        const link = `${serverUrl}/api/users/verify/${user.id}/${token}`;
         const sender = new mailersend_1.Sender(process.env.EMAIL_HOST, "Digital Portfolio");
         const recipient = [new mailersend_1.Recipient(user.email, getFullName(user))];
         const emailParams = new mailersend_1.EmailParams()
@@ -179,7 +234,7 @@ router.route("/me/verify").put(auth_middleware_1.default.verifyToken, (req, res)
             .setSubject("Email verification")
             .setHtml(`<section><h1>Click link below to verify email</h1><a>${link}</a></section>`);
         yield mailerSend.email.send(emailParams);
-        res.send(200);
+        res.sendStatus(200);
     }
     catch (err) {
         console.error(err);
@@ -197,8 +252,7 @@ router.route("/reset").post(upload.none(), (0, express_validator_1.body)("email"
             allowInsecureKeySizes: true,
             expiresIn: 3600, // 1 hour
         });
-        // TODO Link to the frontend password reset form, link reset token
-        const link = `http://localhost:4000/api/users/reset/${user.id}/${token}`;
+        const link = `${siteUrl}/login/restore_password/${user.id}/${token}`;
         const sender = new mailersend_1.Sender(process.env.EMAIL_HOST, "Digital Portfolio");
         const recipient = [new mailersend_1.Recipient(user.email, user.name)];
         const emailParams = new mailersend_1.EmailParams()
@@ -231,9 +285,7 @@ router.route("/verify/:id/:token").get((req, res) => __awaiter(void 0, void 0, v
                 throw new Error("token does not match user id");
             }
         });
-        res.sendStatus(200);
-        // TODO redirect to frontend home page
-        // res.redirect()
+        res.status(200).redirect(siteUrl);
     }
     catch (err) {
         console.error(err);
@@ -254,8 +306,6 @@ router.route("/reset/:id/:token").post(upload.none(), (0, express_validator_1.bo
                 user.password = password;
                 user.save();
                 res.sendStatus(200);
-                // TODO redirect to frontend home page
-                // res.redirect()
             }
             else {
                 throw new Error("token does not match user id");
@@ -321,3 +371,4 @@ router.route("/:id").get((req, res) => __awaiter(void 0, void 0, void 0, functio
     }
 }));
 exports.default = router;
+//# sourceMappingURL=users.route.js.map

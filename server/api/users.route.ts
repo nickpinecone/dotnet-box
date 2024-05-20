@@ -13,11 +13,13 @@ import User from "../models/user.model";
 import Portfolio from "../models/portfolio.model";
 import validation from "../middlewares/validate.middleware";
 
-
 dotenv.config();
 
 const router = express.Router();
 const upload = multer({ dest: path.resolve(__dirname, "..", "public/photos/") });
+
+const serverUrl: string = "http://localhost:4000";
+const siteUrl: string = "http://localhost:3000";
 
 const mailerSend = new MailerSend({
     apiKey: process.env.EMAIL_API as string,
@@ -26,6 +28,18 @@ const mailerSend = new MailerSend({
 // @ts-expect-error user is Document
 function getFullName(user): string {
     return `${user.name} ${user.surname} ${user.paternalName ?? ""}`;
+}
+
+function makeid(length: number): string {
+    let result = "";
+    const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    const charactersLength = characters.length;
+    let counter = 0;
+    while (counter < length) {
+        result += characters.charAt(Math.floor(Math.random() * charactersLength));
+        counter += 1;
+    }
+    return result;
 }
 
 router.route("/").get(async (req, res) => {
@@ -129,6 +143,69 @@ router.route("/login").post(
     }
 );
 
+async function fetchData(url: string): Promise<any> {
+    const response = await fetch(url);
+    const data = await response.json();
+
+    if (!data.response) {
+        throw new Error("could not fetch data with url: " + url);
+    }
+
+    return data.response;
+}
+
+router.route("/loginVK").post(
+    upload.none(),
+    body("silentToken").notEmpty(),
+    body("uuid").notEmpty(),
+    validation.validateForm,
+    async (req, res) => {
+        try {
+            const silentToken = req.body.silentToken;
+            const uuid = req.body.uuid;
+            const vkApi = process.env.VK_API;
+
+            let url = "https://api.vk.com/method/auth.exchangeSilentAuthToken?" + `v=5.131&token=${silentToken}&access_token=${vkApi}&uuid=${uuid}`;
+            const generalData = await fetchData(url);
+
+            url = "https://api.vk.com/method/account.getProfileInfo?" + `v=5.131&access_token=${generalData.access_token}`;
+            const profileData = await fetchData(url);
+
+            let user = await User.findOne({ email: generalData.email });
+
+            if (!user) {
+                const portfolio = await Portfolio.create({});
+                user = await User.create({ name: profileData.first_name, surname: profileData.last_name, password: makeid(10), email: generalData.email });
+
+                portfolio.owner = user._id;
+                user.portfolio = portfolio._id;
+
+                await portfolio.save();
+                await user.save();
+            }
+
+            const token = jwt.sign(
+                { id: user.id },
+                process.env.LOGIN_SECRET as string,
+                {
+                    algorithm: 'HS256',
+                    allowInsecureKeySizes: true,
+                    expiresIn: 86400 * 365, // 24 hours (* 365 days for testing)
+                }
+            );
+
+            res.status(200).send({
+                user,
+                accessToken: token
+            });
+        }
+        catch (err) {
+            console.error(err);
+            res.status(500).send("could not login user through VK" + err);
+        }
+    }
+);
+
 router.route("/me").get(auth.verifyToken, async (req, res) => {
     try {
         const userId = res.locals.userId;
@@ -151,6 +228,7 @@ router.route("/me").get(auth.verifyToken, async (req, res) => {
 });
 
 router.route("/byEmail").get(
+    upload.none(),
     body("email").notEmpty().isEmail(),
     validation.validateForm,
     async (req, res) => {
@@ -223,8 +301,7 @@ router.route("/me/verify").put(auth.verifyToken, async (req, res) => {
             }
         );
 
-        // TODO Link to the frontend verify account page
-        const link = `http://localhost:4000/api/users/verify/${user.id}/${token}`;
+        const link = `${serverUrl}/api/users/verify/${user.id}/${token}`;
 
         const sender = new Sender(process.env.EMAIL_HOST as string, "Digital Portfolio");
         const recipient = [new Recipient(user.email as string, getFullName(user))];
@@ -237,7 +314,7 @@ router.route("/me/verify").put(auth.verifyToken, async (req, res) => {
 
         await mailerSend.email.send(emailParams);
 
-        res.send(200);
+        res.sendStatus(200);
     }
     catch (err) {
         console.error(err);
@@ -266,8 +343,7 @@ router.route("/reset").post(
                 }
             );
 
-            // TODO Link to the frontend password reset form, link reset token
-            const link = `http://localhost:4000/api/users/reset/${user.id}/${token}`;
+            const link = `${siteUrl}/login/restore_password/${user.id}/${token}`;
 
             const sender = new Sender(process.env.EMAIL_HOST as string, "Digital Portfolio");
             const recipient = [new Recipient(user.email as string, user.name as string)];
@@ -312,9 +388,7 @@ router.route("/verify/:id/:token").get(async (req, res) => {
             }
         );
 
-        res.sendStatus(200);
-        // TODO redirect to frontend home page
-        // res.redirect()
+        res.status(200).redirect(siteUrl);
     }
     catch (err) {
         console.error(err);
@@ -343,8 +417,6 @@ router.route("/reset/:id/:token").post(upload.none(),
                         user.password = password;
                         user.save();
                         res.sendStatus(200);
-                        // TODO redirect to frontend home page
-                        // res.redirect()
                     }
                     else {
                         throw new Error("token does not match user id");

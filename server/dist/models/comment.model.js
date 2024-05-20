@@ -50,3 +50,4 @@ CommentSchema.pre("save", function (next) {
     return next();
 });
 exports.default = Comment;
+//# sourceMappingURL=comment.model.js.map

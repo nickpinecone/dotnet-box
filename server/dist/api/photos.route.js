@@ -30,3 +30,4 @@ router.route("/:name").get((req, res) => __awaiter(void 0, void 0, void 0, funct
     }
 }));
 exports.default = router;
+//# sourceMappingURL=photos.route.js.map
