@@ -4,6 +4,7 @@ import UserCard from '../components/user-card/user-card';
 import AddHeader from '../components/add-header/add-achievment'
 import Card from '../components/card/card'
 import More from "../components/more/more"
+import profile from "../img/avatar.png"
 
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
@@ -35,12 +36,25 @@ function Portfolio() {
     const { data } = await axios.get(`http://localhost:4000/api/users/${idUser}`)
     setDataPeple(data)
     setDataProjects(data.portfolio.achievements)
+    getPhoto(data)
+  }
+
+  const [photo, setPhoto] = useState();
+  const getPhoto = async (info) => {
+    if (info.avatar) {
+      const img = await axios.get(`http://localhost:4000/api/photos/${info.avatar}`, { responseType: "blob" })
+      let url = URL.createObjectURL(img.data)
+      setPhoto(url)
+    }
+    else {
+      setPhoto(profile)
+    }
   }
 
   return (
     <main class="container">
       <Header />
-      <UserCard userData={userData} />
+      <UserCard userData={userData} photo={photo}/>
       <AddHeader />
       {dataProjects.map(project => <Card idUser={userData._id} data={project} />)}
     </main>

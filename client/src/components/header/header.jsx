@@ -1,6 +1,6 @@
 import m from './header.module.css';
 import logo from './../../img/logo.svg'
-import { NavLink } from 'react-router-dom';
+import { NavLink, Link } from 'react-router-dom';
 
 function Header() {
   return (
@@ -12,7 +12,7 @@ function Header() {
         <nav className={m.header_nav}>
           <ul className={m.site_navigation}>
             <li className={m.site_navigation_item}>
-              <NavLink className={m.nav_link} to="/">Главная</NavLink>
+              <Link className={m.nav_link} to="/">Главная</Link>
             </li>
             <li className={m.site_navigation_item}>
               <NavLink className={m.nav_link} to="/search">Поиск</NavLink>

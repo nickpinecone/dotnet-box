@@ -24,6 +24,15 @@
   margin-bottom: 5px;
 }
 
+.achiv_input_people {
+  display: flex;
+}
+
+.achiv_input_people .achiv_input {
+  margin-right: 20px; 
+}
+
+
 .achiv_input_choose {
   display: flex;
   width: 1140px;

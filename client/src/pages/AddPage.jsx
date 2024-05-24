@@ -1,7 +1,8 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import Header from '../components/header/header';
 import Add from '../components/add/add'
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 function AddAchiv() {
 
@@ -10,6 +11,7 @@ function AddAchiv() {
   useEffect(() => {
     if (!localStorage.getItem('token')) {
       navigate('/login')
+
     }
   }, []);
 

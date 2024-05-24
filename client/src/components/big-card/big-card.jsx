@@ -2,11 +2,13 @@ import m from './big-card.module.css';
 import people from "../../img/avatar.png"
 import achievment from "./../../img/achievment.png"
 import { NavLink, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import Microlink from '@microlink/react';
 
 function BigCard({ dataCard, photo, fromAdd, userId }) {
+
   const [steps, setSteps] = useState([])
   const [comment, setComment] = useState()
   const [comments, setComments] = useState(dataCard.comments)
@@ -98,10 +100,18 @@ function BigCard({ dataCard, photo, fromAdd, userId }) {
     setComment("")
   }
 
-  const[photos, setPhotos] = useState()
+  const[photos, setPhotos] = useState(people)
 
-  const viewMembers = () =>{
-    return <img className={m.big_card_image_people} src={photos} alt="Фото участника" />
+  const viewMembers = (member) =>{
+    if(member !== undefined){
+      if(member.avatar !== undefined){
+        getPhoto(member.avatar)
+        return <Link to={`/${userId}`}><img className={m.big_card_image_people} src={photos} alt="Фото участника" /></Link>
+      }
+      else{
+        return <Link to={`/${userId}`}><img className={m.big_card_image_people} src={people} alt="Фото участника" /></Link>
+      }
+    }
   }
 
   const getPhoto = async(id) => {
@@ -143,8 +153,7 @@ function BigCard({ dataCard, photo, fromAdd, userId }) {
                   {viewLink()}
                   <li className={m.achiv_top_add_info_item}>
                     <p className={m.achiv_descr_title}>Участники</p>
-                    <img className={m.big_card_image_people} src={people} alt="Фото участника" />
-                    <img className={m.big_card_image_people} src={people} alt="Фото участника" />
+                    {(dataCard.members).map(member => viewMembers(member))}
                   </li>
                 </ul>
               </div>

@@ -4,7 +4,6 @@ import axios from 'axios';
 import { useEffect, useState } from 'react';
 
 function UserCard({ userData, photo }) {
-
   let isMy = () => {
     return userData._id === localStorage.getItem("id")
   }
@@ -14,16 +13,24 @@ function UserCard({ userData, photo }) {
     }
   }
 
+  const subToUser = async() => {
+    const { data } = await axios.put(`http://localhost:4000/api/users/me/subscribe/${userData._id}`, {
+      headers: { 'x-access-token': localStorage.getItem('token') },
+    });
+  }
+
   const sub = () => {
     if (!isMy()) {
       return (
         <li className={`${m.contact_list_item} ${m.buttons}`}>
-          <Link className={m.subscribe}>Подписаться</Link>
+          <Link className={m.subscribe} onClick={subToUser} >Подписаться</Link>
           <Link className={m.unsubscribe}>Отписаться</Link>
         </li>
       )
     }
   }
+
+
 
   if (!userData) {
     return <>loading...</>

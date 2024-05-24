@@ -3,6 +3,7 @@ import Card from '../card/card';
 import BigCard from '../big-card/big-card';
 import { useState } from 'react';
 import axios from 'axios';
+import { Link } from 'react-router-dom';
 
 function Add() {
 
@@ -12,12 +13,12 @@ function Add() {
   const [allDescr, setAllDescr] = useState('')
   const [link, setLink] = useState('')
   const [img, setImg] = useState(null)
-  console.log(img)
+
+  const [people, setPeople] = useState('')
 
   const onAdd = async () => {
     try {
       let formData = new FormData();
-      console.log(img)
       formData.append('type', type)
       formData.append('title', name)
       formData.append('shortDescription', descr)
@@ -29,7 +30,7 @@ function Add() {
 
       const { data } = await axios.post('http://localhost:4000/api/portfolios/me/achievement', formData,
         {
-          params: { members, members },
+          params: { members },
           headers: { 'x-access-token': localStorage.getItem('token') },
         })
     }
@@ -46,6 +47,12 @@ function Add() {
         <BigCard dataCard={dataAchieve} fromAdd={true} />
       </div>
     )
+  }
+
+  const AddPeople = async() => {
+
+    const data = await axios.get('http://localhost:4000/api/users/byEmail', {email : people} )
+    console.log(data)
   }
 
   return (
@@ -76,7 +83,10 @@ function Add() {
           </li>
           <li>
             <p className={m.achiv_header_text}>Участники</p>
-            <input className={`${m.achiv_input} ${m.achiv_input_short}`}></input>
+            <div className={m.achiv_input_people}>
+              <input className={`${m.achiv_input} ${m.achiv_input_short}`} value={people} onChange={(e) => { setPeople(e.target.value) }}></input>
+              <div className={m.button_sized}><Link className={m.publish} onClick={() => { AddPeople() }}>Добавить</Link></div>
+            </div>
           </li>
         </ul>
         <h2 className={m.check}>Проверка на подлинность</h2>
@@ -97,7 +107,7 @@ function Add() {
             <input className={`${m.achiv_input} ${m.achiv_input_short}`}></input>
           </li>
           <li>
-            <p className={m.achiv_header_text}>Участники</p>
+            <p className={m.achiv_header_text}>Данные</p>
             <input className={`${m.achiv_input} ${m.achiv_input_short}`}></input>
           </li>
         </ul>
