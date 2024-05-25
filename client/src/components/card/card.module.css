@@ -63,6 +63,7 @@
   display: grid;
   margin-top: 20px;
   padding: 13px 35px;
+  box-shadow: 0px 4px 4px 0px #0000001A;
 }
 
 .details:hover {

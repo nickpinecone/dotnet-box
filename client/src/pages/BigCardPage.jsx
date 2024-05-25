@@ -17,7 +17,6 @@ function BigCardPage() {
     }
   }, []);
 
-
   const [achieve, setAchieve] = useState([]);
   const [photo, setPhoto] = useState()
 
@@ -50,7 +49,7 @@ function BigCardPage() {
 
   const viewBigCard = () => {
     if (achieve.length !== 0) {
-      return <BigCard dataCard={achieve} photo={photo} userId={idUser} />
+      return <BigCard dataCard={achieve} photo={photo} userId={idUser} achieveId={idAchieve} />
     }
   }
 

@@ -49,9 +49,8 @@ function Add() {
     )
   }
 
-  const AddPeople = async() => {
-
-    const data = await axios.get('http://localhost:4000/api/users/byEmail', {email : people} )
+  const AddPeople = async () => {
+    const data = await axios.get('http://localhost:4000/api/users/byEmail', { email: people })
     console.log(data)
   }
 

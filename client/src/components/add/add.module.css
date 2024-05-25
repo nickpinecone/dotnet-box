@@ -29,9 +29,8 @@
 }
 
 .achiv_input_people .achiv_input {
-  margin-right: 20px; 
+  margin-right: 20px;
 }
-
 
 .achiv_input_choose {
   display: flex;
@@ -117,6 +116,7 @@
   border: none;
   cursor: pointer;
   transition: all 500ms ease;
+  box-shadow: 0px 4px 4px 0px #0000001A;
 }
 
 .add_photo_file {
@@ -141,6 +141,7 @@
   border: none;
   cursor: pointer;
   transition: all 500ms ease;
+  box-shadow: 0px 4px 4px 0px #0000001A;
 }
 
 .publish {
@@ -155,6 +156,7 @@
   border: none;
   cursor: pointer;
   transition: all 500ms ease;
+  box-shadow: 0px 4px 4px 0px #0000001A;
 }
 
 .add_photo:hover,

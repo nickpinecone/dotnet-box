@@ -39,6 +39,7 @@
   height: 400px;
   border-radius: 50%;
   object-fit: cover;
+  box-shadow: 4px 4px 4px 0px #00000040;
 }
 
 .profile_image_dowload {
@@ -149,8 +150,8 @@
   display: flex;
   padding: 13px 35.5px;
   border-radius: 100px;
-  font-size: 32px;
-  font-weight: 400;
+  font-size: 28px;
+  font-weight: 700;
   line-height: 38.73px;
   color: #FFFFFF;
   background-color: #2196f3;

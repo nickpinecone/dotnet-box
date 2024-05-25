@@ -1,18 +1,18 @@
 import m from './edit.module.css';
-import Card from '../card/card';
-import BigCard from '../big-card/big-card';
 import { useState } from 'react';
 import axios from 'axios';
+import { Link } from 'react-router-dom';
 
-function Edit({ dataCard, photo, fromAdd, userId }) {
+function Edit({ dataCard, idAchieve }) {
 
-  const [type, setType] = useState('')
-  const [name, setName] = useState('')
+  const [name, setName] = useState(dataCard.title)
   const [descr, setDescr] = useState('')
   const [allDescr, setAllDescr] = useState('')
   const [link, setLink] = useState('')
   const [img, setImg] = useState(null)
   console.log(img)
+  
+  const [people, setPeople] = useState('')
 
   const onEdit = async () => {
     try {
@@ -26,9 +26,9 @@ function Edit({ dataCard, photo, fromAdd, userId }) {
 
       let members = localStorage.getItem('id')
 
-      const { data } = await axios.put('http://localhost:4000/api/portfolios/me/achievement/66328449d557727a7c7e9f95', formData,
+      const { data } = await axios.put(`http://localhost:4000/api/portfolios/me/achievement/${idAchieve}`, formData,
         {
-          params: { members, members },
+          params: { members },
           headers: { 'x-access-token': localStorage.getItem('token') },
         })
     }
@@ -37,35 +37,37 @@ function Edit({ dataCard, photo, fromAdd, userId }) {
     }
   }
 
+  const AddPeople = async () => {
+    const data = await axios.get('http://localhost:4000/api/users/byEmail', { email: people })
+    console.log(data)
+  }
+
   return (
     <div>
       <section className={m.add_achiv}>
-        <p className={m.achiv_header_text}>Тип достижения</p>
-        <select className={m.achiv_input_choose} value={type} onChange={(e) => { setType(e.target.value) }}>
-          <option className={m.achiv_input_choose_option} value='certificate'>Сертификат / диплом</option>
-          <option value='project'>Проект</option>
-        </select>
-
         <ul className={m.list}>
           <li>
             <p className={m.achiv_header_text}>Название</p>
-            <input className={`${m.achiv_input} ${m.achiv_input_short}`} value={dataCard.title} onChange={(e) => { setName(e.target.value) }}></input>
+            <input className={`${m.achiv_input} ${m.achiv_input_short}`} placeholder={dataCard.title} onChange={(e) => { setName(e.target.value) }}></input>
           </li>
           <li>
             <p className={m.achiv_header_text}>Краткое описание</p>
-            <textarea className={`${m.achiv_input} ${m.achiv_description}`} value={dataCard.shortDescription} onChange={(e) => { setDescr(e.target.value) }}></textarea>
+            <textarea className={`${m.achiv_input} ${m.achiv_description}`} placeholder={dataCard.shortDescription} onChange={(e) => { setDescr(e.target.value) }}></textarea>
           </li>
           <li>
             <p className={m.achiv_header_text}>Полное описание</p>
-            <textarea className={`${m.achiv_input} ${m.achiv_full_description}`} value={dataCard.fullDescription} onChange={(e) => { setAllDescr(e.target.value) }}></textarea>
+            <textarea className={`${m.achiv_input} ${m.achiv_full_description}`} placeholder={dataCard.fullDescription} onChange={(e) => { setAllDescr(e.target.value) }}></textarea>
           </li>
           <li>
             <p className={m.achiv_header_text}>Ссылка на достижение</p>
-            <input className={`${m.achiv_input} ${m.achiv_input_short}`} value={link} onChange={(e) => { setLink(e.target.value) }}></input>
+            <input className={`${m.achiv_input} ${m.achiv_input_short}`} placeholder={link} onChange={(e) => { setLink(e.target.value) }}></input>
           </li>
           <li>
             <p className={m.achiv_header_text}>Участники</p>
-            <input className={`${m.achiv_input} ${m.achiv_input_short}`}></input>
+            <div className={m.achiv_input_people}>
+              <input className={`${m.achiv_input} ${m.achiv_input_short}`} value={people} onChange={(e) => { setPeople(e.target.value) }}></input>
+              <div className={m.button_sized}><Link className={m.publish} onClick={() => { AddPeople() }}>Добавить</Link></div>
+            </div>
           </li>
         </ul>
         <h2 className={m.check}>Проверка на подлинность</h2>

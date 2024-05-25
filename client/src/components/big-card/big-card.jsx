@@ -43,7 +43,7 @@ function BigCard({ dataCard, photo, fromAdd, userId }) {
 
   const viewFindStep = () => {
     if (!fromAdd) {
-      return <NavLink className={m.link_to_step_achieve} onClick={findStep}>Шаги к достижению цели</NavLink>
+      return <NavLink className={m.link_to_step_achieve} onClick={findStep}>Шаги для достижения цели</NavLink>
     }
   }
 
@@ -53,7 +53,7 @@ function BigCard({ dataCard, photo, fromAdd, userId }) {
     else
       return (
         <div>
-          <button className={m.btn_like} type="button" >Редактировать</button>
+          <NavLink className={m.edit} to='./edit'>Редактировать</NavLink>
           <button className={m.btn_like} type="button" onClick={delAchieve} >Удалить</button>
         </div>)
   }
@@ -100,21 +100,21 @@ function BigCard({ dataCard, photo, fromAdd, userId }) {
     setComment("")
   }
 
-  const[photos, setPhotos] = useState(people)
+  const [photos, setPhotos] = useState(people)
 
-  const viewMembers = (member) =>{
-    if(member !== undefined){
-      if(member.avatar !== undefined){
+  const viewMembers = (member) => {
+    if (member !== undefined) {
+      if (member.avatar !== undefined) {
         getPhoto(member.avatar)
         return <Link to={`/${userId}`}><img className={m.big_card_image_people} src={photos} alt="Фото участника" /></Link>
       }
-      else{
+      else {
         return <Link to={`/${userId}`}><img className={m.big_card_image_people} src={people} alt="Фото участника" /></Link>
       }
     }
   }
 
-  const getPhoto = async(id) => {
+  const getPhoto = async (id) => {
     const img = await axios.get(`http://localhost:4000/api/photos/${id}`, { responseType: "blob" })
     const url = URL.createObjectURL(img.data)
     setPhotos(url)
@@ -165,7 +165,7 @@ function BigCard({ dataCard, photo, fromAdd, userId }) {
               {viewComment()}
             </ul>
             <form className={m.achiv_comment_add}>
-              <textarea className={m.achiv_comment_add_text} name="comment" autoFocus="none" placeholder='Комментарий' value={comment} onChange={(e) => { setComment(e.target.value) }}></textarea>
+              <textarea className={m.achiv_comment_add_text} name="comment" placeholder='Комментарий' value={comment} onChange={(e) => { setComment(e.target.value) }}></textarea>
               <button type="button" className={m.achiv_comment_add_btn} onClick={addComment}>Отправить</button>
             </form>
           </div>

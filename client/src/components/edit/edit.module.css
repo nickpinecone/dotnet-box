@@ -24,6 +24,14 @@
   margin-bottom: 5px;
 }
 
+.achiv_input_people {
+  display: flex;
+}
+
+.achiv_input_people .achiv_input {
+  margin-right: 20px;
+}
+
 .achiv_input_choose {
   display: flex;
   width: 1140px;
@@ -108,6 +116,7 @@
   border: none;
   cursor: pointer;
   transition: all 500ms ease;
+  box-shadow: 0px 4px 4px 0px #0000001A;
 }
 
 .add_photo_file {
@@ -132,6 +141,7 @@
   border: none;
   cursor: pointer;
   transition: all 500ms ease;
+  box-shadow: 0px 4px 4px 0px #0000001A;
 }
 
 .publish {
@@ -146,16 +156,19 @@
   border: none;
   cursor: pointer;
   transition: all 500ms ease;
+  box-shadow: 0px 4px 4px 0px #0000001A;
 }
 
 .add_photo:hover,
-.publish:hover {
+.publish:hover,
+.confirm:hover {
   background-color: #0661A9;
   color: #FFFFFF;
 }
 
 .add_photo:active,
-.publish:active {
+.publish:active,
+.confirm:active {
   background-color: #11293D;
   color: #FFFFFF;
 }

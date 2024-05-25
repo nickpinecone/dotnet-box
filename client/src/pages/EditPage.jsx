@@ -1,7 +1,8 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import Header from '../components/header/header';
 import Edit from '../components/edit/edit'
 import { useNavigate, useParams } from 'react-router-dom';
+import axios from 'axios';
 
 function EditPage() {
 
@@ -11,7 +12,7 @@ function EditPage() {
   const navigate = useNavigate()
 
   useEffect(() => {
-    if (!localStorage.getItem('token')) {
+    if (localStorage.getItem('token')) {
       handleGetData();
     }
   }, []);
@@ -46,16 +47,10 @@ function EditPage() {
     setPhoto(url)
   }
 
-  const viewEditPage = () => {
-    if (achieve.length !== 0) {
-      return <Edit dataCard={achieve} photo={photo} userId={idUser} />
-    }
-  }
-
   return (
     <main class="container">
       <Header />
-      {viewEditPage()}
+      <Edit dataCard={achieve} idAchieve={idAchieve} />
     </main>
   );
 }
