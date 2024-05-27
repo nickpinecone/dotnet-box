@@ -49,13 +49,19 @@ function BigCard({ dataCard, photo, fromAdd, userId }) {
 
   const viewLikeOrEdit = () => {
     if (userId != localStorage.getItem("id"))
-      return <button className={m.btn_like} type="button">Понравилось</button>
+      return <NavLink className={m.btn_like} onClick={PutLike}>Понравилось</NavLink>
     else
       return (
         <div>
           <NavLink className={m.edit} to='./edit'>Редактировать</NavLink>
           <button className={m.btn_like} type="button" onClick={delAchieve} >Удалить</button>
         </div>)
+  }
+
+  const PutLike = async() => {
+    const { data } = await axios.put(`http://localhost:4000/api/portfolios/me/achievement/like/${dataCard._id}`,{} , {
+      headers: { 'x-access-token': localStorage.getItem('token') },
+    })
   }
 
   const delAchieve = async () => {

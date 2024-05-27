@@ -1,16 +1,24 @@
 import m from './edit.module.css';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
 
 function Edit({ dataCard, idAchieve }) {
+  useEffect(() => {
+    getData()
+  }, [dataCard])
 
-  const [name, setName] = useState(dataCard.title)
+  const getData = () => {
+    setName(dataCard.title)
+    setDescr(dataCard.shortDescription)
+    setAllDescr(dataCard.fullDescription)
+    setLink(dataCard.url)
+  }
+  const [name, setName] = useState('')
   const [descr, setDescr] = useState('')
   const [allDescr, setAllDescr] = useState('')
   const [link, setLink] = useState('')
   const [img, setImg] = useState(null)
-  console.log(img)
   
   const [people, setPeople] = useState('')
 
@@ -48,19 +56,19 @@ function Edit({ dataCard, idAchieve }) {
         <ul className={m.list}>
           <li>
             <p className={m.achiv_header_text}>Название</p>
-            <input className={`${m.achiv_input} ${m.achiv_input_short}`} placeholder={dataCard.title} onChange={(e) => { setName(e.target.value) }}></input>
+            <input className={`${m.achiv_input} ${m.achiv_input_short}`} value={name} onChange={(e) => { setName(e.target.value) }}></input>
           </li>
           <li>
             <p className={m.achiv_header_text}>Краткое описание</p>
-            <textarea className={`${m.achiv_input} ${m.achiv_description}`} placeholder={dataCard.shortDescription} onChange={(e) => { setDescr(e.target.value) }}></textarea>
+            <textarea className={`${m.achiv_input} ${m.achiv_description}`} value={descr} onChange={(e) => { setDescr(e.target.value) }}></textarea>
           </li>
           <li>
             <p className={m.achiv_header_text}>Полное описание</p>
-            <textarea className={`${m.achiv_input} ${m.achiv_full_description}`} placeholder={dataCard.fullDescription} onChange={(e) => { setAllDescr(e.target.value) }}></textarea>
+            <textarea className={`${m.achiv_input} ${m.achiv_full_description}`} value={allDescr} onChange={(e) => { setAllDescr(e.target.value) }}></textarea>
           </li>
           <li>
             <p className={m.achiv_header_text}>Ссылка на достижение</p>
-            <input className={`${m.achiv_input} ${m.achiv_input_short}`} placeholder={link} onChange={(e) => { setLink(e.target.value) }}></input>
+            <input className={`${m.achiv_input} ${m.achiv_input_short}`} value={link} onChange={(e) => { setLink(e.target.value) }}></input>
           </li>
           <li>
             <p className={m.achiv_header_text}>Участники</p>
@@ -70,28 +78,7 @@ function Edit({ dataCard, idAchieve }) {
             </div>
           </li>
         </ul>
-        <h2 className={m.check}>Проверка на подлинность</h2>
-        <ul className={m.list}>
-          <li>
-            <p className={m.achiv_header_text}>Ссылка на сайт для проверки</p>
-            <input className={`${m.achiv_input} ${m.achiv_input_short}`}></input>
-          </li>
-          <li>
-            <p className={m.achiv_header_text}>Что надо ввести для получения данных</p>
-            <input className={`${m.achiv_input} ${m.achiv_input_short}`}></input>
-          </li>
-        </ul>
-        <h3 className={m.info}>Уникальная информация, которая будет выведена после поиска вашего достижения на сайте</h3>
-        <ul className={m.list}>
-          <li>
-            <p className={m.achiv_header_text}>Название</p>
-            <input className={`${m.achiv_input} ${m.achiv_input_short}`}></input>
-          </li>
-          <li>
-            <p className={m.achiv_header_text}>Участники</p>
-            <input className={`${m.achiv_input} ${m.achiv_input_short}`}></input>
-          </li>
-        </ul>
+        
 
         <div className={m.centered_buttons}>
           <div className={m.button_sized}>

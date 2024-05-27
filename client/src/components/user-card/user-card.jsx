@@ -14,7 +14,8 @@ function UserCard({ userData, photo }) {
   }
 
   const subToUser = async() => {
-    const { data } = await axios.put(`http://localhost:4000/api/users/me/subscribe/${userData._id}`, {
+    await axios.put(`http://localhost:4000/api/users/me/subscribe/${userData._id}`, {}, 
+    {
       headers: { 'x-access-token': localStorage.getItem('token') },
     });
   }

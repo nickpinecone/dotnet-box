@@ -43,14 +43,32 @@
 }
 
 .achievment_text {
-  min-height: 116px;
+  min-height: 70px;
   font-size: 24px;
   font-weight: 400;
   margin: 0;
 }
 
+.like {
+  width: 50px;
+  height: 43px;
+  margin-top: 20px;
+  padding-left: 65px;
+  padding-top: 7px;
+  font-weight: 800;
+  font-size: 24px;
+  color: #2196f3;
+  background-image: url("../../img/Like.svg");
+  background-repeat: no-repeat;
+}
+
+.flex {
+  display: flex;
+}
+
 .details {
   width: min-content;
+  margin-right: 50px;
   border-radius: 100px;
   font-weight: 700;
   font-size: 20px;

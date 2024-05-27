@@ -4,7 +4,7 @@ import axios from 'axios';
 import { useEffect, useState } from 'react';
 
 function Card({ idUser, data, change, img }) {
-
+  console.log(data)
   useEffect(() => {
     if (data.photo != undefined) {
       getPhoto()
@@ -32,8 +32,8 @@ function Card({ idUser, data, change, img }) {
       return (
         <div className={m.change}>
           <div className={m.change_list}>
-            <a className={m.change_list_item}>Редактировать</a>
-            <a onClick={delAchieve} href='/' className={m.change_list_item}>Удалить</a>
+            <NavLink className={m.change_list_item} to={`/${idUser}/${data._id}/edit`}>Редактировать</NavLink>
+            <NavLink onClick={delAchieve} href='/' className={m.change_list_item}>Удалить</NavLink>
           </div>
         </div>);
     }
@@ -42,12 +42,33 @@ function Card({ idUser, data, change, img }) {
     }
   }
 
+  const ViewLike = () => {
+    if(data.likeAmount){
+      return <NavLink className={m.like} onClick={PutLike}>{data.likeAmount}</NavLink>
+    }
+    else{
+      return <NavLink className={m.like} onClick={PutLike}>0</NavLink>
+    }
+  }
+
+  const PutLike = async() => {
+    const { data } = await axios.put(`http://localhost:4000/api/portfolios/me/achievement/like/${data._id}`,{} , {
+      headers: { 'x-access-token': localStorage.getItem('token') },
+    })
+  }
+
   const linkTo = () => {
     if (idUser === null) {
-      return <NavLink className={m.details}>Подробнее</NavLink>
+      return <div className={m.flex}>
+        <NavLink className={m.details}>Подробнее</NavLink>
+        {ViewLike()}
+        </div>
     }
     else {
-      return <NavLink className={m.details} to={`/${idUser}/${data._id}`}>Подробнее</NavLink>
+      return <div className={m.flex}>
+        <NavLink className={m.details} to={`/${idUser}/${data._id}`}>Подробнее</NavLink>
+        {ViewLike()}
+      </div>
     }
   }
 
