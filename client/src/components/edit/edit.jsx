@@ -19,7 +19,7 @@ function Edit({ dataCard, idAchieve }) {
   const [allDescr, setAllDescr] = useState('')
   const [link, setLink] = useState('')
   const [img, setImg] = useState(null)
-  
+
   const [people, setPeople] = useState('')
 
   const onEdit = async () => {
@@ -78,7 +78,7 @@ function Edit({ dataCard, idAchieve }) {
             </div>
           </li>
         </ul>
-        
+
 
         <div className={m.centered_buttons}>
           <div className={m.button_sized}>

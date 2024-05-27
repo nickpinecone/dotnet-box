@@ -36,14 +36,15 @@
 }
 
 .achievment_description {
-  min-height: 34px;
+  height: 34px;
   font-size: 28px;
   font-weight: 400;
-  margin: 20px 0;
+  margin-bottom: 20px;
+  margin-top: 0;
 }
 
 .achievment_text {
-  min-height: 70px;
+  height: 116px;
   font-size: 24px;
   font-weight: 400;
   margin: 0;
@@ -51,28 +52,37 @@
 
 .like {
   width: 50px;
-  height: 43px;
+  height: 50px;
   margin-top: 20px;
-  padding-left: 65px;
-  padding-top: 7px;
   font-weight: 800;
   font-size: 24px;
   color: #2196f3;
   background-image: url("../../img/Like.svg");
   background-repeat: no-repeat;
+  box-shadow: 0px 4px 4px 0px #0000001A;
+  border-radius: 50%;
 }
 
 .flex {
   display: flex;
 }
 
+.counter {
+  margin-left: 15px;
+  margin-top: 20px;
+  color: #2196F3;
+  font-size: 24px;
+  font-weight: 800;
+  padding-top: 8px;
+}
+
 .details {
-  width: min-content;
-  margin-right: 50px;
+  display: flex;
+  align-items: center;
+  margin-right: 30px;
   border-radius: 100px;
   font-weight: 700;
   font-size: 20px;
-  text-align: center;
   color: #FFFFFF;
   background-color: #2196f3;
   border: none;

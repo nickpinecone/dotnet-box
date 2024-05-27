@@ -29,7 +29,7 @@ function SubscriptionCard({ userData }) {
       <section className={m.element}>
         <img className={m.picture} src={photo} />
         <div className={m.text}>
-          <p className={m.text_title}>{userData.name} {userData.sername}</p>
+          <p className={m.text_title}>{userData.name} {userData.surname}</p>
           <p >Всем привет! Люблю занималься аналитикой!</p>
         </div>
         <a className={m.unsubscribe}>Отписаться</a>

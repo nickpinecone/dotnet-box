@@ -58,7 +58,7 @@ function Login() {
           </li>
           <li className={m.inputs_item}>
             <p className={m.inputs_item_text}>Пароль</p>
-            <input value={password} onChange={(e) => { setPassowrd(e.target.value); setError(false) }} className={`${m.inputs_item_input} ${error ? m.inputs_item_input_error : ''} `} type="text" />
+            <input value={password} onChange={(e) => { setPassowrd(e.target.value); setError(false) }} className={`${m.inputs_item_input} ${error ? m.inputs_item_input_error : ''} `} type="password" />
           </li>
         </ul>
         <div className={m.container_button_enter}>

@@ -9,16 +9,13 @@ function Card({ idUser, data, change, img }) {
     if (data.photo != undefined) {
       getPhoto()
     }
-
   }, [])
 
   const [photo, setPhoto] = useState()
 
-
   const getPhoto = async () => {
     const img = await axios.get(`http://localhost:4000/api/photos/${data.photo}`, { responseType: "blob" })
-    let url = URL.createObjectURL(img.data)
-    setPhoto(url)
+    setPhoto(URL.createObjectURL(img.data))
   }
 
   const delAchieve = async () => {
@@ -43,16 +40,15 @@ function Card({ idUser, data, change, img }) {
   }
 
   const ViewLike = () => {
-    if(data.likeAmount){
-      return <NavLink className={m.like} onClick={PutLike}>{data.likeAmount}</NavLink>
-    }
-    else{
-      return <NavLink className={m.like} onClick={PutLike}>0</NavLink>
-    }
+    return <NavLink className={m.like} onClick={PutLike}></NavLink>
   }
 
-  const PutLike = async() => {
-    const { data } = await axios.put(`http://localhost:4000/api/portfolios/me/achievement/like/${data._id}`,{} , {
+  const ViewCounter = () => {
+    return <span className={m.counter}>{data.likeAmount ? data.likeAmount : 0}</span>
+  }
+
+  const PutLike = async () => {
+    const { like } = await axios.put(`http://localhost:4000/api/portfolios/me/achievement/like/${data._id}`, {}, {
       headers: { 'x-access-token': localStorage.getItem('token') },
     })
   }
@@ -62,12 +58,14 @@ function Card({ idUser, data, change, img }) {
       return <div className={m.flex}>
         <NavLink className={m.details}>Подробнее</NavLink>
         {ViewLike()}
-        </div>
+        {ViewCounter()}
+      </div>
     }
     else {
       return <div className={m.flex}>
         <NavLink className={m.details} to={`/${idUser}/${data._id}`}>Подробнее</NavLink>
         {ViewLike()}
+        {ViewCounter()}
       </div>
     }
   }

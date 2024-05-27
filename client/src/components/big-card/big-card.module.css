@@ -47,7 +47,7 @@
 }
 
 .achiv_title {
-  max-width: 420px;
+  max-width: 800px;
   margin-top: 30px;
   margin-bottom: 20px;
   font-weight: 400;
@@ -67,14 +67,19 @@
   font-size: 24px;
 }
 
+.likes {
+  height: 49px;
+  display: flex;
+}
+
 .btn_like {
-  margin-right: 10px;
   padding: 11px 30px;
   border-radius: 100px;
   color: #fff;
   font-weight: 600;
   font-size: 24px;
   background: #2196f3;
+  box-shadow: 0px 4px 4px 0px #0000001A;
 }
 
 .edit {
@@ -88,12 +93,12 @@
   box-shadow: 0px 4px 4px 0px #0000001A;
 }
 
-.edit:hover {
+.edit:hover, .btn_like:hover {
   color: #fff;
   background-color: #0661A9;
 }
 
-.edit:active {
+.edit:active, .btn_like:active {
   color: #fff;
   background-color: #11293D;
 }
@@ -198,7 +203,7 @@
   padding: 13px 37px;
   border-radius: 100px;
   font-weight: 600;
-  font-size: 20px;
+  font-size: 22px;
   color: #fff;
   background: #2196f3;
 }
@@ -225,7 +230,7 @@
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  width: 576px;
+  width: 350px;
   position: absolute;
   top: 30px;
   right: 30px;
@@ -233,8 +238,8 @@
 
 .link_to_step_achieve {
   background-color: #fff;
-  padding: 20px 20px;
-  width: 300px;
+  padding: 22px 28px;
+  width: 350px;
   border-radius: 24px;
   display: block;
   font-size: 20px;
@@ -242,7 +247,7 @@
   color: #2196f3;
   background-image: url("../../img/arrow.svg");
   background-repeat: no-repeat;
-  background-position: right 20px top 28px;
+  background-position: right 22px center;
   transition: none;
   box-shadow: 0px 4px 4px 0px #0000001A;
 }
@@ -264,7 +269,7 @@
 }
 
 .step_to_achieve {
-  width: 520px;
+  width: 350px;
   list-style: none;
   padding: 22px 28px;
   display: none;
@@ -281,7 +286,7 @@
 }
 
 .step_loading {
-  width: 520px;
+  width: 350px;
   border-radius: 10px;
   font-size: 20px;
   font-weight: 700;
