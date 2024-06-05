@@ -10,9 +10,12 @@ function Registration() {
   const [name, setName] = useState('')
   const [login, setLogin] = useState('')
   const [password, setPassowrd] = useState([])
+  const [repeatPass, repeatPassword] = useState([])
+
+  const [error, setError] = useState(false)
 
   const onLogin = async () => {
-    if (isValidEmail(login) && isValidPassword(password)) {
+    if (isValidEmail(login) && isValidPassword(password) && isMatchingPasswords()) {
       try {
         console.log(name, password, login)
         const { user } = await axios.post('http://localhost:4000/api/users/register', {
@@ -32,6 +35,9 @@ function Registration() {
         console.log(error)
       }
     }
+    else {
+      setError(true)
+    }
   }
 
   function isValidEmail(email) {
@@ -42,6 +48,10 @@ function Registration() {
     return password.length >= 8;
   }
 
+  function isMatchingPasswords() {
+    return password === repeatPass;
+  }
+
   return (
     <div className={m.enter_container}>
       <form className={m.container_login}>
@@ -49,15 +59,19 @@ function Registration() {
         <ul className={m.inputs}>
           <li className={m.inputs_item}>
             <p className={m.inputs_item_text}>ФИО</p>
-            <input className={m.inputs_item_input} value={name} onChange={(e) => { setName(e.target.value) }} type="text" />
+            <input value={name} onChange={(e) => { setName(e.target.value); setError(false)  } } className={`${m.inputs_item_input} ${error ? m.inputs_item_input_error : ''} `} type="text" />
           </li>
           <li className={m.inputs_item}>
             <p className={m.inputs_item_text}>Email</p>
-            <input className={m.inputs_item_input} value={login} onChange={(e) => { setLogin(e.target.value) }} type="text" />
+            <input value={login} onChange={(e) => { setLogin(e.target.value); setError(false)  } } className={`${m.inputs_item_input} ${error ? m.inputs_item_input_error : ''} `} type="text" />
           </li>
           <li className={m.inputs_item}>
             <p className={m.inputs_item_text}>Пароль</p>
-            <input className={m.inputs_item_input} value={password} onChange={(e) => { setPassowrd(e.target.value) }} type="password" />
+            <input value={password} onChange={(e) => { setPassowrd(e.target.value); setError(false)  }} className={`${m.inputs_item_input} ${error ? m.inputs_item_input_error : ''} `} type="password" />
+          </li>
+          <li className={m.inputs_item}>
+            <p className={m.inputs_item_text}>Повторите пароль</p>
+            <input value={repeatPass} onChange={(e) => { repeatPassword(e.target.value); setError(false)  }} className={`${m.inputs_item_input} ${error ? m.inputs_item_input_error : ''} `} type="password" />
           </li>
         </ul>
         <div className={m.container_button_enter}>
