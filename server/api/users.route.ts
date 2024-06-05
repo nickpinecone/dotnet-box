@@ -5,7 +5,6 @@ import jwt from "jsonwebtoken";
 import { MailerSend, Recipient, Sender, EmailParams } from "mailersend";
 import dotenv from "dotenv";
 import path from "path";
-import fs from "fs";
 import { body } from "express-validator";
 
 import auth from "../middlewares/auth.middleware";
@@ -40,6 +39,56 @@ function makeid(length: number): string {
         counter += 1;
     }
     return result;
+}
+
+function generateToken(userId: string, secret: string, expireTime: number) {
+    return jwt.sign(
+        { id: userId },
+        secret,
+        {
+            algorithm: 'HS256',
+            allowInsecureKeySizes: true,
+            expiresIn: expireTime,
+        }
+    );
+}
+
+async function fetchData(url: string): Promise<any> {
+    const response = await fetch(url);
+    const data = await response.json();
+
+    if (!data.response) {
+        throw new Error("could not fetch data with url: " + url);
+    }
+
+    return data.response;
+}
+
+async function sendVerifyEmail(userId: string) {
+    const user = await User.findOne({ _id: userId });
+    if (!user) throw new Error("could not authenticate user with id: " + userId);
+
+    const token = generateToken(userId, process.env.VERIFICATION_SECRET as string, 3600);
+
+    const link = `${serverUrl}/api/users/verify/${user.id}/${token}`;
+
+    const sender = new Sender(process.env.EMAIL_HOST as string, "Digital Portfolio");
+    const recipient = [new Recipient(user.email as string, getFullName(user))];
+
+    const emailParams = new EmailParams()
+        .setFrom(sender)
+        .setTo(recipient)
+        .setSubject("Email verification")
+        .setHtml(
+            `
+            <section>
+                <h1>Click the link below to verify email</h1>
+                <a href="${link}">Verify Email</a>
+            </section>
+            `
+        );
+
+    await mailerSend.email.send(emailParams);
 }
 
 router.route("/").get(async (req, res) => {
@@ -94,6 +143,8 @@ router.route("/register").post(
             await portfolio.save();
             await user.save();
 
+            await sendVerifyEmail(user._id.toString());
+
             res.sendStatus(200);
         }
         catch (err) {
@@ -121,15 +172,7 @@ router.route("/login").post(
             if (!bcrypt.compareSync(password, user.password as string))
                 throw new Error("wrong password for user with email: " + email);
 
-            const token = jwt.sign(
-                { id: user.id },
-                process.env.LOGIN_SECRET as string,
-                {
-                    algorithm: 'HS256',
-                    allowInsecureKeySizes: true,
-                    expiresIn: 86400 * 365, // 24 hours (* 365 days for testing)
-                }
-            );
+            const token = generateToken(user.id, process.env.LOGIN_SECRET as string, 86400 * 365);
 
             res.status(200).send({
                 user,
@@ -142,17 +185,6 @@ router.route("/login").post(
         }
     }
 );
-
-async function fetchData(url: string): Promise<any> {
-    const response = await fetch(url);
-    const data = await response.json();
-
-    if (!data.response) {
-        throw new Error("could not fetch data with url: " + url);
-    }
-
-    return data.response;
-}
 
 router.route("/loginVK").post(
     upload.none(),
@@ -171,11 +203,19 @@ router.route("/loginVK").post(
             url = "https://api.vk.com/method/account.getProfileInfo?" + `v=5.131&access_token=${generalData.access_token}`;
             const profileData = await fetchData(url);
 
-            let user = await User.findOne({ email: generalData.email });
+            let user = await User.findOne({ vkId: generalData.user_id });
 
             if (!user) {
                 const portfolio = await Portfolio.create({});
-                user = await User.create({ name: profileData.first_name, surname: profileData.last_name, password: makeid(10), email: generalData.email });
+                user = await User.create({
+                    verified: true,
+                    vkId: generalData.user_id,
+                    name: profileData.first_name,
+                    surname: profileData.last_name,
+                    password: makeid(10),
+                    email: generalData.email,
+                    phoneNumber: profileData.phone,
+                });
 
                 portfolio.owner = user._id;
                 user.portfolio = portfolio._id;
@@ -184,15 +224,7 @@ router.route("/loginVK").post(
                 await user.save();
             }
 
-            const token = jwt.sign(
-                { id: user.id },
-                process.env.LOGIN_SECRET as string,
-                {
-                    algorithm: 'HS256',
-                    allowInsecureKeySizes: true,
-                    expiresIn: 86400 * 365, // 24 hours (* 365 days for testing)
-                }
-            );
+            const token = generateToken(user.id, process.env.LOGIN_SECRET as string, 86400 * 365);
 
             res.status(200).send({
                 user,
@@ -261,14 +293,8 @@ router.route("/me").put(
             const user = await User.findOne({ _id: userId });
             if (!user) throw new Error("could not authenticate user with id: " + userId);
 
-            if (req.file && user.avatar) {
-                const photoName = path.resolve(__dirname, "..", "public/photos/" + user.avatar);
-                fs.unlink(photoName, (err) => { if (err) console.error(err); });
-            }
-
             if (req.file) {
                 user.avatar = req.file.filename;
-
             }
 
             user.bio = bio;
@@ -284,43 +310,6 @@ router.route("/me").put(
     }
 );
 
-router.route("/me/verify").put(auth.verifyToken, async (req, res) => {
-    try {
-        const userId = res.locals.userId;
-
-        const user = await User.findOne({ _id: userId });
-        if (!user) throw new Error("could not authenticate user with id: " + userId);
-
-        const token = jwt.sign(
-            { id: user.id },
-            process.env.VERIFICATION_SECRET as string,
-            {
-                algorithm: 'HS256',
-                allowInsecureKeySizes: true,
-                expiresIn: 3600, // 1 hour
-            }
-        );
-
-        const link = `${serverUrl}/api/users/verify/${user.id}/${token}`;
-
-        const sender = new Sender(process.env.EMAIL_HOST as string, "Digital Portfolio");
-        const recipient = [new Recipient(user.email as string, getFullName(user))];
-
-        const emailParams = new EmailParams()
-            .setFrom(sender)
-            .setTo(recipient)
-            .setSubject("Email verification")
-            .setHtml(`<section><h1>Click link below to verify email</h1><a>${link}</a></section>`);
-
-        await mailerSend.email.send(emailParams);
-
-        res.sendStatus(200);
-    }
-    catch (err) {
-        console.error(err);
-        res.status(500).send("could not initiate verification for user: " + err);
-    }
-});
 
 router.route("/reset").post(
     upload.none(),
@@ -462,7 +451,10 @@ router.route("/me/subscribe/:subId").put(auth.verifyToken, async (req, res) => {
         if (!user) throw new Error("could not find user: " + userId);
         if (!subUser) throw new Error("could not find target user: " + req.params.subId);
 
-        user.subscriptions.push(subUser._id);
+        if (!user.subscriptions.includes(subUser._id)) {
+            user.subscriptions.push(subUser._id);
+        }
+
         await user.save();
 
         res.sendStatus(200);

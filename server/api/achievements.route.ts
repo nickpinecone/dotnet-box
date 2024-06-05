@@ -1,8 +1,5 @@
 import express from "express";
 import multer from "multer";
-import path from "path";
-import fs from "fs";
-
 import Portfolio from "../models/portfolio.model";
 import Achievement from "../models/achievement.model";
 import User from "../models/user.model";
@@ -10,9 +7,26 @@ import auth from "../middlewares/auth.middleware";
 import validation from "../middlewares/validate.middleware";
 import { body, query } from "express-validator";
 import comments from "./comments.route";
+import path from "path";
 
 const router = express.Router();
-const upload = multer({ dest: path.resolve(__dirname, "..", "public/photos/") });
+
+const imageMimes = ["image/jpeg", "image/png", "image/jpg"];
+
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        const base = path.resolve(__dirname, "..", "public");
+
+        if (imageMimes.includes(file.mimetype)) {
+            cb(null, base + "/photos")
+        }
+        else {
+            cb(null, base + "/files");
+        }
+    }
+});
+
+const upload = multer({ storage: storage });
 
 router.route("/achievement/:achievementId").get(async (req, res) => {
     try {
@@ -31,6 +45,7 @@ router.route("/achievement/:achievementId").get(async (req, res) => {
 router.route("/me/achievement").post(
     auth.verifyToken,
     upload.single("photo"),
+    upload.array("files"),
     body("type").default(""),
     body("title").default(""),
     body("shortDescription").default(""),
@@ -100,8 +115,6 @@ router.route("/me/achievement/like/:achievementId").put(
 
                 achievement.likeAmount += 1;
                 user.liked.push(achievement._id);
-
-
             }
             else {
                 if (achievement.likeAmount) {
@@ -141,13 +154,9 @@ router.route("/me/achievement/:achievementId").put(
             const achievement = await Achievement.findOne({ _id: req.params.achievementId, portfolio: user.portfolio });
             if (!achievement) throw new Error("could not find achievement: " + req.params.achievementId);
 
-            if (req.file && achievement.photo) {
-                const photoName = path.resolve(__dirname, "..", "public/photos/" + achievement.photo);
-                fs.unlink(photoName, (err) => { if (err) console.error(err); });
-            }
-
-            if (req.file)
+            if (req.file) {
                 achievement.photo = req.file.filename;
+            }
 
             achievement.title = req.body.title;
             achievement.shortDescription = req.body.shortDescription;
@@ -187,11 +196,6 @@ router.route("/me/achievement/:achievementId").delete(auth.verifyToken, async (r
         if (!achievement) throw new Error("could not find achievement: " + req.params.achievementId);
 
         await Achievement.deleteOne({ _id: req.params.achievementId });
-
-        if (achievement.photo) {
-            const photoName = path.resolve(__dirname, "..", "public/photos/" + achievement?.photo);
-            fs.unlink(photoName, (err) => { if (err) console.error(err); });
-        }
 
         portfolio.achievements = portfolio.achievements.filter((el) => el._id.toString() != achievement._id.toString());
 
