@@ -50,6 +50,10 @@
   border-radius: 10px;
 }
 
+.inputs_item_input_error {
+  background-color: #FFC9C9;
+}
+
 .container_button_enter {
   text-align: center;
 }
