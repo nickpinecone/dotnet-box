@@ -24,6 +24,9 @@ const storage = multer.diskStorage({
         else {
             cb(null, base + "/files");
         }
+    },
+    filename: function (req, file, cb) {
+        cb(null, (new Date()).toISOString() + "-" + file.originalname);
     }
 });
 
@@ -85,8 +88,10 @@ router.route("/me/achievement").post(
                 achievement.members.push(member._id);
             }
 
-            if (req.file) {
-                achievement.photo = req.file.filename;
+            //@ts-expect-error photo is multer fields
+            if (req.files.photo) {
+                //@ts-expect-error photo is multer fields
+                achievement.photo = req.files.photo.filename;
             }
 
             //@ts-expect-error who does that?
@@ -155,6 +160,7 @@ router.route("/me/achievement/:achievementId").put(
     auth.verifyToken,
     upload.fields([{ name: "photo", maxCount: 1 }, { name: "files" }]),
     body("title").default(""),
+    body("type").default(""),
     body("theme").default(""),
     body("shortDescription").default(""),
     body("fullDescription").default(""),
@@ -170,11 +176,13 @@ router.route("/me/achievement/:achievementId").put(
             const achievement = await Achievement.findOne({ _id: req.params.achievementId, portfolio: user.portfolio });
             if (!achievement) throw new Error("could not find achievement: " + req.params.achievementId);
 
-            if (req.file) {
-                achievement.photo = req.file.filename;
+            //@ts-expect-error photo is multer fields
+            if (req.files.photo) {
+                //@ts-expect-error photo is multer fields
+                achievement.photo = req.files.photo[0].filename;
             }
 
-            //@ts-expect-error who does that?
+            //@ts-expect-error files is multer fields
             if (req.files.files) {
                 if (achievement.files) {
                     achievement.files.forEach((file) => {
@@ -183,12 +191,13 @@ router.route("/me/achievement/:achievementId").put(
                 }
                 achievement.files = [];
 
-                //@ts-expect-error no comments
+                //@ts-expect-error it is an array
                 req.files.files.forEach((file) => {
                     achievement.files.push(file.filename);
                 });
             }
 
+            achievement.type = req.body.type;
             achievement.title = req.body.title;
             achievement.theme = req.body.theme;
             achievement.shortDescription = req.body.shortDescription;
