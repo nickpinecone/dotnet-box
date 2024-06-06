@@ -5,7 +5,7 @@ import { AchTypes, AchThemes, AchSorts } from "../models/achievement.model";
 
 const router = express.Router();
 
-router.route("photo/:name").get(async (req, res) => {
+router.route("/photo/:name").get(async (req, res) => {
     try {
         const photoName = path.resolve(__dirname, "..", "public/photos/" + req.params.name);
         const readStream = fs.createReadStream(photoName);
@@ -18,7 +18,7 @@ router.route("photo/:name").get(async (req, res) => {
     }
 });
 
-router.route("file/:name").get(async (req, res) => {
+router.route("/file/:name").get(async (req, res) => {
     try {
         const fileName = path.resolve(__dirname, "..", "public/files/" + req.params.name);
         const readStream = fs.createReadStream(fileName);
@@ -31,7 +31,7 @@ router.route("file/:name").get(async (req, res) => {
     }
 });
 
-router.route("data").get(async (req, res) => {
+router.route("/data").get(async (req, res) => {
     try {
         res.status(200).send({
             themes: AchThemes,
