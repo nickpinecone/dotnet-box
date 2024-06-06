@@ -8,59 +8,67 @@ import User from "../models/user.model";
 
 import validation from "../middlewares/validate.middleware";
 import { query } from "express-validator";
-import Achievement from "../models/achievement.model";
+import { AchSorts, AchThemes, AchTypes, Achievement } from "../models/achievement.model";
 
 const router = express.Router();
 const upload = multer();
 
-router.route("/").get(
-    query("search").optional().escape(),
+router.route("/").get(async (req, res) => {
+    try {
+        const portfolios = await Portfolio.find({}).sort({ createdAt: -1 })
+            .populate("owner").populate({ path: "achievements" });
+        res.send(portfolios);
+    }
+    catch (err) {
+        console.error(err);
+        res.status(500).send("could not get portfolios: " + err);
+    }
+});
+
+router.route("/search").get(
+    query("query").default("").escape(),
     query("limit").default("10").escape(),
+    query("theme").default(AchThemes[0]).escape(),
+    query("type").default(AchTypes[0]).escape(),
+    query("sort").default(AchSorts[0]).escape(),
     validation.validateForm,
     async (req, res) => {
         try {
-            const limit = Number(req.query.limit as string);
+            let searchQuery = {};
 
-            if (req.query.search) {
-                const searchList = [];
-
-                const searchKey = new RegExp(`${req.query.search}`, 'i');
-                const searchSettings = {
+            if (req.query.query) {
+                const searchKey = new RegExp(`${req.query.query}`, 'i');
+                searchQuery = {
                     $or: [
                         { "title": searchKey },
                         { "shortDescription": searchKey },
                         { "fullDescription": searchKey },
-                        { "url": searchKey },
                     ]
                 };
-
-                const portfolios = await Portfolio.find(searchSettings).sort({ createdAt: -1 }).limit(limit)
-                    .populate("owner").populate({ path: "achievements" });
-                for (let i = 0; i < portfolios.length; i++) {
-                    const portfolio = portfolios[i];
-                    searchList.push(portfolio);
-                }
-
-                const achievements = await Achievement.find(searchSettings).sort({ createdAt: -1 }).limit(limit);
-                for (let i = 0; i < achievements.length; i++) {
-                    const achievement = achievements[i];
-                    const portfolio = await Portfolio.findById(achievement.portfolio)
-                        .populate("owner").populate({ path: "achievements" });
-                    if (portfolio && searchList.every((item) => item._id.toString() !== portfolio._id.toString()))
-                        searchList.push(portfolio);
-                }
-
-                res.send([...searchList]);
             }
-            else {
-                const portfolios = await Portfolio.find({}).sort({ createdAt: -1 }).limit(limit)
-                    .populate("owner").populate({ path: "achievements" });
-                res.send(portfolios);
+
+            const limit = Number(req.query.limit as string);
+            let achievements = await Achievement.find(searchQuery).limit(limit);
+
+            if (req.query.theme != AchThemes[0]) {
+                achievements = achievements.filter((ach) => ach.theme === req.query.theme);
             }
+
+            if (req.query.type != AchTypes[0]) {
+                achievements = achievements.filter((ach) => ach.type === req.query.type);
+            }
+
+            if (req.query.sort != AchSorts[0]) {
+                if (req.query.sort == AchSorts[1]) {
+                    achievements.sort((ach) => ach.likeAmount);
+                }
+            }
+
+            res.status(200).send(achievements);
         }
         catch (err) {
             console.error(err);
-            res.status(500).send("could not get portfolios: " + err);
+            res.status(500).send("could not search for achievements: " + err);
         }
     }
 );

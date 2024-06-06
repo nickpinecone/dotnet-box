@@ -1,7 +1,7 @@
 import express from "express";
 import multer from "multer";
 import Portfolio from "../models/portfolio.model";
-import Achievement from "../models/achievement.model";
+import { Achievement } from "../models/achievement.model";
 import User from "../models/user.model";
 import auth from "../middlewares/auth.middleware";
 import validation from "../middlewares/validate.middleware";
@@ -52,6 +52,7 @@ router.route("/me/achievement").post(
     auth.verifyToken,
     upload.fields([{ name: "photo", maxCount: 1 }, { name: "files" }]),
     body("type").default(""),
+    body("theme").default(""),
     body("title").default(""),
     body("shortDescription").default(""),
     body("fullDescription").default(""),
@@ -68,13 +69,14 @@ router.route("/me/achievement").post(
             if (!portfolio) throw new Error("user doesnt have portfolio");
 
             const type = req.body.type;
+            const theme = req.body.theme;
             const title = req.body.title;
             const shortDescription = req.body.shortDescription;
             const fullDescription = req.body.fullDescription;
             const url = req.body.url;
             const members = req.query.members as string[];
 
-            const achievement = await Achievement.create({ type, title, shortDescription, fullDescription, url });
+            const achievement = await Achievement.create({ type, theme, title, shortDescription, fullDescription, url });
 
             for (let i = 0; i < members.length; i++) {
                 const memberId = members[i];
@@ -153,6 +155,7 @@ router.route("/me/achievement/:achievementId").put(
     auth.verifyToken,
     upload.fields([{ name: "photo", maxCount: 1 }, { name: "files" }]),
     body("title").default(""),
+    body("theme").default(""),
     body("shortDescription").default(""),
     body("fullDescription").default(""),
     body("url").default(""),
@@ -187,6 +190,7 @@ router.route("/me/achievement/:achievementId").put(
             }
 
             achievement.title = req.body.title;
+            achievement.theme = req.body.theme;
             achievement.shortDescription = req.body.shortDescription;
             achievement.fullDescription = req.body.fullDescription;
             achievement.url = req.body.url;

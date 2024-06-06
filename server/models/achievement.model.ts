@@ -2,10 +2,14 @@ import mongoose, { Schema } from "mongoose";
 import fs from "fs";
 import path from "path";
 
-const AchievementTypes = ["project", "certificate"];
+const AchTypes = ["все", "проект", "сертификат"];
+const AchThemes = ["все", "спорт", "наука"];
+const AchSorts = ["дата", "лайки"];
 
 const AchievementSchema = new Schema({
     type: String,
+    theme: String,
+
     title: String,
     shortDescription: String,
     fullDescription: String,
@@ -66,8 +70,14 @@ AchievementSchema.pre("save", function (next) {
     if (
         this.type &&
         this.isModified("type") &&
-        !AchievementTypes.includes(this.type)
+        !AchTypes.includes(this.type)
     ) return next(new Error("wrong achievement type"));
+
+    if (
+        this.theme &&
+        this.isModified("theme") &&
+        !AchThemes.includes(this.theme)
+    ) return next(new Error("wrong theme"));
 
     return next();
 });
@@ -87,4 +97,4 @@ AchievementSchema.pre("deleteOne", async function (next) {
 
 const Achievement = mongoose.model("achievement", AchievementSchema);
 
-export default Achievement;
+export { Achievement, AchTypes, AchThemes, AchSorts };

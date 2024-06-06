@@ -1,6 +1,7 @@
 import express from "express";
 import path from "path";
 import fs from "fs";
+import { AchTypes, AchThemes, AchSorts } from "../models/achievement.model";
 
 const router = express.Router();
 
@@ -13,7 +14,7 @@ router.route("photo/:name").get(async (req, res) => {
     }
     catch (err) {
         console.error(err);
-        res.status(500).send("could not get photo with name: " + req.params.name);
+        res.status(500).send("could not get photo: " + err);
     }
 });
 
@@ -26,8 +27,23 @@ router.route("file/:name").get(async (req, res) => {
     }
     catch (err) {
         console.error(err);
-        res.status(500).send("could not get file with name: " + req.params.name);
+        res.status(500).send("could not get file: " + err);
     }
+});
+
+router.route("data").get(async (req, res) => {
+    try {
+        res.status(200).send({
+            themes: AchThemes,
+            types: AchTypes,
+            sorts: AchSorts,
+        });
+    }
+    catch (err) {
+        console.error(err);
+        res.status(500).send("could not get search data: " + err)
+    }
+
 });
 
 export default router;

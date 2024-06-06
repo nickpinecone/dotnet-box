@@ -4,7 +4,7 @@ import User from "../models/user.model";
 import auth from "../middlewares/auth.middleware";
 import validation from "../middlewares/validate.middleware";
 import { body } from "express-validator";
-import Achievement from "../models/achievement.model";
+import { Achievement } from "../models/achievement.model";
 import multer from "multer";
 
 const router = express.Router();
