@@ -8,6 +8,7 @@ import validation from "../middlewares/validate.middleware";
 import { body, query } from "express-validator";
 import comments from "./comments.route";
 import path from "path";
+import fs from "fs";
 
 const router = express.Router();
 
@@ -28,6 +29,11 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
+async function removeFile(name: string) {
+    const photoName = path.resolve(__dirname, "..", "public/files/" + name);
+    fs.unlink(photoName, (err) => { if (err) console.error(err); });
+}
+
 router.route("/achievement/:achievementId").get(async (req, res) => {
     try {
         const achievement = await Achievement.findOne({ _id: req.params.achievementId })
@@ -44,8 +50,7 @@ router.route("/achievement/:achievementId").get(async (req, res) => {
 
 router.route("/me/achievement").post(
     auth.verifyToken,
-    upload.single("photo"),
-    upload.array("files"),
+    upload.fields([{ name: "photo", maxCount: 1 }, { name: "files" }]),
     body("type").default(""),
     body("title").default(""),
     body("shortDescription").default(""),
@@ -80,6 +85,14 @@ router.route("/me/achievement").post(
 
             if (req.file) {
                 achievement.photo = req.file.filename;
+            }
+
+            //@ts-expect-error who does that?
+            if (req.files.files) {
+                //@ts-expect-error no comments
+                req.files.files.forEach((file) => {
+                    achievement.files.push(file.filename);
+                });
             }
 
             achievement.portfolio = portfolio._id;
@@ -138,7 +151,7 @@ router.route("/me/achievement/like/:achievementId").put(
 
 router.route("/me/achievement/:achievementId").put(
     auth.verifyToken,
-    upload.single("photo"),
+    upload.fields([{ name: "photo", maxCount: 1 }, { name: "files" }]),
     body("title").default(""),
     body("shortDescription").default(""),
     body("fullDescription").default(""),
@@ -156,6 +169,21 @@ router.route("/me/achievement/:achievementId").put(
 
             if (req.file) {
                 achievement.photo = req.file.filename;
+            }
+
+            //@ts-expect-error who does that?
+            if (req.files.files) {
+                if (achievement.files) {
+                    achievement.files.forEach((file) => {
+                        removeFile(file);
+                    });
+                }
+                achievement.files = [];
+
+                //@ts-expect-error no comments
+                req.files.files.forEach((file) => {
+                    achievement.files.push(file.filename);
+                });
             }
 
             achievement.title = req.body.title;
@@ -194,6 +222,12 @@ router.route("/me/achievement/:achievementId").delete(auth.verifyToken, async (r
 
         const achievement = await Achievement.findOne({ _id: req.params.achievementId, portfolio: user.portfolio });
         if (!achievement) throw new Error("could not find achievement: " + req.params.achievementId);
+
+        if (achievement.files) {
+            achievement.files.forEach((file) => {
+                removeFile(file);
+            });
+        }
 
         await Achievement.deleteOne({ _id: req.params.achievementId });
 
