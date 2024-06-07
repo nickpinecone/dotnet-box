@@ -26,14 +26,16 @@ function BigCardPage() {
   }
 
   const getDataPhoto = async () => {
-    const { data } = await axios.get(`http://localhost:4000/api/users/${idUser}`)
-    data.portfolio.achievements.forEach(element => {
-      if (element._id === idAchieve) {
-        if (element.photo !== undefined) {
-          getPhoto(element)
+    if(idUser !== "undefined") {
+      const { data } = await axios.get(`http://localhost:4000/api/users/${idUser}`)
+      data.portfolio.achievements.forEach(element => {
+        if (element._id === idAchieve) {
+          if (element.photo !== undefined) {
+            getPhoto(element)
+          }
         }
-      }
-    });
+      });
+    }
   }
 
   const getDataAchieve = async () => {
@@ -42,7 +44,7 @@ function BigCardPage() {
   }
 
   const getPhoto = async (data) => {
-    const img = await axios.get(`http://localhost:4000/api/photos/${data.photo}`, { responseType: "blob" })
+    const img = await axios.get(`http://localhost:4000/api/content/photo/${data.photo}`, { responseType: "blob" })
     let url = URL.createObjectURL(img.data)
     setPhoto(url)
   }

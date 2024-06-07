@@ -122,7 +122,7 @@ function BigCard({ dataCard, photo, fromAdd, userId }) {
   }
 
   const getPhoto = async (id) => {
-    const img = await axios.get(`http://localhost:4000/api/photos/${id}`, { responseType: "blob" })
+    const img = await axios.get(`http://localhost:4000/api/content/photo/${id}`, { responseType: "blob" })
     const url = URL.createObjectURL(img.data)
     setPhotos(url)
   }

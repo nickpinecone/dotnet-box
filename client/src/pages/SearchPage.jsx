@@ -12,7 +12,7 @@ function SearchPage() {
   }, [])
 
   const getAchieve = async () => {
-    const dataUsers = await axios.get('http://localhost:4000/api/portfolios/')
+    const dataUsers = await axios.get('http://localhost:4000/api/portfolios/search')
     console.log(dataUsers.data)
     setData(dataUsers.data)
   }
@@ -21,7 +21,7 @@ function SearchPage() {
     <div>
       <Header />
       <Search />
-      {data.map(portfolio => portfolio.achievements.map(achieve => <Card idUser={portfolio.owner._id} data={achieve} />))}
+      {data.map(achiv => <Card data={achiv} />)}
     </div>
   );
 }

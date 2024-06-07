@@ -42,7 +42,7 @@ function Portfolio() {
   const [photo, setPhoto] = useState();
   const getPhoto = async (info) => {
     if (info.avatar) {
-      const img = await axios.get(`http://localhost:4000/api/photos/${info.avatar}`, { responseType: "blob" })
+      const img = await axios.get(`http://localhost:4000/api/content/photo/${info.avatar}`, { responseType: "blob" })
       let url = URL.createObjectURL(img.data)
       setPhoto(url)
     }
