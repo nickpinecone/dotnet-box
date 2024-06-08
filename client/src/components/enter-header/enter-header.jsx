@@ -24,7 +24,7 @@ function EnterHeader() {
               <NavLink className={m.nav_link} to="/search">Достижения</NavLink>
             </li>
             <li className={m.site_navigation_item}>
-              <NavLink className={m.buttons} to="/login">Войти</NavLink>
+              <NavLink className={m.buttons} to="/login">Вход</NavLink>
             </li>
             <li className={m.site_navigation_item}>
               <NavLink className={m.buttons} to="/registration">Регистрация</NavLink>
