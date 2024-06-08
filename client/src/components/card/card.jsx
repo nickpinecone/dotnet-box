@@ -80,7 +80,7 @@ function Card({ idUser, data, change, img }) {
         {linkTo()}
         {changeCom()}
       </section>
-    </div >
+    </div>
   );
 }
 
