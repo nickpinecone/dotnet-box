@@ -1,0 +1,29 @@
+.registration {
+  background: #2196F3;
+  width: 1440px;
+  height: 750px;
+  margin: 0 auto;
+  display: flex;
+}
+
+.headers {
+  color: #FFFFFF;
+}
+
+.h1 {
+  font-size: 80px;
+  font-weight: 700;
+  width: 798px;
+  margin: 111px 0 45px 106px;
+}
+
+.h2 {
+  font-size: 40px;
+  font-weight: 700;
+  width: 641px;
+  margin: 0 0 97px 106px;
+}
+
+.registrate {
+  
+}

@@ -43,7 +43,6 @@ function UserCard({ userData, photo }) {
         <img className={m.profile_image} src={photo} alt="avatar"/>
         <section className={m.profile}>
           <h2 className={m.name}>{userData.name} {userData.surname}</h2>
-          <a className={m.login}>{userData._id}</a>
           <ul className={m.contact_list}>
             <li className={m.contact_list_item}>
               <a className={m.email} href={`mailto:${userData.email}`}>{userData.email}</a>
