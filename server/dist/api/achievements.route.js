@@ -22,13 +22,12 @@ const validate_middleware_1 = __importDefault(require("../middlewares/validate.m
 const express_validator_1 = require("express-validator");
 const comments_route_1 = __importDefault(require("./comments.route"));
 const path_1 = __importDefault(require("path"));
-const fs_1 = __importDefault(require("fs"));
+const promises_1 = __importDefault(require("node:fs/promises"));
 const router = express_1.default.Router();
-const imageMimes = ["image/jpeg", "image/png", "image/jpg"];
 const storage = multer_1.default.diskStorage({
     destination: function (req, file, cb) {
         const base = path_1.default.resolve(__dirname, "..", "public");
-        if (imageMimes.includes(file.mimetype)) {
+        if (file.fieldname == "photo") {
             cb(null, base + "/photos");
         }
         else {
@@ -43,8 +42,12 @@ const upload = (0, multer_1.default)({ storage: storage });
 function removeFile(name) {
     return __awaiter(this, void 0, void 0, function* () {
         const photoName = path_1.default.resolve(__dirname, "..", "public/files/" + name);
-        fs_1.default.unlink(photoName, (err) => { if (err)
-            console.error(err); });
+        try {
+            yield promises_1.default.unlink(photoName);
+        }
+        catch (err) {
+            console.error(err);
+        }
     });
 }
 router.route("/achievement/:achievementId").get((req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -88,7 +91,7 @@ router.route("/me/achievement").post(auth_middleware_1.default.verifyToken, uplo
         //@ts-expect-error photo is multer fields
         if (req.files.photo) {
             //@ts-expect-error photo is multer fields
-            achievement.photo = req.files.photo.filename;
+            achievement.photo = req.files.photo[0].filename;
         }
         //@ts-expect-error who does that?
         if (req.files.files) {

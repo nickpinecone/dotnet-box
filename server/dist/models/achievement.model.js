@@ -37,7 +37,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AchSorts = exports.AchThemes = exports.AchTypes = exports.Achievement = void 0;
 const mongoose_1 = __importStar(require("mongoose"));
-const fs_1 = __importDefault(require("fs"));
+const promises_1 = __importDefault(require("node:fs/promises"));
 const path_1 = __importDefault(require("path"));
 const AchTypes = ["все", "проект", "сертификат"];
 exports.AchTypes = AchTypes;
@@ -88,22 +88,28 @@ const AchievementSchema = new mongoose_1.Schema({
         }],
 });
 AchievementSchema.pre("save", function (next) {
-    // @ts-expect-error somehow mongoose formats the date number
-    this.updatedAt = Date.now();
-    if (this.photo && this.isModified("photo") && this._oldPhoto) {
-        const photoName = path_1.default.resolve(__dirname, "..", "public/photos/" + this._oldPhoto);
-        fs_1.default.unlink(photoName, (err) => { if (err)
-            console.error(err); });
-    }
-    if (this.type &&
-        this.isModified("type") &&
-        !AchTypes.includes(this.type))
-        return next(new Error("wrong achievement type"));
-    if (this.theme &&
-        this.isModified("theme") &&
-        !AchThemes.includes(this.theme))
-        return next(new Error("wrong theme"));
-    return next();
+    return __awaiter(this, void 0, void 0, function* () {
+        // @ts-expect-error somehow mongoose formats the date number
+        this.updatedAt = Date.now();
+        if (this.photo && this.isModified("photo") && this._oldPhoto) {
+            const photoName = path_1.default.resolve(__dirname, "..", "public/photos/" + this._oldPhoto);
+            try {
+                yield promises_1.default.unlink(photoName);
+            }
+            catch (err) {
+                console.error(err);
+            }
+        }
+        if (this.type &&
+            this.isModified("type") &&
+            !AchTypes.includes(this.type))
+            return next(new Error("wrong achievement type"));
+        if (this.theme &&
+            this.isModified("theme") &&
+            !AchThemes.includes(this.theme))
+            return next(new Error("wrong theme"));
+        return next();
+    });
 });
 AchievementSchema.pre("deleteOne", function (next) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -112,9 +118,14 @@ AchievementSchema.pre("deleteOne", function (next) {
         if (achievement == null)
             return next(new Error("no achievement with id : " + id));
         if (achievement.photo) {
+            console.log("Hello");
             const photoName = path_1.default.resolve(__dirname, "..", "public/photos/" + achievement.photo);
-            fs_1.default.unlink(photoName, (err) => { if (err)
-                console.error(err); });
+            try {
+                yield promises_1.default.unlink(photoName);
+            }
+            catch (err) {
+                console.error(err);
+            }
         }
         return next();
     });

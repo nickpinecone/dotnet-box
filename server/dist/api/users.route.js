@@ -314,8 +314,14 @@ router.route("/reset/:id/:token").post(upload.none(), (0, express_validator_1.bo
         res.status(500).send("could not reset password for user: " + err);
     }
 }));
-router.route("/me/subscribe").get(auth_middleware_1.default.verifyToken, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.route("/me/subscribe").get((0, express_validator_1.query)("query").default("").escape(), auth_middleware_1.default.verifyToken, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
+        let hasQuery = false;
+        let searchKey = new RegExp("", "i");
+        if (req.query.query) {
+            hasQuery = true;
+            searchKey = new RegExp(`${req.query.query}`, "i");
+        }
         const userId = res.locals.userId;
         const user = yield user_model_1.default.findOne({ _id: userId }).populate({
             path: "subscriptions",
@@ -325,7 +331,11 @@ router.route("/me/subscribe").get(auth_middleware_1.default.verifyToken, (req, r
         });
         if (!user)
             throw new Error("could not find user: " + userId);
-        res.send(user === null || user === void 0 ? void 0 : user.subscriptions);
+        let subs = user.subscriptions;
+        if (hasQuery) {
+            subs = subs.filter((sub) => searchKey.test(getFullName(sub)));
+        }
+        res.send(subs);
     }
     catch (err) {
         console.error(err);
@@ -341,7 +351,10 @@ router.route("/me/subscribe/:subId").put(auth_middleware_1.default.verifyToken, 
             throw new Error("could not find user: " + userId);
         if (!subUser)
             throw new Error("could not find target user: " + req.params.subId);
-        if (!user.subscriptions.includes(subUser._id)) {
+        if (user.subscriptions.includes(subUser._id)) {
+            user.subscriptions = user.subscriptions.filter((sub) => sub._id.toString() != subUser._id.toString());
+        }
+        else {
             user.subscriptions.push(subUser._id);
         }
         yield user.save();

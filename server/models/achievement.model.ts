@@ -1,5 +1,5 @@
 import mongoose, { Schema } from "mongoose";
-import fs from "fs";
+import fs from "node:fs/promises";
 import path from "path";
 
 const AchTypes = ["все", "проект", "сертификат"];
@@ -58,13 +58,19 @@ const AchievementSchema = new Schema({
     }],
 });
 
-AchievementSchema.pre("save", function (next) {
+AchievementSchema.pre("save", async function (next) {
     // @ts-expect-error somehow mongoose formats the date number
     this.updatedAt = Date.now();
 
     if (this.photo && this.isModified("photo") && this._oldPhoto) {
         const photoName = path.resolve(__dirname, "..", "public/photos/" + this._oldPhoto);
-        fs.unlink(photoName, (err) => { if (err) console.error(err); });
+
+        try {
+            await fs.unlink(photoName);
+        }
+        catch (err) {
+            console.error(err);
+        }
     }
 
     if (
@@ -89,7 +95,13 @@ AchievementSchema.pre("deleteOne", async function (next) {
 
     if (achievement.photo) {
         const photoName = path.resolve(__dirname, "..", "public/photos/" + achievement.photo);
-        fs.unlink(photoName, (err) => { if (err) console.error(err); });
+
+        try {
+            await fs.unlink(photoName);
+        }
+        catch (err) {
+            console.error(err);
+        }
     }
 
     return next();

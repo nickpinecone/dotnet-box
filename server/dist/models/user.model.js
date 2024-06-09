@@ -38,7 +38,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = __importStar(require("mongoose"));
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const path_1 = __importDefault(require("path"));
-const fs_1 = __importDefault(require("fs"));
+const promises_1 = __importDefault(require("node:fs/promises"));
 const UserSchema = new mongoose_1.Schema({
     name: String,
     surname: String,
@@ -76,8 +76,12 @@ UserSchema.pre("save", function (next) {
     return __awaiter(this, void 0, void 0, function* () {
         if (this.avatar && this.isModified("avatar") && this._oldAvatar) {
             const photoName = path_1.default.resolve(__dirname, "..", "public/photos/" + this._oldAvatar);
-            fs_1.default.unlink(photoName, (err) => { if (err)
-                console.error(err); });
+            try {
+                yield promises_1.default.unlink(photoName);
+            }
+            catch (err) {
+                console.error(err);
+            }
         }
         if (!this.isModified("password"))
             return next();
@@ -90,20 +94,6 @@ UserSchema.pre("save", function (next) {
         catch (error) {
             return next(error);
         }
-    });
-});
-UserSchema.pre("deleteOne", function (next) {
-    return __awaiter(this, void 0, void 0, function* () {
-        const id = this.getQuery()["_id"];
-        const user = yield User.findOne({ _id: id });
-        if (user == null)
-            return next(new Error("no user with id : " + id));
-        if (user.avatar) {
-            const photoName = path_1.default.resolve(__dirname, "..", "public/photos/" + user.avatar);
-            fs_1.default.unlink(photoName, (err) => { if (err)
-                console.error(err); });
-        }
-        return next();
     });
 });
 const User = mongoose_1.default.model("user", UserSchema);

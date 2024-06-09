@@ -1,7 +1,7 @@
 import mongoose, { CallbackError, Schema } from "mongoose";
 import bcrypt from "bcrypt";
 import path from "path";
-import fs from "fs";
+import fs from "node:fs/promises";
 
 const UserSchema = new Schema({
     name: String,
@@ -46,7 +46,13 @@ const UserSchema = new Schema({
 UserSchema.pre("save", async function (next) {
     if (this.avatar && this.isModified("avatar") && this._oldAvatar) {
         const photoName = path.resolve(__dirname, "..", "public/photos/" + this._oldAvatar);
-        fs.unlink(photoName, (err) => { if (err) console.error(err); });
+
+        try {
+            await fs.unlink(photoName);
+        }
+        catch (err) {
+            console.error(err);
+        }
     }
 
     if (!this.isModified("password")) return next();
@@ -62,20 +68,6 @@ UserSchema.pre("save", async function (next) {
         return next(error as CallbackError);
     }
 });
-
-UserSchema.pre("deleteOne", async function (next) {
-    const id: string = this.getQuery()["_id"];
-    const user = await User.findOne({ _id: id });
-    if (user == null) return next(new Error("no user with id : " + id));
-
-    if (user.avatar) {
-        const photoName = path.resolve(__dirname, "..", "public/photos/" + user.avatar);
-        fs.unlink(photoName, (err) => { if (err) console.error(err); });
-    }
-
-    return next();
-});
-
 
 const User = mongoose.model("user", UserSchema);
 

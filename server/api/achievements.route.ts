@@ -8,7 +8,7 @@ import validation from "../middlewares/validate.middleware";
 import { body, query } from "express-validator";
 import comments from "./comments.route";
 import path from "path";
-import fs from "fs";
+import fs from "node:fs/promises";
 
 const router = express.Router();
 
@@ -32,7 +32,12 @@ const upload = multer({ storage: storage });
 
 async function removeFile(name: string) {
     const photoName = path.resolve(__dirname, "..", "public/files/" + name);
-    fs.unlink(photoName, (err) => { if (err) console.error(err); });
+    try {
+        await fs.unlink(photoName);
+    }
+    catch (err) {
+        console.error(err);
+    }
 }
 
 router.route("/achievement/:achievementId").get(async (req, res) => {
@@ -89,7 +94,7 @@ router.route("/me/achievement").post(
             //@ts-expect-error photo is multer fields
             if (req.files.photo) {
                 //@ts-expect-error photo is multer fields
-                achievement.photo = req.files.photo.filename;
+                achievement.photo = req.files.photo[0].filename;
             }
 
             //@ts-expect-error who does that?
