@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
-import Header from './../components/header/header';
-import Search from './../components/search/search';
-import Card from './../components/card/card';
+import EnterHeader from '../components/enter-header/enter-header';
+import Main from '../components/main/main';
+import Search from '../components/search/search';
+import Card from '../components/card/card';
 import axios from 'axios';
 
-function SearchPage() {
+function MainPage() {
 
   const [data, setData] = useState([])
   useEffect(() => {
@@ -19,11 +20,12 @@ function SearchPage() {
 
   return (
     <div>
-      <Header />
+      <EnterHeader />
+      <Main />
       <Search />
       {data.map(achiv => <Card data={achiv} />)}
     </div>
   );
 }
 
-export default SearchPage;
+export default MainPage;

@@ -19,7 +19,6 @@ const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const mailersend_1 = require("mailersend");
 const dotenv_1 = __importDefault(require("dotenv"));
 const path_1 = __importDefault(require("path"));
-const fs_1 = __importDefault(require("fs"));
 const express_validator_1 = require("express-validator");
 const auth_middleware_1 = __importDefault(require("../middlewares/auth.middleware"));
 const user_model_1 = __importDefault(require("../models/user.model"));
@@ -48,6 +47,45 @@ function makeid(length) {
         counter += 1;
     }
     return result;
+}
+function generateToken(userId, secret, expireTime) {
+    return jsonwebtoken_1.default.sign({ id: userId }, secret, {
+        algorithm: 'HS256',
+        allowInsecureKeySizes: true,
+        expiresIn: expireTime,
+    });
+}
+function fetchData(url) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const response = yield fetch(url);
+        const data = yield response.json();
+        if (!data.response) {
+            throw new Error("could not fetch data with url: " + url);
+        }
+        return data.response;
+    });
+}
+function sendVerifyEmail(userId) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const user = yield user_model_1.default.findOne({ _id: userId });
+        if (!user)
+            throw new Error("could not authenticate user with id: " + userId);
+        const token = generateToken(userId, process.env.VERIFICATION_SECRET, 3600);
+        const link = `${serverUrl}/api/users/verify/${user.id}/${token}`;
+        const sender = new mailersend_1.Sender(process.env.EMAIL_HOST, "Digital Portfolio");
+        const recipient = [new mailersend_1.Recipient(user.email, getFullName(user))];
+        const emailParams = new mailersend_1.EmailParams()
+            .setFrom(sender)
+            .setTo(recipient)
+            .setSubject("Email verification")
+            .setHtml(`
+            <section>
+                <h1>Click the link below to verify email</h1>
+                <a href="${link}">Verify Email</a>
+            </section>
+            `);
+        yield mailerSend.email.send(emailParams);
+    });
 }
 router.route("/").get((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -85,6 +123,7 @@ router.route("/register").post(upload.none(), (0, express_validator_1.body)("ema
         user.portfolio = portfolio._id;
         yield portfolio.save();
         yield user.save();
+        yield sendVerifyEmail(user._id.toString());
         res.sendStatus(200);
     }
     catch (err) {
@@ -101,11 +140,7 @@ router.route("/login").post(upload.none(), (0, express_validator_1.body)("email"
             throw new Error("could not find user with email: " + email);
         if (!bcrypt_1.default.compareSync(password, user.password))
             throw new Error("wrong password for user with email: " + email);
-        const token = jsonwebtoken_1.default.sign({ id: user.id }, process.env.LOGIN_SECRET, {
-            algorithm: 'HS256',
-            allowInsecureKeySizes: true,
-            expiresIn: 86400 * 365, // 24 hours (* 365 days for testing)
-        });
+        const token = generateToken(user.id, process.env.LOGIN_SECRET, 86400 * 365);
         res.status(200).send({
             user,
             accessToken: token
@@ -116,16 +151,6 @@ router.route("/login").post(upload.none(), (0, express_validator_1.body)("email"
         res.status(500).send("could not login user" + err);
     }
 }));
-function fetchData(url) {
-    return __awaiter(this, void 0, void 0, function* () {
-        const response = yield fetch(url);
-        const data = yield response.json();
-        if (!data.response) {
-            throw new Error("could not fetch data with url: " + url);
-        }
-        return data.response;
-    });
-}
 router.route("/loginVK").post(upload.none(), (0, express_validator_1.body)("silentToken").notEmpty(), (0, express_validator_1.body)("uuid").notEmpty(), validate_middleware_1.default.validateForm, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const silentToken = req.body.silentToken;
@@ -135,20 +160,24 @@ router.route("/loginVK").post(upload.none(), (0, express_validator_1.body)("sile
         const generalData = yield fetchData(url);
         url = "https://api.vk.com/method/account.getProfileInfo?" + `v=5.131&access_token=${generalData.access_token}`;
         const profileData = yield fetchData(url);
-        let user = yield user_model_1.default.findOne({ email: generalData.email });
+        let user = yield user_model_1.default.findOne({ vkId: generalData.user_id });
         if (!user) {
             const portfolio = yield portfolio_model_1.default.create({});
-            user = yield user_model_1.default.create({ name: profileData.first_name, surname: profileData.last_name, password: makeid(10), email: generalData.email });
+            user = yield user_model_1.default.create({
+                verified: true,
+                vkId: generalData.user_id,
+                name: profileData.first_name,
+                surname: profileData.last_name,
+                password: makeid(10),
+                email: generalData.email,
+                phoneNumber: profileData.phone,
+            });
             portfolio.owner = user._id;
             user.portfolio = portfolio._id;
             yield portfolio.save();
             yield user.save();
         }
-        const token = jsonwebtoken_1.default.sign({ id: user.id }, process.env.LOGIN_SECRET, {
-            algorithm: 'HS256',
-            allowInsecureKeySizes: true,
-            expiresIn: 86400 * 365, // 24 hours (* 365 days for testing)
-        });
+        const token = generateToken(user.id, process.env.LOGIN_SECRET, 86400 * 365);
         res.status(200).send({
             user,
             accessToken: token
@@ -197,11 +226,6 @@ router.route("/me").put(auth_middleware_1.default.verifyToken, upload.single("av
         const user = yield user_model_1.default.findOne({ _id: userId });
         if (!user)
             throw new Error("could not authenticate user with id: " + userId);
-        if (req.file && user.avatar) {
-            const photoName = path_1.default.resolve(__dirname, "..", "public/photos/" + user.avatar);
-            fs_1.default.unlink(photoName, (err) => { if (err)
-                console.error(err); });
-        }
         if (req.file) {
             user.avatar = req.file.filename;
         }
@@ -212,33 +236,6 @@ router.route("/me").put(auth_middleware_1.default.verifyToken, upload.single("av
     catch (err) {
         console.error(err);
         res.status(500).send("could not update user profile: " + err);
-    }
-}));
-router.route("/me/verify").put(auth_middleware_1.default.verifyToken, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const userId = res.locals.userId;
-        const user = yield user_model_1.default.findOne({ _id: userId });
-        if (!user)
-            throw new Error("could not authenticate user with id: " + userId);
-        const token = jsonwebtoken_1.default.sign({ id: user.id }, process.env.VERIFICATION_SECRET, {
-            algorithm: 'HS256',
-            allowInsecureKeySizes: true,
-            expiresIn: 3600, // 1 hour
-        });
-        const link = `${serverUrl}/api/users/verify/${user.id}/${token}`;
-        const sender = new mailersend_1.Sender(process.env.EMAIL_HOST, "Digital Portfolio");
-        const recipient = [new mailersend_1.Recipient(user.email, getFullName(user))];
-        const emailParams = new mailersend_1.EmailParams()
-            .setFrom(sender)
-            .setTo(recipient)
-            .setSubject("Email verification")
-            .setHtml(`<section><h1>Click link below to verify email</h1><a>${link}</a></section>`);
-        yield mailerSend.email.send(emailParams);
-        res.sendStatus(200);
-    }
-    catch (err) {
-        console.error(err);
-        res.status(500).send("could not initiate verification for user: " + err);
     }
 }));
 router.route("/reset").post(upload.none(), (0, express_validator_1.body)("email").notEmpty().isEmail(), validate_middleware_1.default.validateForm, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -344,7 +341,9 @@ router.route("/me/subscribe/:subId").put(auth_middleware_1.default.verifyToken, 
             throw new Error("could not find user: " + userId);
         if (!subUser)
             throw new Error("could not find target user: " + req.params.subId);
-        user.subscriptions.push(subUser._id);
+        if (!user.subscriptions.includes(subUser._id)) {
+            user.subscriptions.push(subUser._id);
+        }
         yield user.save();
         res.sendStatus(200);
     }

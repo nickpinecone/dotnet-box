@@ -24,7 +24,12 @@
 }
 
 .logo_link {
+  display: flex;
   margin-right: auto;
+}
+
+.logo {
+  align-self: flex-end;
 }
 
 .nav_link {

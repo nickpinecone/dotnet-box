@@ -17,19 +17,8 @@ function Registration() {
   const onLogin = async () => {
     if (isValidEmail(login) && isValidPassword(password) && isMatchingPasswords()) {
       try {
-        console.log(name, password, login)
-        const { user } = await axios.post('http://localhost:4000/api/users/register', {
-          username: name,
-          password: password,
-          email: login
-        })
-
-        const { data } = await axios.post('http://localhost:4000/api/users/login', {
-          email: login,
-          password: password
-        })
-        localStorage.setItem("token", data.accessToken)
-        localStorage.setItem("id", data.user._id)
+        Regist()
+        ToProfile()
         navigate('/')
       } catch (error) {
         console.log(error)
@@ -38,6 +27,24 @@ function Registration() {
     else {
       setError(true)
     }
+  }
+
+  const Regist = async() => {
+    console.log(name, password, login)
+    const { user } = await axios.post('http://localhost:4000/api/users/register', {
+      username: name,
+      password: password,
+      email: login
+    })
+  }
+
+  const ToProfile =  async() => {
+    const { data } = await axios.post('http://localhost:4000/api/users/login', {
+      email: login,
+      password: password
+    })
+    localStorage.setItem("token", data.accessToken)
+    localStorage.setItem("id", data.user._id)
   }
 
   function isValidEmail(email) {

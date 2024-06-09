@@ -304,3 +304,7 @@
   margin-right: 20px;
   border-radius: 50%;
 }
+
+.achiv_comment_item_image:hover {
+  outline: 3px solid #2196f3;
+}

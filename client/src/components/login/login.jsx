@@ -50,7 +50,7 @@ function Login() {
   return (
     <div className={m.enter_container}>
       <form className={m.container_login}>
-        <h2 className={m.login_title}>Вход</h2>
+        <h2 className={m.login_title}>Авторизация</h2>
         <ul className={m.list_inputs}>
           <li className={m.inputs_item}>
             <p className={m.inputs_item_text}>Email</p>
@@ -65,7 +65,7 @@ function Login() {
           <button className={m.enter} onClick={() => { onLogin() }} type="button">Войти</button>
         </div>
       </form>
-      <Link className={m.login_recover_password} to="./restore_password">Забыл пароль?</Link>
+      <Link className={m.login_recover_password} to="./restore_password">Забыли пароль?</Link>
       <div className={m.container_icon_enter} ref={(element) => { init(element) }}></div>
       <p className={m.no_account}>Нет аккаунта? <Link className={m.registration_link} to="../registration">Зарегистрироваться</Link></p>
     </div>

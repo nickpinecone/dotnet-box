@@ -8,8 +8,11 @@
   margin-bottom: 30px;
 }
 
-.find_flex_box {
+.find {
   display: flex;
+  list-style: none;
+  margin: 0;
+  padding: 0;
   margin-bottom: 20px;
 }
 
@@ -22,19 +25,19 @@
   margin-bottom: 5px;
 }
 
-.find_blocks {
-  width: 560px;
+.find_item {
   height: 66px;
-}
-
-.left_find {
   margin-right: 20px;
 }
 
+.find_item:last-child {
+  margin-right: 0;
+}
+
 .find_choose {
-  padding: 13px 20px 13px 20px;
+  padding: 11px 19px 12px 19px;
   display: flex;
-  width: 560px;
+  width: 366.67px;
   height: 42px;
   border-radius: 10px;
   margin-bottom: 20px;
@@ -42,7 +45,7 @@
   border: 0;
   outline: 0;
   background: #FFFFFF url('./../../img/more.png') no-repeat right center;
-  background-position: 520px 16px;
+  background-position: 331px 16px;
   appearance: none;
   font-size: 16px;
 }

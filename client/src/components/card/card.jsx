@@ -14,7 +14,7 @@ function Card({ idUser, data, change, img }) {
   const [photo, setPhoto] = useState()
 
   const getPhoto = async () => {
-    const img = await axios.get(`http://localhost:4000/api/photos/${data.photo}`, { responseType: "blob" })
+    const img = await axios.get(`http://localhost:4000/api/content/photo/${data.photo}`, { responseType: "blob" })
     setPhoto(URL.createObjectURL(img.data))
   }
 
@@ -80,7 +80,7 @@ function Card({ idUser, data, change, img }) {
         {linkTo()}
         {changeCom()}
       </section>
-    </div >
+    </div>
   );
 }
 

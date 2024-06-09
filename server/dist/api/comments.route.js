@@ -18,7 +18,7 @@ const user_model_1 = __importDefault(require("../models/user.model"));
 const auth_middleware_1 = __importDefault(require("../middlewares/auth.middleware"));
 const validate_middleware_1 = __importDefault(require("../middlewares/validate.middleware"));
 const express_validator_1 = require("express-validator");
-const achievement_model_1 = __importDefault(require("../models/achievement.model"));
+const achievement_model_1 = require("../models/achievement.model");
 const multer_1 = __importDefault(require("multer"));
 const router = express_1.default.Router();
 const upload = (0, multer_1.default)();
@@ -28,7 +28,7 @@ router.route("/achievement/:achievementId/comment").post(auth_middleware_1.defau
         const user = yield user_model_1.default.findOne({ _id: userId });
         if (!user)
             throw new Error("could not find user: " + userId);
-        const achievement = yield achievement_model_1.default.findOne({ _id: req.params.achievementId });
+        const achievement = yield achievement_model_1.Achievement.findOne({ _id: req.params.achievementId });
         if (!achievement)
             throw new Error("could not find achievement: " + req.params.achievementId);
         const comment = yield comment_model_1.default.create({ content: req.body.content });
@@ -72,7 +72,7 @@ router.route("/comment/:commentId").delete(auth_middleware_1.default.verifyToken
         if (!comment)
             throw new Error("could not find comment with id: " + req.params.commentId);
         yield comment_model_1.default.deleteOne({ _id: req.params.commentId });
-        const achievement = yield achievement_model_1.default.findOne({ _id: comment.achievement });
+        const achievement = yield achievement_model_1.Achievement.findOne({ _id: comment.achievement });
         if (!achievement)
             throw new Error("could not find achievement: " + comment.achievement);
         achievement.comments = achievement.comments.filter((el) => el._id.toString() != comment._id.toString());

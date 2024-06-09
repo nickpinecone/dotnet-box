@@ -2,7 +2,6 @@
   height: 100px;
   align-items: center;
   flex-direction: column;
-  margin-bottom: 30px;
 }
 
 .header_container {
@@ -23,8 +22,17 @@
   margin-left: 40px;
 }
 
+.site_navigation_item:last-child {
+  margin-left: 20px;
+}
+
 .logo_link {
+  display: flex;
   margin-right: auto;
+}
+
+.logo {
+  align-self: flex-end;
 }
 
 .nav_link {
@@ -32,4 +40,25 @@
   font-size: 20px;
   color: #2196f3;
   text-decoration: none;
+}
+
+.buttons {
+  border-radius: 100px;
+  padding: 12px 25px;
+  margin-bottom: 15px;
+  background: #2196f3;
+  font-weight: 700;
+  font-size: 20px;
+  color: #fff;
+  box-shadow: 0px 4px 4px 0px #0000001A;
+}
+
+.buttons:hover {
+  color: #fff;
+  background-color: #0661A9;
+}
+
+.buttons:active {
+  color: #fff;
+  background-color: #11293D;
 }

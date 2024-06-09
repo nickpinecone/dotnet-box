@@ -25,6 +25,8 @@ function Add() {
       formData.append('fullDescription', allDescr)
       formData.append('photo', img)
       formData.append('url', link)
+      formData.append('files', img)
+      formData.append('theme', "наука")
 
       let members = localStorage.getItem('id')
 

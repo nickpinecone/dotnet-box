@@ -20,48 +20,51 @@ const multer_1 = __importDefault(require("multer"));
 const user_model_1 = __importDefault(require("../models/user.model"));
 const validate_middleware_1 = __importDefault(require("../middlewares/validate.middleware"));
 const express_validator_1 = require("express-validator");
-const achievement_model_1 = __importDefault(require("../models/achievement.model"));
+const achievement_model_1 = require("../models/achievement.model");
 const router = express_1.default.Router();
 const upload = (0, multer_1.default)();
-router.route("/").get((0, express_validator_1.query)("search").optional().escape(), (0, express_validator_1.query)("limit").default("10").escape(), validate_middleware_1.default.validateForm, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.route("/").get((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const limit = Number(req.query.limit);
-        if (req.query.search) {
-            const searchList = [];
-            const searchKey = new RegExp(`${req.query.search}`, 'i');
-            const searchSettings = {
-                $or: [
-                    { "title": searchKey },
-                    { "shortDescription": searchKey },
-                    { "fullDescription": searchKey },
-                    { "url": searchKey },
-                ]
-            };
-            const portfolios = yield portfolio_model_1.default.find(searchSettings).sort({ createdAt: -1 }).limit(limit)
-                .populate("owner").populate({ path: "achievements" });
-            for (let i = 0; i < portfolios.length; i++) {
-                const portfolio = portfolios[i];
-                searchList.push(portfolio);
-            }
-            const achievements = yield achievement_model_1.default.find(searchSettings).sort({ createdAt: -1 }).limit(limit);
-            for (let i = 0; i < achievements.length; i++) {
-                const achievement = achievements[i];
-                const portfolio = yield portfolio_model_1.default.findById(achievement.portfolio)
-                    .populate("owner").populate({ path: "achievements" });
-                if (portfolio && searchList.every((item) => item._id.toString() !== portfolio._id.toString()))
-                    searchList.push(portfolio);
-            }
-            res.send([...searchList]);
-        }
-        else {
-            const portfolios = yield portfolio_model_1.default.find({}).sort({ createdAt: -1 }).limit(limit)
-                .populate("owner").populate({ path: "achievements" });
-            res.send(portfolios);
-        }
+        const portfolios = yield portfolio_model_1.default.find({}).sort({ createdAt: -1 })
+            .populate("owner").populate({ path: "achievements" });
+        res.send(portfolios);
     }
     catch (err) {
         console.error(err);
         res.status(500).send("could not get portfolios: " + err);
+    }
+}));
+router.route("/search").get((0, express_validator_1.query)("query").default("").escape(), (0, express_validator_1.query)("limit").default("10").escape(), (0, express_validator_1.query)("theme").default(achievement_model_1.AchThemes[0]).escape(), (0, express_validator_1.query)("type").default(achievement_model_1.AchTypes[0]).escape(), (0, express_validator_1.query)("sort").default(achievement_model_1.AchSorts[0]).escape(), validate_middleware_1.default.validateForm, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        let searchQuery = {};
+        if (req.query.query) {
+            const searchKey = new RegExp(`${req.query.query}`, 'i');
+            searchQuery = {
+                $or: [
+                    { "title": searchKey },
+                    { "shortDescription": searchKey },
+                    { "fullDescription": searchKey },
+                ]
+            };
+        }
+        const limit = Number(req.query.limit);
+        let achievements = yield achievement_model_1.Achievement.find(searchQuery).limit(limit);
+        if (req.query.theme != achievement_model_1.AchThemes[0]) {
+            achievements = achievements.filter((ach) => ach.theme === req.query.theme);
+        }
+        if (req.query.type != achievement_model_1.AchTypes[0]) {
+            achievements = achievements.filter((ach) => ach.type === req.query.type);
+        }
+        if (req.query.sort != achievement_model_1.AchSorts[0]) {
+            if (req.query.sort == achievement_model_1.AchSorts[1]) {
+                achievements.sort((ach) => ach.likeAmount);
+            }
+        }
+        res.status(200).send(achievements);
+    }
+    catch (err) {
+        console.error(err);
+        res.status(500).send("could not search for achievements: " + err);
     }
 }));
 router.route("/me").get(auth_middleware_1.default.verifyToken, (req, res) => __awaiter(void 0, void 0, void 0, function* () {

@@ -9,9 +9,19 @@ import Microlink from '@microlink/react';
 
 function BigCard({ dataCard, photo, fromAdd, userId }) {
 
+  const [mainData, setMainData] = useState(null)
+  useEffect(() => {
+    setMainData(dataCard);
+    if(mainData != null){
+      getPhotosMembers(mainData)
+      getComments(mainData)
+    }
+    
+  }, [dataCard, photo, fromAdd, userId])
+
   const [steps, setSteps] = useState([])
   const [comment, setComment] = useState()
-  const [comments, setComments] = useState(dataCard.comments)
+  const [comments, setComments] = useState([])
   const navigate = useNavigate()
 
   const findStep = async () => {
@@ -102,18 +112,28 @@ function BigCard({ dataCard, photo, fromAdd, userId }) {
     const add = await axios.post(`http://localhost:4000/api/portfolios/achievement/${dataCard._id}/comment`, { "content": comment }, {
       headers: { 'x-access-token': localStorage.getItem('token') },
     })
-    const { data } = await axios.get(`http://localhost:4000/api/portfolios/achievement/${dataCard._id}`)
-    setComments(data.comments)
-    setComment("")
+    const { data } = await axios.get(`http://localhost:4000/api/users/${localStorage.getItem('id')}`)
+    getPhoto(data.avatar).then(url => {
+      setComments((comments) => [...comments, {text : comment, idPerson: localStorage.getItem('id'), imgPerson: url}])
+    })
+    setComment('')
   }
 
-  const [photos, setPhotos] = useState(people)
+  const getComments = (data) => {
+    (data.comments).map(comment => {
+      getPhoto(comment.author.avatar).then(url => {
+        console.log(comment)
+        setComments((comments) => [...comments, {text : comment.content, idPerson: comment.author._id, imgPerson: url}])
+      })
+    })
+  }
+
+  const [members, setMembers] = useState([])
 
   const viewMembers = (member) => {
     if (member !== undefined) {
       if (member.avatar !== undefined) {
-        getPhoto(member.avatar)
-        return <Link to={`/${userId}`}><img className={m.big_card_image_people} src={photos} alt="Фото участника" /></Link>
+        return <Link to={`/${userId}`}><img className={m.big_card_image_people} src={people} alt="Фото участника" /></Link>
       }
       else {
         return <Link to={`/${userId}`}><img className={m.big_card_image_people} src={people} alt="Фото участника" /></Link>
@@ -122,9 +142,18 @@ function BigCard({ dataCard, photo, fromAdd, userId }) {
   }
 
   const getPhoto = async (id) => {
-    const img = await axios.get(`http://localhost:4000/api/photos/${id}`, { responseType: "blob" })
+    const img = await axios.get(`http://localhost:4000/api/content/photo/${id}`, { responseType: "blob" })
     const url = URL.createObjectURL(img.data)
-    setPhotos(url)
+    return url;
+  }
+
+  const getPhotosMembers = (dataCard) => {
+    console.log(dataCard);
+    (dataCard.members).map(member => {
+      getPhoto(member.avatar).then( url => {
+          setMembers((members) => [...members, {id: member._id, link: url}])
+    })
+    })
   }
 
   return (
@@ -160,7 +189,9 @@ function BigCard({ dataCard, photo, fromAdd, userId }) {
                   {viewLink()}
                   <li className={m.achiv_top_add_info_item}>
                     <p className={m.achiv_descr_title}>Участники</p>
-                    {(dataCard.members).map(member => viewMembers(member))}
+                    {members.map(member => {
+                      return <Link to={`/${member.id}`}><img className={m.big_card_image_people} src={member.link} alt="Фото участника" /></Link>
+                    })}
                   </li>
                 </ul>
               </div>
@@ -169,7 +200,16 @@ function BigCard({ dataCard, photo, fromAdd, userId }) {
           <div className={m.achiv_comment}>
             <h2 className={m.achiv_comment_title}>Комментарии</h2>
             <ul className={m.achiv_comment_list}>
-              {viewComment()}
+              {comments.map(comment => {
+                return (
+                  <li className={m.achiv_comment_item}>
+                    <Link to={`/${comment.idPerson}`}><img className={m.achiv_comment_item_image} src={comment.imgPerson} alt="user" /></Link>
+                    <p className={m.achiv_comment_item_text}>
+                      {comment.text}
+                    </p>
+                  </li>
+                )
+              })}
             </ul>
             <form className={m.achiv_comment_add}>
               <textarea className={m.achiv_comment_add_text} name="comment" placeholder='Комментарий' value={comment} onChange={(e) => { setComment(e.target.value) }}></textarea>
