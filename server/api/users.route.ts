@@ -5,7 +5,7 @@ import jwt from "jsonwebtoken";
 import { MailerSend, Recipient, Sender, EmailParams } from "mailersend";
 import dotenv from "dotenv";
 import path from "path";
-import { body } from "express-validator";
+import { body, query } from "express-validator";
 
 import auth from "../middlewares/auth.middleware";
 import User from "../models/user.model";
@@ -420,26 +420,44 @@ router.route("/reset/:id/:token").post(upload.none(),
     }
 );
 
-router.route("/me/subscribe").get(auth.verifyToken, async (req, res) => {
-    try {
-        const userId = res.locals.userId;
+router.route("/me/subscribe").get(
+    query("query").default("").escape(),
+    auth.verifyToken,
+    async (req, res) => {
+        try {
+            let hasQuery = false;
+            let searchKey = new RegExp("", "i");
 
-        const user = await User.findOne({ _id: userId }).populate({
-            path: "subscriptions",
-            populate: {
-                path: "portfolio", populate: { path: "achievements" },
+            if (req.query.query) {
+                hasQuery = true;
+                searchKey = new RegExp(`${req.query.query}`, "i");
             }
-        });
 
-        if (!user) throw new Error("could not find user: " + userId);
+            const userId = res.locals.userId;
 
-        res.send(user?.subscriptions);
+            const user = await User.findOne({ _id: userId }).populate({
+                path: "subscriptions",
+                populate: {
+                    path: "portfolio", populate: { path: "achievements" },
+                }
+            });
+
+            if (!user) throw new Error("could not find user: " + userId);
+
+            let subs = user.subscriptions;
+
+            if (hasQuery) {
+                subs = subs.filter((sub) => searchKey.test(getFullName(sub)));
+            }
+
+            res.send(subs);
+        }
+        catch (err) {
+            console.error(err);
+            res.status(500).send("could not get subscriptions for user: " + err);
+        }
     }
-    catch (err) {
-        console.error(err);
-        res.status(500).send("could not get subscriptions for user: " + err);
-    }
-});
+);
 
 router.route("/me/subscribe/:subId").put(auth.verifyToken, async (req, res) => {
     try {
@@ -451,7 +469,10 @@ router.route("/me/subscribe/:subId").put(auth.verifyToken, async (req, res) => {
         if (!user) throw new Error("could not find user: " + userId);
         if (!subUser) throw new Error("could not find target user: " + req.params.subId);
 
-        if (!user.subscriptions.includes(subUser._id)) {
+        if (user.subscriptions.includes(subUser._id)) {
+            user.subscriptions = user.subscriptions.filter((sub) => sub._id.toString() != subUser._id.toString());
+        }
+        else {
             user.subscriptions.push(subUser._id);
         }
 

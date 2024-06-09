@@ -12,13 +12,11 @@ import fs from "fs";
 
 const router = express.Router();
 
-const imageMimes = ["image/jpeg", "image/png", "image/jpg"];
-
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
         const base = path.resolve(__dirname, "..", "public");
 
-        if (imageMimes.includes(file.mimetype)) {
+        if (file.fieldname == "photo") {
             cb(null, base + "/photos")
         }
         else {
