@@ -8,8 +8,16 @@ const dotenv_1 = __importDefault(require("dotenv"));
 const server_1 = __importDefault(require("./server"));
 dotenv_1.default.config();
 mongoose_1.default.connect(process.env.DB_URI || "");
-const port = process.env.PORT || 4000;
-server_1.default.listen(port, () => {
-    console.log("server is running on port: " + port);
-});
+const port = Number(process.env.PORT) || 4000;
+const url = process.env.SERVER_URL;
+if (url != "") {
+    server_1.default.listen(port, url, () => {
+        console.log(`server is running on ${url} port: ${port}`);
+    });
+}
+else {
+    server_1.default.listen(port, () => {
+        console.log(`server is running on port: ${port}`);
+    });
+}
 //# sourceMappingURL=index.js.map
