@@ -118,7 +118,6 @@ AchievementSchema.pre("deleteOne", function (next) {
         if (achievement == null)
             return next(new Error("no achievement with id : " + id));
         if (achievement.photo) {
-            console.log("Hello");
             const photoName = path_1.default.resolve(__dirname, "..", "public/photos/" + achievement.photo);
             try {
                 yield promises_1.default.unlink(photoName);
