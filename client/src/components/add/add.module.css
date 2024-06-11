@@ -15,6 +15,11 @@
   padding: 0;
 }
 
+.buttons_add {
+  display: flex;
+  gap: 50px;
+}
+
 .achiv_header_text {
   font-family: "Inter", sans-serif;
   font-size: 16px;
@@ -96,6 +101,7 @@
 }
 
 .button_sized {
+  margin-left: auto;
   height: 44px;
 }
 

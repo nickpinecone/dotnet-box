@@ -14,7 +14,9 @@ function BigCard({ dataCard, photo, fromAdd, userId }) {
     setMainData(dataCard);
     if(mainData != null){
       getPhotosMembers(mainData)
-      getComments(mainData)
+      if(!fromAdd){
+        getComments(mainData)
+      }
     }
     
   }, [dataCard, photo, fromAdd, userId])
@@ -148,12 +150,19 @@ function BigCard({ dataCard, photo, fromAdd, userId }) {
   }
 
   const getPhotosMembers = (dataCard) => {
-    console.log(dataCard);
-    (dataCard.members).map(member => {
-      getPhoto(member.avatar).then( url => {
-          setMembers((members) => [...members, {id: member._id, link: url}])
-    })
-    })
+    setMembers([])
+    if(dataCard.members !== null){
+      (dataCard.members).map(member => {
+        if(member.avatar !== undefined) {
+          getPhoto(member.avatar).then( url => {
+            setMembers((members) => [...members, {id: member._id, link: url}])
+          })
+        }
+        else {
+          setMembers((members) => [...members, {id: member, link: people}])
+        }
+      })
+    }
   }
 
   return (
@@ -183,7 +192,7 @@ function BigCard({ dataCard, photo, fromAdd, userId }) {
               <div className={m.achiv_top_add_info}>
                 <ul className={m.achiv_top_add_info_list}>
                   <li className={m.achiv_top_add_info_item}>
-                    <p className={m.achiv_descr_title}>Подробное описание</p>
+                    <p className={m.achiv_descr_title}>История</p>
                     <p className={m.achiv_descr_text}>{dataCard.fullDescription}</p>
                   </li>
                   {viewLink()}

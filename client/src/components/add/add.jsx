@@ -13,6 +13,8 @@ function Add() {
   const [allDescr, setAllDescr] = useState('')
   const [link, setLink] = useState('')
   const [img, setImg] = useState(null)
+  const [files, setFiles] = useState([]);
+  const [members, setMemebers] = useState([localStorage.getItem('id')])
 
   const [people, setPeople] = useState('')
 
@@ -42,11 +44,18 @@ function Add() {
   }
 
   const viewAchieve = () => {
-    const dataAchieve = { "type": type, 'title': name, 'shortDescription': descr, 'fullDescription': allDescr, 'url': link, 'photo': img }
+    for(let file of files){
+      console.log(file.type)
+    }
+    console.log(img)
+    let url = null;
+    if(img !== null && img !== undefined){
+      url = URL.createObjectURL(img)
+    }
+    const dataAchieve = { "type": type, 'title': name, 'shortDescription': descr, 'fullDescription': allDescr, 'url': link, "members": members }
     return (
       <div>
-        <Card idUser={null} data={dataAchieve} />
-        <BigCard dataCard={dataAchieve} fromAdd={true} />
+        <BigCard dataCard={dataAchieve} fromAdd={true} photo={url}/>
       </div>
     )
   }
@@ -75,7 +84,7 @@ function Add() {
             <textarea className={`${m.achiv_input} ${m.achiv_description}`} value={descr} onChange={(e) => { setDescr(e.target.value) }}></textarea>
           </li>
           <li>
-            <p className={m.achiv_header_text}>Полное описание</p>
+            <p className={m.achiv_header_text}>История</p>
             <textarea className={`${m.achiv_input} ${m.achiv_full_description}`} value={allDescr} onChange={(e) => { setAllDescr(e.target.value) }}></textarea>
           </li>
           <li>
@@ -90,40 +99,24 @@ function Add() {
             </div>
           </li>
         </ul>
-        <h2 className={m.check}>Проверка на подлинность</h2>
-        <ul className={m.list}>
-          <li>
-            <p className={m.achiv_header_text}>Ссылка на сайт для проверки</p>
-            <input className={`${m.achiv_input} ${m.achiv_input_short}`}></input>
-          </li>
-          <li>
-            <p className={m.achiv_header_text}>Что надо ввести для получения данных</p>
-            <input className={`${m.achiv_input} ${m.achiv_input_short}`}></input>
-          </li>
-        </ul>
-        <h3 className={m.info}>Уникальная информация, которая будет выведена после поиска вашего достижения на сайте</h3>
-        <ul className={m.list}>
-          <li>
-            <p className={m.achiv_header_text}>Название</p>
-            <input className={`${m.achiv_input} ${m.achiv_input_short}`}></input>
-          </li>
-          <li>
-            <p className={m.achiv_header_text}>Данные</p>
-            <input className={`${m.achiv_input} ${m.achiv_input_short}`}></input>
-          </li>
-        </ul>
+        
 
         <div className={m.centered_buttons}>
-          <div className={m.button_sized}>
+          <div className={m.buttons_add}>
             <form className={m.add_photo}>
               <input className={m.add_photo_file} accept=".png,.jpg" onChange={(e) => { setImg(e.target.files[0]) }} type='file' />
               <span>Добавить фото</span>
             </form>
+
+            <form className={m.add_photo}>
+              <input className={m.add_photo_file} onChange={(e) => { setFiles(e.target.files) }} multiple="multiple" type='file' />
+              <span>Добавить файлы</span>
+            </form>
           </div>
-          <div className={`${m.button_sized} ${m.button_corrected}`}><a className={m.confirm} href='/' onClick={() => { onAdd() }}>Подтердить подлинность</a></div>
           <div className={m.button_sized}><a className={m.publish} href='/' onClick={() => { onAdd() }}>Опубликовать</a></div>
         </div>
       </section>
+      {viewAchieve()}
     </div>
   );
 }

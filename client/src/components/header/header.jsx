@@ -12,7 +12,7 @@ function Header() {
         <nav className={m.header_nav}>
           <ul className={m.site_navigation}>
             <li className={m.site_navigation_item}>
-              <Link className={m.nav_link} to="/">Главная</Link>
+              <Link className={m.nav_link} to="/myPortfolio">Главная</Link>
             </li>
             <li className={m.site_navigation_item}>
               <NavLink className={m.nav_link} to="/search">Поиск</NavLink>

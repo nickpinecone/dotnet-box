@@ -25,7 +25,7 @@ function App() {
       <Routes>
         <Route path="/login" element={<LoginPage />} />
         <Route path="/registration" element={<RegistrationPage />} />
-        <Route path="/" element={<Portfolio />} />
+        <Route path="/myPortfolio" element={<Portfolio />} />
         <Route path="/add" element={<AddPage />} />
         <Route path="/search" element={<Search />} />
         <Route path="/settings" element={<Settings />} />
@@ -35,7 +35,7 @@ function App() {
         <Route path="/login/restore_password" element={<Recovery />} />
         <Route path="/login/restore_password/:idUser/:token" element={<RecoverPasswordPage />} />
         <Route path="/:idUser/:idAchieve/edit" element={<EditPage />} />
-        <Route path="/main" element={<MainPage />} />
+        <Route path="/" element={<MainPage />} />
       </Routes>
     </Router>
   );
