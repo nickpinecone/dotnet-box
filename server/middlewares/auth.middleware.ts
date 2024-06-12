@@ -1,6 +1,18 @@
 import jwt from "jsonwebtoken";
 import express from "express";
 
+function generateToken(userId: string, secret: string, expireTime: number) {
+    return jwt.sign(
+        { id: userId },
+        secret,
+        {
+            algorithm: 'HS256',
+            allowInsecureKeySizes: true,
+            expiresIn: expireTime,
+        }
+    );
+}
+
 function verifyToken(req: express.Request, res: express.Response, next: express.NextFunction) {
     const token = req.headers["x-access-token"];
 
@@ -21,4 +33,4 @@ function verifyToken(req: express.Request, res: express.Response, next: express.
     );
 }
 
-export default { verifyToken };
+export default { verifyToken, generateToken };
