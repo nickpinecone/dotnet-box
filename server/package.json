@@ -16,9 +16,9 @@
     "nodemailer": "^6.9.13"
   },
   "scripts": {
-    "dev": "nodemon index.ts",
-    "start": "nodemon dist/index.js",
-    "build": "tsc"
+    "prepublish": "tsc",
+    "publish": "gh-pages -d dist -b prod-server",
+    "dev": "nodemon index.ts"
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.2",
@@ -33,6 +33,7 @@
     "@typescript-eslint/eslint-plugin": "^7.4.0",
     "@typescript-eslint/parser": "^7.4.0",
     "eslint": "^8.57.0",
+    "gh-pages": "^6.1.1",
     "nodemon": "^3.1.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.4.3"

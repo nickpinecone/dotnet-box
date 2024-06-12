@@ -8,7 +8,13 @@ const router = express.Router();
 router.route("/photo/:name").get(async (req, res) => {
     try {
         const photoName = path.resolve(__dirname, "..", "public/photos/" + req.params.name);
+
+        if (!fs.existsSync(photoName)) {
+            throw new Error("no photo with name: " + req.params.name);
+        }
+
         const readStream = fs.createReadStream(photoName);
+
         res.status(200);
         readStream.pipe(res);
     }
@@ -21,7 +27,13 @@ router.route("/photo/:name").get(async (req, res) => {
 router.route("/file/:name").get(async (req, res) => {
     try {
         const fileName = path.resolve(__dirname, "..", "public/files/" + req.params.name);
+
+        if (!fs.existsSync(fileName)) {
+            throw new Error("no photo with name: " + req.params.name);
+        }
+
         const readStream = fs.createReadStream(fileName);
+
         res.status(200);
         readStream.pipe(res);
     }
@@ -43,7 +55,6 @@ router.route("/data").get(async (req, res) => {
         console.error(err);
         res.status(500).send("could not get search data: " + err)
     }
-
 });
 
 export default router;
