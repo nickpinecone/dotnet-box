@@ -2,7 +2,6 @@ import express from "express";
 import bcrypt from "bcrypt";
 import multer from "multer";
 import jwt from "jsonwebtoken";
-import { MailerSend, Recipient, Sender, EmailParams } from "mailersend";
 import dotenv from "dotenv";
 import path from "path";
 import { body, query } from "express-validator";
@@ -11,18 +10,13 @@ import auth from "../middlewares/auth.middleware";
 import User from "../models/user.model";
 import Portfolio from "../models/portfolio.model";
 import validation from "../middlewares/validate.middleware";
+import mailsend from "../middlewares/mailsend.middleware";
+import { siteUrl } from "../utils/config.util";
 
 dotenv.config();
 
 const router = express.Router();
 const upload = multer({ dest: path.resolve(__dirname, "..", "public/photos/") });
-
-const serverUrl: string = "http://localhost:4000";
-const siteUrl: string = "http://localhost:3000";
-
-const mailerSend = new MailerSend({
-    apiKey: process.env.EMAIL_API as string,
-});
 
 // @ts-expect-error user is Document
 function getFullName(user): string {
@@ -41,18 +35,6 @@ function makeid(length: number): string {
     return result;
 }
 
-function generateToken(userId: string, secret: string, expireTime: number) {
-    return jwt.sign(
-        { id: userId },
-        secret,
-        {
-            algorithm: 'HS256',
-            allowInsecureKeySizes: true,
-            expiresIn: expireTime,
-        }
-    );
-}
-
 async function fetchData(url: string): Promise<any> {
     const response = await fetch(url);
     const data = await response.json();
@@ -64,32 +46,6 @@ async function fetchData(url: string): Promise<any> {
     return data.response;
 }
 
-async function sendVerifyEmail(userId: string) {
-    const user = await User.findOne({ _id: userId });
-    if (!user) throw new Error("could not authenticate user with id: " + userId);
-
-    const token = generateToken(userId, process.env.VERIFICATION_SECRET as string, 3600);
-
-    const link = `${serverUrl}/api/users/verify/${user.id}/${token}`;
-
-    const sender = new Sender(process.env.EMAIL_HOST as string, "Digital Portfolio");
-    const recipient = [new Recipient(user.email as string, getFullName(user))];
-
-    const emailParams = new EmailParams()
-        .setFrom(sender)
-        .setTo(recipient)
-        .setSubject("Email verification")
-        .setHtml(
-            `
-            <section>
-                <h1>Click the link below to verify email</h1>
-                <a href="${link}">Verify Email</a>
-            </section>
-            `
-        );
-
-    await mailerSend.email.send(emailParams);
-}
 
 router.route("/").get(async (req, res) => {
     try {
@@ -143,7 +99,7 @@ router.route("/register").post(
             await portfolio.save();
             await user.save();
 
-            await sendVerifyEmail(user._id.toString());
+            await mailsend.sendVerifyEmail(user._id.toString());
 
             res.sendStatus(200);
         }
@@ -172,7 +128,7 @@ router.route("/login").post(
             if (!bcrypt.compareSync(password, user.password as string))
                 throw new Error("wrong password for user with email: " + email);
 
-            const token = generateToken(user.id, process.env.LOGIN_SECRET as string, 86400 * 365);
+            const token = auth.generateToken(user.id, process.env.LOGIN_SECRET as string, 86400 * 365);
 
             res.status(200).send({
                 user,
@@ -224,7 +180,7 @@ router.route("/loginVK").post(
                 await user.save();
             }
 
-            const token = generateToken(user.id, process.env.LOGIN_SECRET as string, 86400 * 365);
+            const token = auth.generateToken(user.id, process.env.LOGIN_SECRET as string, 86400 * 365);
 
             res.status(200).send({
                 user,
@@ -322,28 +278,7 @@ router.route("/reset").post(
             const user = await User.findOne({ email: email });
             if (!user) throw new Error("could not find user with email: " + email);
 
-            const token = jwt.sign(
-                { id: user?.id },
-                process.env.VERIFICATION_SECRET as string,
-                {
-                    algorithm: 'HS256',
-                    allowInsecureKeySizes: true,
-                    expiresIn: 3600, // 1 hour
-                }
-            );
-
-            const link = `${siteUrl}/login/restore_password/${user.id}/${token}`;
-
-            const sender = new Sender(process.env.EMAIL_HOST as string, "Digital Portfolio");
-            const recipient = [new Recipient(user.email as string, user.name as string)];
-
-            const emailParams = new EmailParams()
-                .setFrom(sender)
-                .setTo(recipient)
-                .setSubject("Password reset")
-                .setHtml(`<section><h1>Click link below to reset your password</h1><a>${link}</a></section>`);
-
-            await mailerSend.email.send(emailParams);
+            mailsend.sendResetEmail(user._id.toString());
 
             res.send(200);
         }
