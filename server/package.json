@@ -17,7 +17,7 @@
   },
   "scripts": {
     "dev": "nodemon index.ts",
-    "publish": "git subtree push --prefix server/dist origin prod-server",
+    "start": "nodemon dist/index.js",
     "build": "tsc"
   },
   "devDependencies": {
