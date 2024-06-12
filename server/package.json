@@ -16,8 +16,8 @@
     "nodemailer": "^6.9.13"
   },
   "scripts": {
-    "prepublish": "tsc",
-    "publish": "gh-pages -d dist -b prod-server",
+    "prestart": "tsc",
+    "start": "node dist/index.js",
     "dev": "nodemon index.ts"
   },
   "devDependencies": {
