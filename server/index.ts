@@ -1,8 +1,19 @@
 import mongoose from "mongoose";
 import dotenv from "dotenv";
+import fs from "fs";
 
 import app from "./server";
 import { isDevelopment, serverUrl } from "./utils/config.util";
+
+const files = './public/files';
+const photos = './public/photos';
+
+if (!fs.existsSync(files)) {
+    fs.mkdirSync(files);
+}
+if (!fs.existsSync(photos)) {
+    fs.mkdirSync(photos);
+}
 
 dotenv.config();
 
