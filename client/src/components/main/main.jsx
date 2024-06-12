@@ -5,15 +5,33 @@ import a from '../../img/icon-metrics-01 1.png';
 import b from '../../img/image 12.png';
 import c from '../../img/image 13.png';
 import d from '../../img/Social Icons.png';
+import { useEffect, useState } from 'react';
 
 function Main() {
+  const [inAccaunt, setInAccaunt] = useState(false)
+
+  useEffect(() => {
+    if(localStorage.getItem("token")){
+      setInAccaunt(true)
+    }
+  }, [])
+
+  const regOrIn = () => {
+    if(!inAccaunt){
+      return <NavLink className={m.register} to='/registration'>Регистрация</NavLink>
+    }
+    else {
+      return <NavLink className={m.register} to='/myPortfolio'>Моё портфолио</NavLink>
+    }
+  }
+
   return (
     <main>
       <section className={m.registration}>
         <div className={m.headers}>
           <h2 className={m.h1}>Создай цифровое портфолио</h2>
           <h3 className={m.h2}>Делись опытом, знаниями, успехами. Узнавай новое, чтобы стать лучше</h3>
-          <NavLink className={m.register} to='/registration'>Регистрация</NavLink>
+          {regOrIn()}
         </div>
         <img className={m.img} src={man} alt="man" />
       </section>

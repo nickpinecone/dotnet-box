@@ -5,6 +5,7 @@
   height: 750px;
   margin: 0 auto;
   display: flex;
+  border-radius: 60px;
 }
 
 .headers {
@@ -75,6 +76,7 @@
   padding: 50px 100px;
   margin: 0 auto;
   background-color: #2196F3;
+  border-radius: 60px;
 }
 
 .advantages h3 {
