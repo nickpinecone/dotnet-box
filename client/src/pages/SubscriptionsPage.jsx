@@ -3,7 +3,9 @@ import Header from '../components/header/header';
 import More from '../components/more/more';
 import SubscriptionCard from '../components/subscription-card/subscription-card';
 import Subscriptions from '../components/subscriptions/subscriptions';
+import { UrlServer } from "../App"
 import axios from "axios";
+
 
 function SubscriptionsPage() {
   const [subscriptions, setSubscriptions] = useState([])
@@ -12,7 +14,7 @@ function SubscriptionsPage() {
     getSubscription()
   }, [])
   const getSubscription = async() => {
-    const { data } = await axios.get('http://localhost:4000/api/users/me/subscribe', {
+    const { data } = await axios.get(`http://${UrlServer()}/api/users/me/subscribe`, {
       headers: { 'x-access-token': localStorage.getItem('token') },
     })
     setSubscriptions(data)

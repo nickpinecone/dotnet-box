@@ -4,6 +4,7 @@ import BigCard from '../big-card/big-card';
 import { useState } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
+import { UrlServer } from "../../App"
 
 function Add() {
 
@@ -27,12 +28,15 @@ function Add() {
       formData.append('fullDescription', allDescr)
       formData.append('photo', img)
       formData.append('url', link)
-      formData.append('files', img)
-      formData.append('theme', "наука")
+      for(let file in files){
+        formData.append('files', file)
+      }
+      formData.append('theme', "спорт")
+      console.log(formData)
 
       let members = localStorage.getItem('id')
 
-      const { data } = await axios.post('http://localhost:4000/api/portfolios/me/achievement', formData,
+      const { data } = await axios.post(`http://${UrlServer()}/api/portfolios/me/achievement`, formData,
         {
           params: { members },
           headers: { 'x-access-token': localStorage.getItem('token') },
@@ -47,7 +51,6 @@ function Add() {
     for(let file of files){
       console.log(file.type)
     }
-    console.log(img)
     let url = null;
     if(img !== null && img !== undefined){
       url = URL.createObjectURL(img)
@@ -61,8 +64,9 @@ function Add() {
   }
 
   const AddPeople = async () => {
-    const data = await axios.get('http://localhost:4000/api/users/byEmail', { email: people })
-    console.log(data)
+    console.log(people)
+    
+    const { data } = await axios.get(`http://${UrlServer()}/api/users/byEmail`, {'email': people})
   }
 
   return (
@@ -113,7 +117,7 @@ function Add() {
               <span>Добавить файлы</span>
             </form>
           </div>
-          <div className={m.button_sized}><a className={m.publish} href='/' onClick={() => { onAdd() }}>Опубликовать</a></div>
+          <div className={m.button_sized}><a className={m.publish} href='#/myPortfolio' onClick={() => { onAdd() }}>Опубликовать</a></div>
         </div>
       </section>
       {viewAchieve()}

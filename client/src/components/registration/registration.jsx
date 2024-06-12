@@ -2,6 +2,7 @@ import { useState } from 'react';
 import m from './registration.module.css'
 import axios from 'axios'
 import { useNavigate } from 'react-router-dom';
+import { UrlServer } from "../../App"
 
 function Registration() {
 
@@ -31,7 +32,7 @@ function Registration() {
 
   const Regist = async() => {
     console.log(name, password, login)
-    const { user } = await axios.post('http://localhost:4000/api/users/register', {
+    const { user } = await axios.post(`http://${UrlServer()}/api/users/register`, {
       username: name,
       password: password,
       email: login
@@ -39,7 +40,7 @@ function Registration() {
   }
 
   const ToProfile =  async() => {
-    const { data } = await axios.post('http://localhost:4000/api/users/login', {
+    const { data } = await axios.post(`http://${UrlServer()}/api/users/login`, {
       email: login,
       password: password
     })

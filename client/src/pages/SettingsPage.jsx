@@ -6,6 +6,7 @@ import Settings from "../components/settings/settings";
 import UserCard from '../components/user-card/user-card';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
+import { UrlServer } from "../App"
 
 function SettingsPage() {
   const navigate = useNavigate()
@@ -28,7 +29,7 @@ function SettingsPage() {
   const [photo, setPhoto] = useState();
 
   const handleGetData = async () => {
-    const { data } = await axios.get('http://localhost:4000/api/users/me', {
+    const { data } = await axios.get(`http://${UrlServer()}/api/users/me`, {
       headers: { 'x-access-token': localStorage.getItem('token') },
     })
     setDataPeple(data)
@@ -37,7 +38,7 @@ function SettingsPage() {
 
   const getPhoto = async(info) => {
     if(info.avatar){
-      const img = await axios.get(`http://localhost:4000/api/content/photo/${info.avatar}`, { responseType: "blob" })
+      const img = await axios.get(`http://${UrlServer()}/api/content/photo/${info.avatar}`, { responseType: "blob" })
       let url = URL.createObjectURL(img.data)
       setPhoto(url)
     }

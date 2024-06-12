@@ -2,6 +2,7 @@ import { useState } from 'react';
 import m from './login.module.css'
 import axios from 'axios'
 import { Link, useNavigate, useParams } from 'react-router-dom';
+import { UrlServer } from "../../App"
 
 import * as VKID from '@vkid/sdk';
 
@@ -22,13 +23,13 @@ function Login() {
 
   const onLogin = async () => {
     try {
-      const { data } = await axios.post('http://localhost:4000/api/users/login', {
+      const { data } = await axios.post(`http://${UrlServer()}/api/users/login`, {
         email: login,
         password: password
       })
       localStorage.setItem("token", data.accessToken)
       localStorage.setItem("id", data.user._id)
-      navigate('/')
+      navigate('/myPortfolio')
     } catch (error) {
       setError(true)
       console.log(error)

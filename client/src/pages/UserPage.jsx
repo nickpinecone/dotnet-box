@@ -5,6 +5,7 @@ import AddHeader from '../components/add-header/add-achievment'
 import Card from '../components/card/card'
 import More from "../components/more/more"
 import profile from "../img/avatar.png"
+import { UrlServer } from "../App"
 
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
@@ -33,7 +34,7 @@ function Portfolio() {
   const [dataProjects, setDataProjects] = useState([])
 
   const handleGetData = async () => {
-    const { data } = await axios.get(`http://localhost:4000/api/users/${idUser}`)
+    const { data } = await axios.get(`http://${UrlServer()}/api/users/${idUser}`)
     setDataPeple(data)
     setDataProjects(data.portfolio.achievements)
     getPhoto(data)
@@ -42,7 +43,7 @@ function Portfolio() {
   const [photo, setPhoto] = useState();
   const getPhoto = async (info) => {
     if (info.avatar) {
-      const img = await axios.get(`http://localhost:4000/api/content/photo/${info.avatar}`, { responseType: "blob" })
+      const img = await axios.get(`http://${UrlServer()}/api/content/photo/${info.avatar}`, { responseType: "blob" })
       let url = URL.createObjectURL(img.data)
       setPhoto(url)
     }

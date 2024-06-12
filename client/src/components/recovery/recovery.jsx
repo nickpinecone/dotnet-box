@@ -2,6 +2,7 @@ import { useState } from 'react';
 import m from './recovery.module.css'
 import axios from 'axios'
 import { useNavigate } from 'react-router-dom';
+import { UrlServer } from "../../App"
 
 function Recovery() {
 
@@ -12,7 +13,7 @@ function Recovery() {
   const onLogin = async () => {
     if (isValidEmail(login)) {
       try {
-        const { data } = await axios.post('http://localhost:4000/api/users/reset', {
+        const { data } = await axios.post(`http://${UrlServer()}/api/users/reset`, {
           email: login
         })
         navigate('/')

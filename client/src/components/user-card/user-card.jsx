@@ -2,6 +2,7 @@ import m from './user-card.module.css';
 import { Link, NavLink } from 'react-router-dom';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
+import { UrlServer } from "../../App"
 
 function UserCard({ userData, photo }) {
   let isMy = () => {
@@ -14,7 +15,7 @@ function UserCard({ userData, photo }) {
   }
 
   const subToUser = async() => {
-    await axios.put(`http://localhost:4000/api/users/me/subscribe/${userData._id}`, {}, 
+    await axios.put(`http://${UrlServer()}/api/users/me/subscribe/${userData._id}`, {}, 
     {
       headers: { 'x-access-token': localStorage.getItem('token') },
     });

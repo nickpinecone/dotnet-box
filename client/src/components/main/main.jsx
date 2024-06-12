@@ -1,5 +1,5 @@
 import m from './main.module.css';
-import { NavLink } from 'react-router-dom';
+import { NavLink, Link } from 'react-router-dom';
 import man from '../../img/5388563362240022086 1.png';
 import a from '../../img/icon-metrics-01 1.png';
 import b from '../../img/image 12.png';
@@ -18,10 +18,10 @@ function Main() {
 
   const regOrIn = () => {
     if(!inAccaunt){
-      return <NavLink className={m.register} to='/registration'>Регистрация</NavLink>
+      return <Link className={m.register} to='/registration'>Регистрация</Link>
     }
     else {
-      return <NavLink className={m.register} to='/myPortfolio'>Моё портфолио</NavLink>
+      return <Link className={m.register} to='/myPortfolio'>Моё портфолио</Link>
     }
   }
 

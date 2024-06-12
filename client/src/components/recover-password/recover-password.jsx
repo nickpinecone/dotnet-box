@@ -2,6 +2,7 @@ import { useState } from 'react';
 import m from './recover-password.module.css'
 import axios from 'axios'
 import { useNavigate, useParams } from 'react-router-dom';
+import { UrlServer } from "../../App"
 
 function Recovery() {
 
@@ -15,7 +16,7 @@ function Recovery() {
   const onLogin = async () => {
     if (isValidPassword(password)) {
       try {
-        const { data } = await axios.post(`http://localhost:4000/api/users/reset/${idUser}/${token}`, {
+        const { data } = await axios.post(`http://${UrlServer()}/api/users/reset/${idUser}/${token}`, {
           password: password
         })
         navigate('/')

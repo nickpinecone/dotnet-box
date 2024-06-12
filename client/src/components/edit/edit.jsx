@@ -2,6 +2,7 @@ import m from './edit.module.css';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
+import { UrlServer } from "../../App"
 
 function Edit({ dataCard, idAchieve }) {
   useEffect(() => {
@@ -34,7 +35,7 @@ function Edit({ dataCard, idAchieve }) {
 
       let members = localStorage.getItem('id')
 
-      const { data } = await axios.put(`http://localhost:4000/api/portfolios/me/achievement/${idAchieve}`, formData,
+      const { data } = await axios.put(`http://${UrlServer()}/api/portfolios/me/achievement/${idAchieve}`, formData,
         {
           params: { members },
           headers: { 'x-access-token': localStorage.getItem('token') },
@@ -46,7 +47,7 @@ function Edit({ dataCard, idAchieve }) {
   }
 
   const AddPeople = async () => {
-    const data = await axios.get('http://localhost:4000/api/users/byEmail', { email: people })
+    const data = await axios.get(`http://${UrlServer()}/api/users/byEmail`, { email: people })
     console.log(data)
   }
 

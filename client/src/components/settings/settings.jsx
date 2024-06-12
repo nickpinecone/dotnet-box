@@ -4,17 +4,24 @@ import download from '../../img/download.svg'
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
+import { UrlServer } from "../../App"
 
 function Settings({userData, photo}) {
 
   const [img, setImg] = useState()
   const [avatar, setAvatar] = useState()
+  const [FIO, setFIO] = useState()
+  const [login, setLogin] = useState()
+
+  useEffect(() => {
+    setAvatar(photo)
+  }, [photo])
 
   const onUpdate = async() => {
     try {
       let formData = new FormData();
       formData.append('avatar', img)
-      const { data } = await axios.put('http://localhost:4000/api/users/me', formData,
+      const { data } = await axios.put(`http://${UrlServer()}/api/users/me`, formData,
         {
           headers: { 'x-access-token': localStorage.getItem('token') },
         })
@@ -28,9 +35,9 @@ function Settings({userData, photo}) {
     <main>
       <section className={m.profile_container}>
         <div className={m.profile_img}> 
-          <img className={m.profile_image} src={photo} alt="ProfileImage" />
+          <img className={m.profile_image} src={avatar} alt="ProfileImage" />
           <img className={m.profile_image_dowload} src={download} alt="ProfileImage" />
-          <input className={m.profile_input_img} type="file" accept=".png,.jpg" onChange={(e) => { setImg(e.target.files[0])}}/>
+          <input className={m.profile_input_img} type="file" accept=".png,.jpg" onChange={(e) => { setImg(e.target.files[0]); setAvatar(URL.createObjectURL(e.target.files[0]))}}/>
         </div>
 
         <section className={m.profile}>

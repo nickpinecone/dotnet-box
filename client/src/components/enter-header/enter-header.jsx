@@ -1,6 +1,6 @@
 import m from './enter-header.module.css';
 import logo from "./../../img/logo.svg";
-import { NavLink } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 
 function EnterHeader() {
@@ -15,7 +15,7 @@ function EnterHeader() {
   const viewInAccount = () => {
     if(!inAccaunt) {
       return (<li className={m.site_navigation_item}>
-        <NavLink className={m.buttons} to="/login">Вход</NavLink>
+        <Link className={m.buttons} to="/login">Вход</Link>
       </li>)
     }
   }
@@ -24,7 +24,7 @@ function EnterHeader() {
     if(!inAccaunt) {
       return (
       <li className={m.site_navigation_item}>
-        <NavLink className={m.buttons} to="/registration">Регистрация</NavLink>
+        <Link className={m.buttons} to="/registration">Регистрация</Link>
       </li>)
     }
   }
@@ -33,7 +33,7 @@ function EnterHeader() {
     if(inAccaunt) {
       return (
         <li className={m.site_navigation_item}>
-        <NavLink className={m.buttons} to="/myPortfolio">Моё портфолио</NavLink>
+        <Link className={m.buttons} to="/myPortfolio">Моё портфолио</Link>
       </li>)
     }
   }
@@ -41,19 +41,19 @@ function EnterHeader() {
   return (
     <header className={m.header}>
       <section className={m.header_container}>
-        <NavLink className={m.logo_link} to={'/'}>
+        <Link className={m.logo_link} to={'/'}>
           <img className={m.logo} src={logo} alt='Logo' />
-        </NavLink>
+        </Link>
         <nav className={m.header_nav}>
           <ul className={m.site_navigation}>
             <li className={m.site_navigation_item}>
-              <NavLink className={m.nav_link} to="/">О нас</NavLink>
+              <a className={m.nav_link} >О нас</a>
             </li>
             <li className={m.site_navigation_item}>
-              <NavLink className={m.nav_link} to="/">Преимущества</NavLink>
+              <a className={m.nav_link} >Преимущества</a>
             </li>
             <li className={m.site_navigation_item}>
-              <NavLink className={m.nav_link} to="/search">Достижения</NavLink>
+              <a className={m.nav_link} >Достижения</a>
             </li>
             {viewInAccount()}
             {viewRegistInAccount()}

@@ -3,6 +3,7 @@ import Header from '../components/header/header';
 import Edit from '../components/edit/edit'
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
+import { UrlServer } from "../App"
 
 function EditPage() {
 
@@ -25,7 +26,7 @@ function EditPage() {
   }
 
   const getDataAchieve = async () => {
-    const { data } = await axios.get(`http://localhost:4000/api/portfolios/achievement/${idAchieve}`)
+    const { data } = await axios.get(`http://${UrlServer()}/api/portfolios/achievement/${idAchieve}`)
     setAchieve(data)
   }
 

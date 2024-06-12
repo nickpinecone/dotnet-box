@@ -3,6 +3,7 @@ import Header from '../components/header/header';
 import BigCard from "../components/big-card/big-card";
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
+import { UrlServer } from "../App"
 
 function BigCardPage() {
 
@@ -27,7 +28,7 @@ function BigCardPage() {
 
   const getDataPhoto = async () => {
     if(idUser !== "undefined") {
-      const { data } = await axios.get(`http://localhost:4000/api/users/${idUser}`)
+      const { data } = await axios.get(`http://${UrlServer()}/api/users/${idUser}`)
       data.portfolio.achievements.forEach(element => {
         if (element._id === idAchieve) {
           if (element.photo !== undefined) {
@@ -39,12 +40,12 @@ function BigCardPage() {
   }
 
   const getDataAchieve = async () => {
-    const { data } = await axios.get(`http://localhost:4000/api/portfolios/achievement/${idAchieve}`)
+    const { data } = await axios.get(`http://${UrlServer()}/api/portfolios/achievement/${idAchieve}`)
     setAchieve(data)
   }
 
   const getPhoto = async (data) => {
-    const img = await axios.get(`http://localhost:4000/api/content/photo/${data.photo}`, { responseType: "blob" })
+    const img = await axios.get(`http://${UrlServer()}/api/content/photo/${data.photo}`, { responseType: "blob" })
     let url = URL.createObjectURL(img.data)
     setPhoto(url)
   }

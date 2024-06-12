@@ -6,6 +6,7 @@ import { Link } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import Microlink from '@microlink/react';
+import { UrlServer } from "../../App"
 
 function BigCard({ dataCard, photo, fromAdd, userId }) {
 
@@ -72,13 +73,13 @@ function BigCard({ dataCard, photo, fromAdd, userId }) {
   }
 
   const PutLike = async () => {
-    const { data } = await axios.put(`http://localhost:4000/api/portfolios/me/achievement/like/${dataCard._id}`, {}, {
+    const { data } = await axios.put(`http://${UrlServer()}/api/portfolios/me/achievement/like/${dataCard._id}`, {}, {
       headers: { 'x-access-token': localStorage.getItem('token') },
     })
   }
 
   const delAchieve = async () => {
-    const del = await axios.delete(`http://localhost:4000/api/portfolios/me/achievement/${dataCard._id}`, {
+    const del = await axios.delete(`http://${UrlServer()}/api/portfolios/me/achievement/${dataCard._id}`, {
       headers: { 'x-access-token': localStorage.getItem('token') },
     })
     navigate(-1)
@@ -111,10 +112,10 @@ function BigCard({ dataCard, photo, fromAdd, userId }) {
   }
 
   const addComment = async () => {
-    const add = await axios.post(`http://localhost:4000/api/portfolios/achievement/${dataCard._id}/comment`, { "content": comment }, {
+    const add = await axios.post(`http://${UrlServer()}/api/portfolios/achievement/${dataCard._id}/comment`, { "content": comment }, {
       headers: { 'x-access-token': localStorage.getItem('token') },
     })
-    const { data } = await axios.get(`http://localhost:4000/api/users/${localStorage.getItem('id')}`)
+    const { data } = await axios.get(`http://${UrlServer()}/api/users/${localStorage.getItem('id')}`)
     getPhoto(data.avatar).then(url => {
       setComments((comments) => [...comments, {text : comment, idPerson: localStorage.getItem('id'), imgPerson: url}])
     })
@@ -144,7 +145,7 @@ function BigCard({ dataCard, photo, fromAdd, userId }) {
   }
 
   const getPhoto = async (id) => {
-    const img = await axios.get(`http://localhost:4000/api/content/photo/${id}`, { responseType: "blob" })
+    const img = await axios.get(`http://${UrlServer()}/api/content/photo/${id}`, { responseType: "blob" })
     const url = URL.createObjectURL(img.data)
     return url;
   }

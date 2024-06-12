@@ -2,6 +2,7 @@ import m from './card.module.css';
 import { NavLink } from 'react-router-dom';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
+import { UrlServer } from "../../App"
 
 function Card({ idUser, data, change, img }) {
   console.log(data)
@@ -14,12 +15,12 @@ function Card({ idUser, data, change, img }) {
   const [photo, setPhoto] = useState()
 
   const getPhoto = async () => {
-    const img = await axios.get(`http://localhost:4000/api/content/photo/${data.photo}`, { responseType: "blob" })
+    const img = await axios.get(`http://${UrlServer()}/api/content/photo/${data.photo}`, { responseType: "blob" })
     setPhoto(URL.createObjectURL(img.data))
   }
 
   const delAchieve = async () => {
-    const del = await axios.delete(`http://localhost:4000/api/portfolios/me/achievement/${data._id}`, {
+    const del = await axios.delete(`http://${UrlServer()}/api/portfolios/me/achievement/${data._id}`, {
       headers: { 'x-access-token': localStorage.getItem('token') },
     })
   }
@@ -30,7 +31,7 @@ function Card({ idUser, data, change, img }) {
         <div className={m.change}>
           <div className={m.change_list}>
             <NavLink className={m.change_list_item} to={`/${idUser}/${data._id}/edit`}>Редактировать</NavLink>
-            <NavLink onClick={delAchieve} href='/' className={m.change_list_item}>Удалить</NavLink>
+            <a onClick={delAchieve} href='#/myPortfolio' className={m.change_list_item}>Удалить</a>
           </div>
         </div>);
     }
@@ -48,7 +49,7 @@ function Card({ idUser, data, change, img }) {
   }
 
   const PutLike = async () => {
-    const { like } = await axios.put(`http://localhost:4000/api/portfolios/me/achievement/like/${data._id}`, {}, {
+    const { like } = await axios.put(`http://${UrlServer()}/api/portfolios/me/achievement/like/${data._id}`, {}, {
       headers: { 'x-access-token': localStorage.getItem('token') },
     })
   }

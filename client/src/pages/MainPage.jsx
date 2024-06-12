@@ -4,6 +4,7 @@ import Main from '../components/main/main';
 import Search from '../components/search/search';
 import Card from '../components/card/card';
 import axios from 'axios';
+import { UrlServer } from "../App"
 
 function MainPage() {
 
@@ -13,7 +14,7 @@ function MainPage() {
   }, [])
 
   const getAchieve = async () => {
-    const dataUsers = await axios.get('http://localhost:4000/api/portfolios/search')
+    const dataUsers = await axios.get(`http://${UrlServer()}/api/portfolios/search`)
     console.log(dataUsers.data)
     setData(dataUsers.data)
   }

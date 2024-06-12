@@ -2,6 +2,7 @@ import m from './subscription-card.module.css';
 import profile from "./../../img/avatar.png"
 import { useEffect, useState } from 'react';
 import axios from "axios";
+import { UrlServer } from "../../App"
 
 function SubscriptionCard({ userData }) {
   const [photo, setPhoto] = useState()
@@ -15,7 +16,7 @@ function SubscriptionCard({ userData }) {
 
   const getPhoto = async (info) => {
     if (info.avatar) {
-      const img = await axios.get(`http://localhost:4000/api/photos/${info.avatar}`, { responseType: "blob" })
+      const img = await axios.get(`http://${UrlServer()}/api/photos/${info.avatar}`, { responseType: "blob" })
       let url = URL.createObjectURL(img.data)
       setPhoto(url)
     }
