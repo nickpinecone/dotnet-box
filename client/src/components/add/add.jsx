@@ -1,12 +1,16 @@
 import m from './add.module.css';
 import Card from '../card/card';
 import BigCard from '../big-card/big-card';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
 import { UrlServer } from "../../App"
 
 function Add() {
+
+  useEffect(() => {
+    getListSort()
+  }, [])
 
   const [type, setType] = useState('')
   const [name, setName] = useState('')
@@ -16,8 +20,26 @@ function Add() {
   const [img, setImg] = useState(null)
   const [files, setFiles] = useState([]);
   const [members, setMemebers] = useState([localStorage.getItem('id')])
+  const [themes, setThemes] = useState('')
 
   const [people, setPeople] = useState('')
+
+  const [listSort, setListSort] = useState([]) 
+  const getListSort = async() => {
+    setListSort([])
+    const {data} = await axios.get(`http://${UrlServer()}/api/content/data/`)
+    setListSort(data)
+  }
+  
+  const viewOption = (data) => {
+    const list = [];
+    for(let cat in data){
+      if(cat !== "0"){
+        list.push(data[cat])
+      }
+    }
+    return list.map(ct => <option>{ct}</option>)
+  }
 
   const onAdd = async () => {
     try {
@@ -31,7 +53,7 @@ function Add() {
       for(let file of files){
         formData.append('files', file)
       }
-      formData.append('theme', "спорт")
+      formData.append('theme', themes)
       console.log(formData)
 
       let members = localStorage.getItem('id')
@@ -74,8 +96,12 @@ function Add() {
       <section className={m.add_achiv}>
         <p className={m.achiv_header_text}>Тип достижения</p>
         <select className={m.achiv_input_choose} value={type} onChange={(e) => { setType(e.target.value) }}>
-          <option className={m.achiv_input_choose_option} value='certificate'>Сертификат / диплом</option>
-          <option value='project'>Проект</option>
+          {viewOption(listSort.types)}
+        </select>
+
+        <p className={m.achiv_header_text}>Тематика</p>
+        <select className={m.achiv_input_choose} value={themes} onChange={(e) => { setThemes(e.target.value) }}>
+          {viewOption(listSort.themes)}
         </select>
 
         <ul className={m.list}>

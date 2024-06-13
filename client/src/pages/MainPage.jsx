@@ -20,7 +20,7 @@ function MainPage() {
   }
 
   return (
-    <div>
+    <div className='container__for__footer'>
       <EnterHeader />
       <Main />
       <Search />

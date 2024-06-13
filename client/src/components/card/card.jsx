@@ -7,6 +7,7 @@ import { UrlServer } from "../../App"
 function Card({ idUser, data, change, img }) {
   console.log(data)
   useEffect(() => {
+    setPhoto("")
     if (data.photo != undefined) {
       getPhoto()
     }
@@ -23,6 +24,7 @@ function Card({ idUser, data, change, img }) {
     const del = await axios.delete(`http://${UrlServer()}/api/portfolios/me/achievement/${data._id}`, {
       headers: { 'x-access-token': localStorage.getItem('token') },
     })
+    window.location.reload();
   }
 
   const changeCom = () => {
