@@ -45,8 +45,8 @@ function App() {
 }
 
 export function UrlServer() {
-  //const url = "185.211.170.35";
-  const url = "localhost:4000";
+  const url = "185.211.170.35";
+  //const url = "localhost:4000";
   return (url);
 }
 

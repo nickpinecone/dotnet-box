@@ -10,6 +10,11 @@
   align-items: center;
 }
 
+.achiv_top_add_info_item__img {
+  width: 50%;
+  margin: 0 auto;
+}
+
 .container_big_card_achiv {
   position: relative;
   max-width: 1140px;

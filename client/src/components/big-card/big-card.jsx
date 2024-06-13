@@ -7,6 +7,8 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 import Microlink from '@microlink/react';
 import { UrlServer } from "../../App"
+import ImageGallery from "react-image-gallery";
+import "react-image-gallery/styles/css/image-gallery.css";
 
 function BigCard({ dataCard, photo, fromAdd, userId }) {
 
@@ -15,6 +17,7 @@ function BigCard({ dataCard, photo, fromAdd, userId }) {
     setMainData(dataCard);
     if(mainData != null){
       getPhotosMembers(mainData)
+      getFiles(mainData)
       if(!fromAdd){
         getComments(mainData)
       }
@@ -25,6 +28,7 @@ function BigCard({ dataCard, photo, fromAdd, userId }) {
   const [steps, setSteps] = useState([])
   const [comment, setComment] = useState()
   const [comments, setComments] = useState([])
+  const [files, setFiles] = useState([])
   const navigate = useNavigate()
 
   const findStep = async () => {
@@ -36,6 +40,17 @@ function BigCard({ dataCard, photo, fromAdd, userId }) {
         { "text": `Как достичь ${dataCard.title}`, "spiciness": 0, "ancestors": [] })
       localStorage.setItem(dataCard._id, JSON.stringify(data))
       setSteps(data)
+    }
+  }
+
+  const getFiles = async (mainData) => {
+    if(mainData.files !== null && mainData.files !== undefined){
+      setFiles([])
+      for(let file of (mainData.files)){
+        const { data } = await axios.get(`http://${UrlServer()}/api/content/file/${file}`, { responseType: "blob" })
+        let url = URL.createObjectURL(data);
+        setFiles((files) => [...files, {original: url, thumbnail: url}])
+      }
     }
   }
 
@@ -188,6 +203,7 @@ function BigCard({ dataCard, photo, fromAdd, userId }) {
                   <p className={m.achiv_descr_title}>Описание</p>
                   <p className={m.achiv_descr_text}>{dataCard.shortDescription}</p>
                   {viewLikeOrEdit()}
+                  {console.log(files)}
                 </div>
               </div>
               <div className={m.achiv_top_add_info}>
@@ -195,6 +211,13 @@ function BigCard({ dataCard, photo, fromAdd, userId }) {
                   <li className={m.achiv_top_add_info_item}>
                     <p className={m.achiv_descr_title}>История</p>
                     <p className={m.achiv_descr_text}>{dataCard.fullDescription}</p>
+                  </li>
+
+                  <li className={m.achiv_top_add_info_item}>
+                    <p className={m.achiv_descr_title}>Галерея</p>
+                    <div className={m.achiv_top_add_info_item__img}>
+                    <ImageGallery items={files} showPlayButton={false} showFullscreenButton={false} showBullets={true} showThumbnails={true} showNav={false}/>
+                    </div>
                   </li>
                   {viewLink()}
                   <li className={m.achiv_top_add_info_item}>

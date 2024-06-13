@@ -28,7 +28,7 @@ function Add() {
       formData.append('fullDescription', allDescr)
       formData.append('photo', img)
       formData.append('url', link)
-      for(let file in files){
+      for(let file of files){
         formData.append('files', file)
       }
       formData.append('theme', "спорт")
