@@ -36,7 +36,7 @@ function Settings({userData, photo}) {
       <section className={m.profile_container}>
         <div className={m.profile_img}> 
           <img className={m.profile_image} src={avatar} alt="ProfileImage" />
-          <img className={m.profile_image_dowload} src={download} alt="ProfileImage" />
+          <img className={m.profile_image_download} src={download} alt="ProfileImage" />
           <input className={m.profile_input_img} type="file" accept=".png,.jpg" onChange={(e) => { setImg(e.target.files[0]); setAvatar(URL.createObjectURL(e.target.files[0]))}}/>
         </div>
 

@@ -23,7 +23,7 @@ function BigCard({ dataCard, photo, fromAdd, userId }) {
       }
     }
     
-  }, [dataCard, photo, fromAdd, userId])
+  }, [dataCard])
 
   const [steps, setSteps] = useState([])
   const [comment, setComment] = useState()
@@ -81,7 +81,7 @@ function BigCard({ dataCard, photo, fromAdd, userId }) {
         <NavLink className={m.btn_like} onClick={PutLike}>Понравилось {dataCard.likeAmount ? dataCard.likeAmount : 0}</NavLink>
       </div>
     else
-      return <div>
+      return <div className={m.buttons}>
         <NavLink className={m.edit} to='./edit'>Редактировать</NavLink>
         <button className={m.btn_like} type="button" onClick={delAchieve} >Удалить</button>
       </div>
@@ -140,7 +140,6 @@ function BigCard({ dataCard, photo, fromAdd, userId }) {
   const getComments = (data) => {
     (data.comments).map(comment => {
       getPhoto(comment.author.avatar).then(url => {
-        console.log(comment)
         setComments((comments) => [...comments, {text : comment.content, idPerson: comment.author._id, imgPerson: url}])
       })
     })
@@ -166,7 +165,6 @@ function BigCard({ dataCard, photo, fromAdd, userId }) {
   }
 
   const getPhotosMembers = (dataCard) => {
-    setMembers([])
     if(dataCard.members !== null){
       (dataCard.members).map(member => {
         if(member.avatar !== undefined) {
@@ -203,7 +201,6 @@ function BigCard({ dataCard, photo, fromAdd, userId }) {
                   <p className={m.achiv_descr_title}>Описание</p>
                   <p className={m.achiv_descr_text}>{dataCard.shortDescription}</p>
                   {viewLikeOrEdit()}
-                  {console.log(files)}
                 </div>
               </div>
               <div className={m.achiv_top_add_info}>
@@ -216,7 +213,7 @@ function BigCard({ dataCard, photo, fromAdd, userId }) {
                   <li className={m.achiv_top_add_info_item}>
                     <p className={m.achiv_descr_title}>Галерея</p>
                     <div className={m.achiv_top_add_info_item__img}>
-                    <ImageGallery items={files} showPlayButton={false} showFullscreenButton={false} showBullets={true} showThumbnails={true} showNav={false}/>
+                    <ImageGallery items={files} showPlayButton={false} showFullscreenButton={false} showBullets={true} showThumbnails={true}/>
                     </div>
                   </li>
                   {viewLink()}

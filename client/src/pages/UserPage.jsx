@@ -53,9 +53,9 @@ function Portfolio() {
   }
 
   return (
-    <main class="container">
+    <main>
       <Header />
-      <UserCard userData={userData} photo={photo}/>
+      <UserCard userData={userData} photo={photo} />
       <AddHeader />
       {dataProjects.map(project => <Card idUser={userData._id} data={project} />)}
     </main>
