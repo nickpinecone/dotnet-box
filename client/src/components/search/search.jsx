@@ -18,7 +18,6 @@ export function Search() {
 
   const getAchieve = async () => {
     const dataUsers = await axios.get(`http://${UrlServer()}/api/portfolios/search`)
-    console.log(dataUsers.data)
     setData(dataUsers.data)
   }
 

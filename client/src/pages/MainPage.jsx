@@ -24,7 +24,6 @@ function MainPage() {
       <EnterHeader />
       <Main />
       <Search />
-      {data.map(achiv => <Card data={achiv} />)}
     </div>
   );
 }
