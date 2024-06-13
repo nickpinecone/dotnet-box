@@ -1,7 +1,7 @@
 import express from "express";
 import path from "path";
 import fs from "fs";
-import { AchTypes, AchThemes, AchSorts } from "../models/achievement.model";
+import { AchTypes, AchThemes, AchSorts, Categories } from "../models/achievement.model";
 
 const router = express.Router();
 
@@ -49,6 +49,7 @@ router.route("/data").get(async (req, res) => {
             themes: AchThemes,
             types: AchTypes,
             sorts: AchSorts,
+            categories: Categories,
         });
     }
     catch (err) {

@@ -18,11 +18,6 @@ dotenv.config();
 const router = express.Router();
 const upload = multer({ dest: path.resolve(__dirname, "..", "public/photos/") });
 
-// @ts-expect-error user is Document
-function getFullName(user): string {
-    return `${user.name} ${user.surname} ${user.paternalName ?? ""}`;
-}
-
 function makeid(length: number): string {
     let result = "";
     const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -382,7 +377,7 @@ router.route("/me/subscribe").get(
             let subs = user.subscriptions;
 
             if (hasQuery) {
-                subs = subs.filter((sub) => searchKey.test(getFullName(sub)));
+                subs = subs.filter((sub) => searchKey.test(mailsend.getFullName(sub)));
             }
 
             res.send(subs);

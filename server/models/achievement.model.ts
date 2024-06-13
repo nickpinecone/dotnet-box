@@ -2,8 +2,9 @@ import mongoose, { Schema } from "mongoose";
 import fs from "node:fs/promises";
 import path from "path";
 
-const AchTypes = ["все", "проект", "сертификат"];
-const AchThemes = ["все", "спорт", "наука"];
+const Categories = ["достижения", "люди"];
+const AchTypes = ["все", "проект", "сертификат", "диплом", "грамота", "конференция", "хакатон", "другое"];
+const AchThemes = ["все", "спорт", "наука", "музыка", "исскуство", "информационные технологии", "другое"];
 const AchSorts = ["дата", "лайки"];
 
 const AchievementSchema = new Schema({
@@ -109,4 +110,4 @@ AchievementSchema.pre("deleteOne", async function (next) {
 
 const Achievement = mongoose.model("achievement", AchievementSchema);
 
-export { Achievement, AchTypes, AchThemes, AchSorts };
+export { Achievement, AchTypes, AchThemes, AchSorts, Categories };

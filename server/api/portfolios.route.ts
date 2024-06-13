@@ -8,7 +8,8 @@ import User from "../models/user.model";
 
 import validation from "../middlewares/validate.middleware";
 import { query } from "express-validator";
-import { AchSorts, AchThemes, AchTypes, Achievement } from "../models/achievement.model";
+import { AchSorts, AchThemes, AchTypes, Achievement, Categories } from "../models/achievement.model";
+import mailsend from "../middlewares/mailsend.middleware";
 
 const router = express.Router();
 const upload = multer();
@@ -28,43 +29,73 @@ router.route("/").get(async (req, res) => {
 router.route("/search").get(
     query("query").default("").escape(),
     query("limit").default("10").escape(),
+    query("category").default(Categories[0]).escape(),
     query("theme").default(AchThemes[0]).escape(),
     query("type").default(AchTypes[0]).escape(),
     query("sort").default(AchSorts[0]).escape(),
+    query("member").default("").escape(),
     validation.validateForm,
     async (req, res) => {
         try {
-            let searchQuery = {};
+            if (req.query.category == Categories[0]) {
+                let searchQuery = {};
 
-            if (req.query.query) {
-                const searchKey = new RegExp(`${req.query.query}`, 'i');
-                searchQuery = {
-                    $or: [
-                        { "title": searchKey },
-                        { "shortDescription": searchKey },
-                        { "fullDescription": searchKey },
-                    ]
-                };
-            }
-
-            const limit = Number(req.query.limit as string);
-            let achievements = await Achievement.find(searchQuery).limit(limit);
-
-            if (req.query.theme != AchThemes[0]) {
-                achievements = achievements.filter((ach) => ach.theme === req.query.theme);
-            }
-
-            if (req.query.type != AchTypes[0]) {
-                achievements = achievements.filter((ach) => ach.type === req.query.type);
-            }
-
-            if (req.query.sort != AchSorts[0]) {
-                if (req.query.sort == AchSorts[1]) {
-                    achievements.sort((ach) => ach.likeAmount);
+                if (req.query.query) {
+                    const searchKey = new RegExp(`${req.query.query}`, 'i');
+                    searchQuery = {
+                        $or: [
+                            { "title": searchKey },
+                            { "shortDescription": searchKey },
+                            { "fullDescription": searchKey },
+                        ]
+                    };
                 }
-            }
 
-            res.status(200).send(achievements);
+                const limit = Number(req.query.limit as string);
+                let achievements = await Achievement.find(searchQuery).populate("members");
+
+                if (req.query.theme != AchThemes[0]) {
+                    achievements = achievements.filter((ach) => ach.theme === req.query.theme);
+                }
+
+                if (req.query.type != AchTypes[0]) {
+                    achievements = achievements.filter((ach) => ach.type === req.query.type);
+                }
+
+                if (req.query.sort != AchSorts[0]) {
+                    if (req.query.sort == AchSorts[1]) {
+                        achievements.sort((ach) => ach.likeAmount);
+                    }
+                }
+
+                if (req.query.member != "") {
+                    achievements = achievements.filter(
+                        (ach) => !ach.members.every(
+                            (member) => !mailsend.getFullName(member).includes(req.query.member as string)
+                        )
+                    );
+                }
+
+                if (achievements.length > limit) {
+                    achievements = achievements.slice(0, limit);
+                }
+
+                res.status(200).send(achievements);
+            }
+            else {
+                const limit = Number(req.query.limit as string);
+                let users = await User.find({});
+
+                if (req.query.query != "") {
+                    users = users.filter((user) => mailsend.getFullName(user).includes(req.query.query as string));
+                }
+
+                if (users.length > limit) {
+                    users = users.slice(0, limit);
+                }
+
+                res.status(200).send(users);
+            }
         }
         catch (err) {
             console.error(err);

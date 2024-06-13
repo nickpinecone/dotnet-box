@@ -9,6 +9,11 @@ const mailerSend = new MailerSend({
     apiKey: process.env.EMAIL_API as string,
 });
 
+// @ts-expect-error user is Document
+function getFullName(user): string {
+    return `${user.name} ${user.surname} ${user.paternalName ?? ""}`;
+}
+
 async function sendVerifyEmail(userId: string) {
     try {
         const user = await User.findOne({ _id: userId });
@@ -74,4 +79,4 @@ async function sendResetEmail(userId: string) {
     }
 }
 
-export default { sendVerifyEmail, sendResetEmail };
+export default { sendVerifyEmail, sendResetEmail, getFullName };
