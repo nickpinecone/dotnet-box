@@ -28,3 +28,7 @@ a:hover {
 a:active {
   color: #11293D;
 }
+
+.container__for__footer {
+  padding-bottom: 100px;
+}

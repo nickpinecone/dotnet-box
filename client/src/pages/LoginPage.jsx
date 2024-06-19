@@ -3,7 +3,7 @@ import Login from '../components/login/login';
 
 function Entrance() {
   return (
-    <div>
+    <div class>
       <EnterHeader />
       <Login />
     </div>

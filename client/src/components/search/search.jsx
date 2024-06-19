@@ -4,33 +4,53 @@ import { useEffect, useState } from 'react';
 import { UrlServer } from '../../App';
 import Card from '../card/card';
 import axios from 'axios';
+import More from '../more/more'
 
 export function Search() {
-  const [tema, setTema] = useState()
+  const [tema, setTema] = useState("achive")
   const [tip, setTip] = useState()
   const [sort, setSort] = useState()
   const [person, setPerson] = useState()
   const [data, setData] = useState([])
+  const [lim, setLimit] = useState(3)
+
+  const [listSort, setListSort] = useState([]) 
+  const getListSort = async() => {
+    setListSort([])
+    const {data} = await axios.get(`http://${UrlServer()}/api/content/data/`)
+    setListSort(data)
+  }
+  
+  const viewOption = (data) => {
+    const list = [];
+    for(let cat in data){
+      list.push(data[cat])
+    }
+    return list.map(ct => <option>{ct}</option>)
+  }
 
   useEffect(() => {
     getAchieve()
+    getListSort()
   }, [])
 
   const getAchieve = async () => {
     const dataUsers = await axios.get(`http://${UrlServer()}/api/portfolios/search`)
-    console.log(dataUsers.data)
     setData(dataUsers.data)
   }
 
   const Find = async () => {
-    console.log(tema, tip, sort, person);
-    let query = "";
-    let limit = "";
+    let query;
+    let limit = lim;
     let theme = sort;
-    let type = "";
-    const { data } = await axios.get(`http://${UrlServer()}/api/portfolios/search`, { params: { theme } })
+    let type = tip;
+
+    console.log(tema, tip, sort, person);
+    
+    const { data } = await axios.get(`http://${UrlServer()}/api/portfolios/search`, { params: { theme, type, limit } })
     setData(data)
   }
+
 
   return (
     <div>
@@ -39,31 +59,19 @@ export function Search() {
           <li className={m.find_item}>
             <p className={m.find_text}>Вид</p>
             <select className={m.find_choose} value={tema} onChange={(e) => { setTema(e.target.value) }}>
-              <option>-- выбрать --</option>
-              <option>Карточка достижения</option>
-              <option>Карточка человека</option>
+              {viewOption(listSort.categories)}
             </select>
           </li>
           <li className={m.find_item}>
             <p className={m.find_text}>Тип</p>
             <select className={m.find_choose} value={tip} onChange={(e) => { setTip(e.target.value) }}>
-              <option>-- выбрать --</option>
-              <option>Сертификат</option>
-              <option>Проект</option>
-              <option>Диплом</option>
-              <option>Грамота</option>
+              {viewOption(listSort.types)}
             </select>
           </li>
           <li className={m.find_item}>
             <p className={m.find_text}>Тематика</p>
             <select className={m.find_choose} value={sort} onChange={(e) => { setSort(e.target.value) }}>
-              <option>-- выбрать --</option>
-              <option value="спорт">Спорт</option>
-              <option>Музыка</option>
-              <option value="наука">Наука</option>
-              <option>Исскуство</option>
-              <option>Информационные технологии</option>
-              <option>Другое</option>
+              {viewOption(listSort.themes)}
             </select>
           </li>
         </ul>
@@ -72,6 +80,7 @@ export function Search() {
         <Link className={m.search_achiv} onClick={Find}>Найти</Link>
       </section >
       <FindCards data={data} />
+      <Link className={m.btn__more} onClick={() => {setLimit(lim+3); Find()}}>Показать ещё</Link>
     </div>
 
   );

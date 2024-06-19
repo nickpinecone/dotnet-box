@@ -18,7 +18,7 @@ function Main() {
 
   const regOrIn = () => {
     if(!inAccaunt){
-      return <Link className={m.register} to='/registration'>Регистрация</Link>
+      return <Link className={m.register} to='/login'>Создай портфолио</Link>
     }
     else {
       return <Link className={m.register} to='/myPortfolio'>Моё портфолио</Link>
