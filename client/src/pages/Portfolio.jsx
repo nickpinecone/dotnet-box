@@ -20,20 +20,6 @@ function MyPortfolio() {
       if (localStorage.getItem("token")) {
         handleGetData();
       }
-      else {
-        let payload = "";
-
-        query.forEach((value) => {
-          payload = value;
-        });
-
-        if (payload !== "") {
-          handleVkPayload(payload);
-        }
-        else {
-          navigate("/login");
-        }
-      }
     }
     catch {
       navigate('/login')
@@ -43,18 +29,6 @@ function MyPortfolio() {
   const [userData, setDataPeple] = useState(null)
   const [dataProjects, setDataProjects] = useState([])
   const [photo, setPhoto] = useState();
-
-  const handleVkPayload = async (payload) => {
-    let payloadData = JSON.parse(payload);
-    const { data } = await axios.post(`http://${UrlServer()}/api/users/loginVK`, {
-      silentToken: payloadData.token,
-      uuid: payloadData.uuid,
-    });
-    localStorage.setItem("token", data.accessToken);
-    localStorage.setItem("id", data.user._id);
-
-    handleGetData();
-  }
 
   const handleGetData = async () => {
     const { data } = await axios.get(`http://${UrlServer()}/api/users/me`, {
