@@ -12,7 +12,7 @@ public class FileStorageOptions
 
 public interface IFileStorage
 {
-    public Task<Attachment> UploadAsync(BlobData data, CancellationToken cancellationToken = default);
+    public Task<BlobResponse> UploadAsync(BlobData data, CancellationToken cancellationToken = default);
 
     public Task<BlobData?> DownloadAsync(Guid fileId, CancellationToken cancellationToken = default);
 

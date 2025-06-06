@@ -38,7 +38,7 @@ public class MinioStorage : IFileStorage
         }
     }
 
-    public async Task<Attachment> UploadAsync(BlobData data, CancellationToken cancellationToken = default)
+    public async Task<BlobResponse> UploadAsync(BlobData data, CancellationToken cancellationToken = default)
     {
         await CreateBucketIfNotExists();
 
@@ -60,12 +60,11 @@ public class MinioStorage : IFileStorage
 
         await _minioClient.PutObjectAsync(putArgs, cancellationToken);
 
-        return new Attachment()
+        return new BlobResponse()
         {
-            BlobId = blobId,
-            MimeType = data.ContentType,
             Name = data.Name,
-            CreatedAt = DateTime.UtcNow,
+            BlobId = blobId,
+            MimeType = data.ContentType
         };
     }
 

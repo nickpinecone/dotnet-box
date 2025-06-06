@@ -9,4 +9,10 @@ public class Attachment
     public required string Name { get; set; }
     public required string MimeType { get; set; }
     public required DateTime CreatedAt { get; set; }
+    
+    public required int ChatId { get; set; }
+    public Chat? Chat { get; set; }
+    
+    public required int MessageId { get; set; }
+    public Message? Message { get; set; }
 }

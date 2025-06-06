@@ -5,6 +5,7 @@ using Api.Data;
 using Api.Infrastructure.Extensions;
 using Api.Infrastructure.Handlers;
 using Api.Services.FileStorage;
+using Api.Services.UserAccessor;
 using Api.Signal;
 using FluentValidation;
 using Microsoft.AspNetCore.Builder;
@@ -41,6 +42,8 @@ public static class Startup
 
     private static void RegisterServices(this IServiceCollection services)
     {
+        services.AddScoped<IUserAccessor, UserAccessor>();
+        
         services.AddMinio(configureClient => configureClient
             .WithEndpoint(Environment.GetEnvironmentVariable("MINIO_URL"))
             .WithCredentials(Environment.GetEnvironmentVariable("MINIO_ROOT_USER"),
