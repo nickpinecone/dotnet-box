@@ -1,0 +1,69 @@
+services:
+  chats-minio:
+    image: minio/minio
+    command: server --console-address ":9001" /var/lib/minio/data
+    ports:
+      - "5004:9001"
+    volumes:
+      - chats-minio-data:/var/lib/minio/data
+    environment:
+      - MINIO_ROOT_USER=$(MINIO_ROOT_USER)
+      - MINIO_ROOT_PASSWORD=$(MINIO_ROOT_PASSWORD)
+  
+  chats-api-db:
+    image: postgres
+    ports:
+      - "5002:5432"
+    environment:
+      POSTGRES_USER: $(API_POSTGRES_USER)
+      POSTGRES_PASSWORD: $(API_POSTGRES_PASSWORD)
+      POSTGRES_DB: $(API_POSTGRES_DB)
+    volumes:
+      - chats-api-db-data:/var/lib/postgresql/data
+  
+  chats-api:
+    build: ./Api
+    depends_on:
+      - chats-minio
+      - chats-api-db
+    ports:
+      - "5000:5000"
+    volumes:
+      - './Api:/api:z'
+      - './.env:/.env'
+      - '/api/bin'
+      - '/api/obj'
+    env_file:
+      - .env
+      
+
+  chats-bot-db:
+    image: postgres
+    ports:
+      - "5003:5432"
+    environment:
+      POSTGRES_USER: $(BOT_POSTGRES_USER)
+      POSTGRES_PASSWORD: $(BOT_POSTGRES_PASSWORD)
+      POSTGRES_DB: $(BOT_POSTGRES_DB)
+    volumes:
+      - chats-bot-db-data:/var/lib/postgresql/data
+
+  chats-bot:
+    build: ./Bot
+    depends_on:
+      - chats-minio
+      - chats-bot-db
+    ports:
+      - "5001:5001"
+    volumes:
+      - './Bot:/bot:z'
+      - './.env:/.env'
+      - '/bot/bin'
+      - '/bot/obj'
+    env_file:
+      - .env
+
+volumes:
+  chats-minio-data:
+  chats-api-db-data:
+  chats-bot-db-data:
