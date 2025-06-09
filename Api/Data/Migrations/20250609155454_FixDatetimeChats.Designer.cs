@@ -3,6 +3,7 @@ using System;
 using Api.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Api.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250609155454_FixDatetimeChats")]
+    partial class FixDatetimeChats
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -142,28 +145,6 @@ namespace Api.Data.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Messages");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = -1,
-                            ChatId = -1,
-                            Content = "Test 1",
-                            CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            IsRead = false,
-                            StudentId = -1,
-                            TelegramId = 0
-                        },
-                        new
-                        {
-                            Id = -2,
-                            ChatId = -1,
-                            Content = "Test 2",
-                            CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            IsRead = false,
-                            TelegramId = 1,
-                            UserId = -1
-                        });
                 });
 
             modelBuilder.Entity("Api.Models.Student", b =>
@@ -260,7 +241,7 @@ namespace Api.Data.Migrations
             modelBuilder.Entity("Api.Models.Message", b =>
                 {
                     b.HasOne("Api.Models.Chat", "Chat")
-                        .WithMany("Messages")
+                        .WithMany()
                         .HasForeignKey("ChatId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -289,8 +270,6 @@ namespace Api.Data.Migrations
             modelBuilder.Entity("Api.Models.Chat", b =>
                 {
                     b.Navigation("Attachments");
-
-                    b.Navigation("Messages");
                 });
 
             modelBuilder.Entity("Api.Models.Message", b =>

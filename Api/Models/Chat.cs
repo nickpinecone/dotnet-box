@@ -16,5 +16,6 @@ public class Chat
     public required int StudentId { get; set; }
     public Student? Student { get; set; }
     
+    public ICollection<Message> Messages { get; set; } = [];
     public ICollection<Attachment> Attachments { get; set; } = [];
 }

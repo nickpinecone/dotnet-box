@@ -31,12 +31,19 @@ public static class GetMyChats
         }
         
         var query = db.Chats
-            .Include(ch => ch.User)
-            .Include(ch => ch.Student)
-            .Where(ch => ch.UserId == user.Id);
+            .Where(ch => ch.UserId == user.Id)
+            .Include(ch => ch.Messages.OrderByDescending(m => m.CreatedAt).Take(1))
+            .AsSplitQuery();
         
         var filtered = Filter(query, search);
         var paged = await PagedList<ChatDto>.CreateAsync(mapper.Map(filtered), page, limit);
+
+        // TODO already accounted for in the Include but doesn't work for some reason
+        // need more testing to figure out why
+        foreach (var chat in paged.Content)
+        {
+            chat.Messages = chat.Messages.Take(1);
+        }
 
         return TypedResults.Ok(paged);
     }

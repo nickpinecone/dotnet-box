@@ -9,9 +9,6 @@ public class ReplyDto
 {
     public int Id { get; set; }
     public required int TelegramId { get; set; }
-    public required int ChatId { get; set; }
-    public int? UserId { get; set; }
-    public int? StudentId { get; set; }
 }
 
 public class MessageDto
@@ -38,8 +35,8 @@ public class ChatDto
     public required int UnreadCount { get; set; }
     public required DateTime CreatedAt { get; set; }
     
-    public UserDto? User { get; set; }
-    public StudentDto? Student { get; set; }
+    public required int UserId { get; set; }
+    public required int StudentId { get; set; }
 
     public IEnumerable<MessageDto> Messages { get; set; } = [];
 }

@@ -1,3 +1,4 @@
+using System;
 using Api.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -31,6 +32,37 @@ public class AppDbContext : DbContext
             Id = -1,
             Email = "student@example.com",
             TelegramId = "592566902",
+        });
+        
+        modelBuilder.Entity<Chat>().HasData(new Chat()
+        {
+            Id = -1,
+            CreatedAt = DateTime.MinValue,
+            StudentId = -1,
+            UserId = -1,
+            UnreadCount = 0,
+        });
+        
+        modelBuilder.Entity<Message>().HasData(new Message()
+        {
+            Id = -1,
+            CreatedAt = DateTime.MinValue,
+            StudentId = -1,
+            Content = "Test 1",
+            ChatId = -1,
+            IsRead = false,
+            TelegramId = 0,
+        });
+        
+        modelBuilder.Entity<Message>().HasData(new Message()
+        {
+            Id = -2,
+            CreatedAt = DateTime.MinValue,
+            UserId = -1,
+            Content = "Test 2",
+            ChatId = -1,
+            IsRead = false,
+            TelegramId = 1,
         });
     }
 }
