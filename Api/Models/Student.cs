@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Riok.Mapperly.Abstractions;
 
 namespace Api.Models;
 

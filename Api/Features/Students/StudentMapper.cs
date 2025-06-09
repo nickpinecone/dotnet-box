@@ -1,17 +1,11 @@
 using System.Collections.Generic;
 using System.Linq;
+using Api.Features.Students.DTOs;
 using Api.Infrastructure.Extensions;
 using Api.Models;
 using Riok.Mapperly.Abstractions;
 
 namespace Api.Features.Students;
-
-public class StudentDto
-{
-    public int Id { get; set; }
-    public required string Email { get; set; }
-    public required string TelegramId { get; set; }
-}
 
 [Mapper]
 public partial class StudentMapper : IMapper
