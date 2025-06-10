@@ -32,5 +32,6 @@
 
   <ItemGroup>
     <Folder Include="Features\Chats\Commands\" />
+    <Folder Include="Features\Messages\Commands\" />
   </ItemGroup>
 </Project>
