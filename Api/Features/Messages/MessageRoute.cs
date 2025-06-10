@@ -11,6 +11,6 @@ public class MessageRoute : IRoute
     {
         var group = app.MapGroup("").WithTags("Messages");
 
-        group.MapGet("/messages", GetMessages.Handle);
+        group.MapGet("/messages/{id:int}", GetMessageById.Handle);
     }
 }

@@ -7,17 +7,17 @@ services:
     volumes:
       - chats-minio-data:/var/lib/minio/data
     environment:
-      - MINIO_ROOT_USER=$(MINIO_ROOT_USER)
-      - MINIO_ROOT_PASSWORD=$(MINIO_ROOT_PASSWORD)
+      - MINIO_ROOT_USER=${MINIO_ROOT_USER}
+      - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD}
   
   chats-api-db:
     image: postgres
     ports:
       - "5002:5432"
     environment:
-      POSTGRES_USER: $(API_POSTGRES_USER)
-      POSTGRES_PASSWORD: $(API_POSTGRES_PASSWORD)
-      POSTGRES_DB: $(API_POSTGRES_DB)
+      POSTGRES_USER: ${API_POSTGRES_USER}
+      POSTGRES_PASSWORD: ${API_POSTGRES_PASSWORD}
+      POSTGRES_DB: ${API_POSTGRES_DB}
     volumes:
       - chats-api-db-data:/var/lib/postgresql/data
   
@@ -42,9 +42,9 @@ services:
     ports:
       - "5003:5432"
     environment:
-      POSTGRES_USER: $(BOT_POSTGRES_USER)
-      POSTGRES_PASSWORD: $(BOT_POSTGRES_PASSWORD)
-      POSTGRES_DB: $(BOT_POSTGRES_DB)
+      POSTGRES_USER: ${BOT_POSTGRES_USER}
+      POSTGRES_PASSWORD: ${BOT_POSTGRES_PASSWORD}
+      POSTGRES_DB: ${BOT_POSTGRES_DB}
     volumes:
       - chats-bot-db-data:/var/lib/postgresql/data
 

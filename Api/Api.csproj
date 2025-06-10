@@ -29,9 +29,4 @@
     <PackageReference Include="Riok.Mapperly" Version="4.2.1" />
     <PackageReference Include="Scalar.AspNetCore" Version="2.4.11" />
   </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Features\Chats\Commands\" />
-    <Folder Include="Features\Messages\Commands\" />
-  </ItemGroup>
 </Project>

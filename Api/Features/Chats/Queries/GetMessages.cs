@@ -1,11 +1,10 @@
-using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Api.Data;
+using Api.Features.Messages;
 using Api.Features.Messages.DTOs;
 using Api.Infrastructure.Extensions;
 using Api.Infrastructure.Rest;
-using Api.Models;
 using Api.Services.UserAccessor;
 using FluentResults;
 using Microsoft.AspNetCore.Authentication;
@@ -14,7 +13,7 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace Api.Features.Messages.Queries;
+namespace Api.Features.Chats.Queries;
 
 public static class GetMessages
 {
@@ -22,7 +21,7 @@ public static class GetMessages
         AppDbContext db,
         MessageMapper mapper,
         IUserAccessor userAccessor,
-        [FromQuery(Name = "student_id")] int studentId,
+        [FromRoute(Name = "student_id")] int studentId,
         int? page = null,
         int? limit = null
     )
@@ -77,9 +76,13 @@ public static class GetMessages
 
         var messages = db.Messages
             .Include(m => m.Chat)
+            .Include(m => m.Replies)
+            .Include(m => m.ReplyTo)
+            .Include(m => m.Attachments)
             .Where(m => m.Chat!.UserId == user.Id && m.Chat.StudentId == studentId)
             .OrderBy(m => m.CreatedAt)
-            .ThenBy(m => m.Id);
+            .ThenBy(m => m.Id)
+            .AsSplitQuery();
 
         var paged = await PagedList<MessageDto>.CreateAsync(mapper.Map(messages), page, limit);
 

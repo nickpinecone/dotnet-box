@@ -39,6 +39,11 @@ public static class GetMyChats
                 .ThenByDescending(m => m.Id)
                 .Take(1)
             )
+            .OrderByDescending(ch => ch.Messages
+                .OrderByDescending(m => m.CreatedAt)
+                .ThenByDescending(m => m.Id)
+                .First().CreatedAt
+            )
             .AsSplitQuery();
 
         var filtered = Filter(query, search);

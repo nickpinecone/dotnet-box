@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Api.Features.Attachments.DTOs;
 
 namespace Api.Features.Messages.DTOs;
 
@@ -18,4 +19,6 @@ public class MessageDto
     
     public ReplyDto? ReplyTo { get; set; }
     public IEnumerable<ReplyDto> Replies { get; set; } = [];
+    
+    public IEnumerable<AttachmentDto> Attachments { get; set; } = [];
 }
