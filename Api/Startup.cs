@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using Api.Data;
 using Api.Infrastructure.Extensions;
 using Api.Infrastructure.Handlers;
@@ -9,6 +10,7 @@ using Api.Services.UserAccessor;
 using Api.Signal;
 using FluentValidation;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http.Json;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
@@ -30,9 +32,18 @@ public static class Startup
         builder.Services.AddHealthChecks();
         builder.Services.AddSignalR();
         builder.Services.AddOpenApi();
-        
+
         builder.Services.ConfigureHttpJsonOptions(o =>
-            o.SerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower);
+        {
+            o.SerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower;
+            o.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
+        });
+        
+        builder.Services.Configure<JsonOptions>(o =>
+        {
+            o.SerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower;
+            o.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
+        });
 
         builder.Services.AddMappers(typeof(Program).Assembly);
         builder.Services.AddValidatorsFromAssembly(typeof(Program).Assembly);

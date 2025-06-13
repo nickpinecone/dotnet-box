@@ -1,4 +1,5 @@
 using System;
+using Api.Infrastructure.Rest;
 
 namespace Api.Models;
 
@@ -15,4 +16,6 @@ public class Attachment
     
     public required int MessageId { get; set; }
     public Message? Message { get; set; }
+    
+    public string Cursor => CursorType.Encode(new CursorType(CreatedAt, Id));
 }

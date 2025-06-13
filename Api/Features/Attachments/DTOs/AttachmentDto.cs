@@ -12,4 +12,6 @@ public class AttachmentDto
     
     public required int ChatId { get; set; }
     public required int MessageId { get; set; }
+    
+    public required string Cursor { get; set; }
 }

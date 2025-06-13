@@ -22,10 +22,9 @@ public static class GetMessages
         MessageMapper mapper,
         IUserAccessor userAccessor,
         [FromRoute(Name = "student_id")] int studentId,
-        string? cursor,
-        CursorMode mode =CursorMode.Before,
-        // string? search,
-        // int? page,
+        CursorType? cursor,
+        string? search,
+        CursorMode mode = CursorMode.before,
         int limit = -1
     )
     {
@@ -42,63 +41,40 @@ public static class GetMessages
         {
             return Result.Fail($"Student does not exist: {studentId}").ToNotFoundProblem();
         }
-        
-        var chats = await PaginationService.CreateAsync(db.Messages, m => m.CreatedAt, m => m.Id,
-            CursorType.Decode(cursor), limit, mode);
 
-        return TypedResults.Ok(new PaginatedList<MessageDto>()
+        var query = db.Messages
+            .Include(m => m.Chat)
+            .Include(m => m.Replies)
+            .Include(m => m.ReplyTo)
+            .Include(m => m.Attachments)
+            .Where(m => m.Chat!.UserId == user.Id && m.Chat.StudentId == studentId)
+            .AsSplitQuery();
+
+        if (cursor is null)
         {
-            Content = mapper.Map(chats.Content),
-            Limit = chats.Limit,
-            TotalRecord = chats.TotalRecord
-        });
+            var firstUnread = await db.Messages
+                .Include(m => m.Chat)
+                .Where(m => m.Chat!.UserId == user.Id && m.Chat.StudentId == studentId)
+                .OrderBy(m => m.CreatedAt)
+                .ThenBy(m => m.Id)
+                .FirstOrDefaultAsync(m => !m.IsRead && m.StudentId != null);
 
-        // If we get this, it means we want to know the page, where we have an unread message
-        // In a chat, we should start from an unread message, instead of at the very bottom
-        // if (page is null || page <= 0)
-        // {
-        //     var firstUnread = await db.Messages
-        //         .Include(m => m.Chat)
-        //         .Where(m => m.Chat!.UserId == user.Id && m.Chat.StudentId == studentId)
-        //         .OrderBy(m => m.CreatedAt)
-        //         .ThenBy(m => m.Id)
-        //         .FirstOrDefaultAsync(m => !m.IsRead && m.StudentId != null);
-        //
-        //     if (firstUnread == null)
-        //     {
-        //         var count = await db.Messages
-        //             .OrderBy(m => m.CreatedAt)
-        //             .ThenBy(m => m.Id)
-        //             .CountAsync();
-        //         
-        //         page = (count / (limit ?? 1));
-        //     }
-        //     else
-        //     {
-        //         var unreadIndex = await db.Messages
-        //             .OrderBy(m => m.CreatedAt)
-        //             .ThenBy(m => m.Id)
-        //             .CountAsync(m =>
-        //                 m.CreatedAt < firstUnread.CreatedAt ||
-        //                 (m.CreatedAt == firstUnread.CreatedAt && m.Id < firstUnread.Id)
-        //             );
-        //     
-        //         page = (unreadIndex / (limit ?? 1)) + 1;
-        //     }
-        // }
-        //
-        // var messages = db.Messages
-        //     .Include(m => m.Chat)
-        //     .Include(m => m.Replies)
-        //     .Include(m => m.ReplyTo)
-        //     .Include(m => m.Attachments)
-        //     .Where(m => m.Chat!.UserId == user.Id && m.Chat.StudentId == studentId)
-        //     .OrderBy(m => m.CreatedAt)
-        //     .ThenBy(m => m.Id)
-        //     .AsSplitQuery();
-        //
-        // var paged = await PagedList<MessageDto>.CreateAsync(mapper.Map(messages), page, limit);
-        //
-        // return TypedResults.Ok(paged);
+            if (firstUnread is not null)
+            {
+                cursor = new CursorType(firstUnread.CreatedAt, firstUnread.Id);
+                mode = CursorMode.around;
+            }
+        }
+
+        var paged = await PaginationService.CreateAsync(
+            query,
+            m => m.CreatedAt,
+            m => m.Id,
+            cursor, limit, mode
+        );
+
+        var mapped = paged.With(mapper.Map(paged.Content));
+
+        return TypedResults.Ok(mapped);
     }
 }

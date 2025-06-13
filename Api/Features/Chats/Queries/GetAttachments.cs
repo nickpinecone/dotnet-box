@@ -18,13 +18,15 @@ namespace Api.Features.Chats.Queries;
 
 public static class GetAttachments
 {
-    public static async Task<Results<Ok<PagedList<AttachmentDto>>, NotFound<ProblemDetails>>> Handle(
+    public static async Task<Results<Ok<PaginatedList<AttachmentDto>>, NotFound<ProblemDetails>>> Handle(
         AppDbContext db,
         AttachmentMapper mapper,
         IUserAccessor userAccessor,
         [FromRoute(Name = "student_id")] int studentId,
-        int? page = null,
-        int? limit = null
+        CursorType? cursor,
+        string? search,
+        CursorMode mode = CursorMode.before,
+        int limit = -1
     )
     {
         var user = await userAccessor.GetUserAsync();
@@ -41,25 +43,20 @@ public static class GetAttachments
             return Result.Fail($"Student does not exist: {studentId}").ToNotFoundProblem();
         }
 
-        if (page is null || page <= 0)
-        {
-            var count = await db.Attachments
-                .OrderBy(a => a.CreatedAt)
-                .ThenBy(a => a.Id)
-                .CountAsync();
-
-            page = (count / (limit ?? 1));
-        }
-
-        var attachments = db.Attachments
+        var query = db.Attachments
             .Include(a => a.Chat)
             .Where(a => a.Chat!.UserId == user.Id && a.Chat.StudentId == studentId)
-            .OrderBy(a => a.CreatedAt)
-            .ThenBy(a => a.Id)
             .AsSplitQuery();
 
-        var paged = await PagedList<AttachmentDto>.CreateAsync(mapper.Map(attachments), page, limit);
+        var paged = await PaginationService.CreateAsync(
+            query,
+            a => a.CreatedAt,
+            a => a.Id,
+            cursor, limit, mode
+        );
 
-        return TypedResults.Ok(paged);
+        var mapped = paged.With(mapper.Map(paged.Content));
+
+        return TypedResults.Ok(mapped);
     }
 }

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Api.Features.Chats.Queries;
+using Api.Infrastructure.Rest;
 
 namespace Api.Models;
 
