@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Api.Features.Chats.Queries;
 
 namespace Api.Models;
 
@@ -18,4 +19,6 @@ public class Chat
     
     public ICollection<Message> Messages { get; set; } = [];
     public ICollection<Attachment> Attachments { get; set; } = [];
+
+    public string Cursor => CursorType.Encode(new CursorType(CreatedAt, Id));
 }

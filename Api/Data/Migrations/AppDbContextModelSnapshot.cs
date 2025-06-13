@@ -163,6 +163,36 @@ namespace Api.Data.Migrations
                             IsRead = false,
                             TelegramId = 1,
                             UserId = -1
+                        },
+                        new
+                        {
+                            Id = -3,
+                            ChatId = -1,
+                            Content = "Test 3",
+                            CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            IsRead = false,
+                            TelegramId = 1,
+                            UserId = -1
+                        },
+                        new
+                        {
+                            Id = -4,
+                            ChatId = -1,
+                            Content = "Test 4",
+                            CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            IsRead = false,
+                            TelegramId = 1,
+                            UserId = -1
+                        },
+                        new
+                        {
+                            Id = -5,
+                            ChatId = -1,
+                            Content = "Test 5",
+                            CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            IsRead = false,
+                            TelegramId = 1,
+                            UserId = -1
                         });
                 });
 

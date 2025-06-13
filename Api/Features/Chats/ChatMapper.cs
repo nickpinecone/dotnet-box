@@ -1,3 +1,5 @@
+using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using Api.Features.Chats.DTOs;
 using Api.Infrastructure.Extensions;
@@ -11,4 +13,6 @@ public partial class ChatMapper : IMapper
 {
     public partial ChatDto Map(Chat chat);
     public partial IQueryable<ChatDto> Map(IQueryable<Chat> chats);
+    
+    public partial IEnumerable<ChatDto> Map(IEnumerable<Chat> chats);
 }

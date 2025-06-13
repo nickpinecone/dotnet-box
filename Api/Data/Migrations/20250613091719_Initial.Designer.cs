@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Api.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250606180504_Initial")]
+    [Migration("20250613091719_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -88,7 +88,17 @@ namespace Api.Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Chat");
+                    b.ToTable("Chats");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = -1,
+                            CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            StudentId = -1,
+                            UnreadCount = 0,
+                            UserId = -1
+                        });
                 });
 
             modelBuilder.Entity("Api.Models.Message", b =>
@@ -134,7 +144,59 @@ namespace Api.Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Message");
+                    b.ToTable("Messages");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = -1,
+                            ChatId = -1,
+                            Content = "Test 1",
+                            CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            IsRead = false,
+                            StudentId = -1,
+                            TelegramId = 0
+                        },
+                        new
+                        {
+                            Id = -2,
+                            ChatId = -1,
+                            Content = "Test 2",
+                            CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            IsRead = false,
+                            TelegramId = 1,
+                            UserId = -1
+                        },
+                        new
+                        {
+                            Id = -3,
+                            ChatId = -1,
+                            Content = "Test 3",
+                            CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            IsRead = false,
+                            TelegramId = 1,
+                            UserId = -1
+                        },
+                        new
+                        {
+                            Id = -4,
+                            ChatId = -1,
+                            Content = "Test 4",
+                            CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            IsRead = false,
+                            TelegramId = 1,
+                            UserId = -1
+                        },
+                        new
+                        {
+                            Id = -5,
+                            ChatId = -1,
+                            Content = "Test 5",
+                            CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            IsRead = false,
+                            TelegramId = 1,
+                            UserId = -1
+                        });
                 });
 
             modelBuilder.Entity("Api.Models.Student", b =>
@@ -231,7 +293,7 @@ namespace Api.Data.Migrations
             modelBuilder.Entity("Api.Models.Message", b =>
                 {
                     b.HasOne("Api.Models.Chat", "Chat")
-                        .WithMany()
+                        .WithMany("Messages")
                         .HasForeignKey("ChatId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -260,6 +322,8 @@ namespace Api.Data.Migrations
             modelBuilder.Entity("Api.Models.Chat", b =>
                 {
                     b.Navigation("Attachments");
+
+                    b.Navigation("Messages");
                 });
 
             modelBuilder.Entity("Api.Models.Message", b =>

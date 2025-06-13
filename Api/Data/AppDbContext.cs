@@ -64,5 +64,38 @@ public class AppDbContext : DbContext
             IsRead = false,
             TelegramId = 1,
         });
+        
+        modelBuilder.Entity<Message>().HasData(new Message()
+        {
+            Id = -3,
+            CreatedAt = DateTime.MinValue,
+            UserId = -1,
+            Content = "Test 3",
+            ChatId = -1,
+            IsRead = false,
+            TelegramId = 1,
+        });
+        
+        modelBuilder.Entity<Message>().HasData(new Message()
+        {
+            Id = -4,
+            CreatedAt = DateTime.MinValue,
+            UserId = -1,
+            Content = "Test 4",
+            ChatId = -1,
+            IsRead = false,
+            TelegramId = 1,
+        });
+        
+        modelBuilder.Entity<Message>().HasData(new Message()
+        {
+            Id = -5,
+            CreatedAt = DateTime.MinValue,
+            UserId = -1,
+            Content = "Test 5",
+            ChatId = -1,
+            IsRead = false,
+            TelegramId = 1,
+        });
     }
 }

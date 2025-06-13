@@ -21,4 +21,6 @@ public class MessageDto
     public IEnumerable<ReplyDto> Replies { get; set; } = [];
     
     public IEnumerable<AttachmentDto> Attachments { get; set; } = [];
+    
+    public required string Cursor { get; set; }
 }

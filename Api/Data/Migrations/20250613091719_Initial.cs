@@ -4,6 +4,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
+#pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
+
 namespace Api.Data.Migrations
 {
     /// <inheritdoc />
@@ -40,7 +42,7 @@ namespace Api.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Chat",
+                name: "Chats",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
@@ -52,15 +54,15 @@ namespace Api.Data.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Chat", x => x.Id);
+                    table.PrimaryKey("PK_Chats", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Chat_Students_StudentId",
+                        name: "FK_Chats_Students_StudentId",
                         column: x => x.StudentId,
                         principalTable: "Students",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Chat_Users_UserId",
+                        name: "FK_Chats_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
                         principalColumn: "Id",
@@ -68,7 +70,7 @@ namespace Api.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Message",
+                name: "Messages",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
@@ -84,25 +86,25 @@ namespace Api.Data.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Message", x => x.Id);
+                    table.PrimaryKey("PK_Messages", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Message_Chat_ChatId",
+                        name: "FK_Messages_Chats_ChatId",
                         column: x => x.ChatId,
-                        principalTable: "Chat",
+                        principalTable: "Chats",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Message_Message_ReplyToId",
+                        name: "FK_Messages_Messages_ReplyToId",
                         column: x => x.ReplyToId,
-                        principalTable: "Message",
+                        principalTable: "Messages",
                         principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_Message_Students_StudentId",
+                        name: "FK_Messages_Students_StudentId",
                         column: x => x.StudentId,
                         principalTable: "Students",
                         principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_Message_Users_UserId",
+                        name: "FK_Messages_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
                         principalColumn: "Id");
@@ -125,15 +127,15 @@ namespace Api.Data.Migrations
                 {
                     table.PrimaryKey("PK_Attachments", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Attachments_Chat_ChatId",
+                        name: "FK_Attachments_Chats_ChatId",
                         column: x => x.ChatId,
-                        principalTable: "Chat",
+                        principalTable: "Chats",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Attachments_Message_MessageId",
+                        name: "FK_Attachments_Messages_MessageId",
                         column: x => x.MessageId,
-                        principalTable: "Message",
+                        principalTable: "Messages",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -148,6 +150,23 @@ namespace Api.Data.Migrations
                 columns: new[] { "Id", "Email" },
                 values: new object[] { -1, "user@example.com" });
 
+            migrationBuilder.InsertData(
+                table: "Chats",
+                columns: new[] { "Id", "CreatedAt", "StudentId", "UnreadCount", "UserId" },
+                values: new object[] { -1, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), -1, 0, -1 });
+
+            migrationBuilder.InsertData(
+                table: "Messages",
+                columns: new[] { "Id", "ChatId", "Content", "CreatedAt", "IsRead", "ReplyToId", "StudentId", "TelegramId", "UserId" },
+                values: new object[,]
+                {
+                    { -5, -1, "Test 5", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, null, null, 1, -1 },
+                    { -4, -1, "Test 4", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, null, null, 1, -1 },
+                    { -3, -1, "Test 3", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, null, null, 1, -1 },
+                    { -2, -1, "Test 2", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, null, null, 1, -1 },
+                    { -1, -1, "Test 1", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, null, -1, 0, null }
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_Attachments_ChatId",
                 table: "Attachments",
@@ -159,33 +178,33 @@ namespace Api.Data.Migrations
                 column: "MessageId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Chat_StudentId",
-                table: "Chat",
+                name: "IX_Chats_StudentId",
+                table: "Chats",
                 column: "StudentId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Chat_UserId",
-                table: "Chat",
+                name: "IX_Chats_UserId",
+                table: "Chats",
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Message_ChatId",
-                table: "Message",
+                name: "IX_Messages_ChatId",
+                table: "Messages",
                 column: "ChatId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Message_ReplyToId",
-                table: "Message",
+                name: "IX_Messages_ReplyToId",
+                table: "Messages",
                 column: "ReplyToId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Message_StudentId",
-                table: "Message",
+                name: "IX_Messages_StudentId",
+                table: "Messages",
                 column: "StudentId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Message_UserId",
-                table: "Message",
+                name: "IX_Messages_UserId",
+                table: "Messages",
                 column: "UserId");
         }
 
@@ -196,10 +215,10 @@ namespace Api.Data.Migrations
                 name: "Attachments");
 
             migrationBuilder.DropTable(
-                name: "Message");
+                name: "Messages");
 
             migrationBuilder.DropTable(
-                name: "Chat");
+                name: "Chats");
 
             migrationBuilder.DropTable(
                 name: "Students");

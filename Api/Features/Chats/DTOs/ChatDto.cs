@@ -15,4 +15,6 @@ public class ChatDto
     public required int StudentId { get; set; }
 
     public IEnumerable<MessageDto> Messages { get; set; } = [];
+
+    public required string Cursor { get; set; }
 }
