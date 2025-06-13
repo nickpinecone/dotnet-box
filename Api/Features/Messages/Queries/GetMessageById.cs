@@ -4,7 +4,6 @@ using Api.Features.Messages.DTOs;
 using Api.Infrastructure.Extensions;
 using Api.Services.UserAccessor;
 using FluentResults;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
@@ -18,15 +17,11 @@ public static class GetMessageById
         AppDbContext db,
         MessageMapper mapper,
         IUserAccessor userAccessor,
+        // Parameters
         int id
     )
     {
         var user = await userAccessor.GetUserAsync();
-
-        if (user is null)
-        {
-            throw new AuthenticationFailureException("User is unauthenticated");
-        }
 
         var message = await db.Messages
             .Include(m => m.Chat)
@@ -38,7 +33,7 @@ public static class GetMessageById
 
         if (message is null)
         {
-            return Result.Fail($"Message does not exist or is not related to you: {id}").ToNotFoundProblem();
+            return Result.Fail(MessageErrors.NotFound(id)).ToNotFoundProblem();
         }
 
         return TypedResults.Ok(mapper.Map(message));

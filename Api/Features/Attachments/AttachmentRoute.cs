@@ -9,8 +9,18 @@ public class AttachmentRoute : IRoute
 {
     public void MapRoutes(WebApplication app)
     {
-        var group = app.MapGroup("").WithTags("Attachments");
+        var group = app
+            .MapGroup("")
+            .WithTags("Файлы");
 
-        group.MapGet("/attachments/my", GetAttachments.Handle);
+        group.MapGet("/attachments/my", GetAttachments.Handle)
+            .WithDescription(
+                $"Получение файлов пользователя"
+            );
+        
+        group.MapGet("/attachments/{id:int}", DownloadAttachment.Handle)
+            .WithDescription(
+                $"Скачивание файла по id"
+            );
     }
 }

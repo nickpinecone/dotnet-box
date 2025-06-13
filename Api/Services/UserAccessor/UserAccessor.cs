@@ -1,6 +1,7 @@
 using System.Threading.Tasks;
 using Api.Data;
 using Api.Models;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.EntityFrameworkCore;
 
 namespace Api.Services.UserAccessor;
@@ -14,8 +15,15 @@ public class UserAccessor : IUserAccessor
         _db = db;
     }
 
-    public async Task<User?> GetUserAsync()
+    public async Task<User> GetUserAsync()
     {
-        return await _db.Users.FirstOrDefaultAsync();
+        var user = await _db.Users.FirstOrDefaultAsync();
+        
+        if (user is null)
+        {
+            throw new AuthenticationFailureException("User is unauthenticated");
+        }
+
+        return user;
     }
 }

@@ -1,3 +1,4 @@
+using Api.Features.Messages.Commands;
 using Api.Features.Messages.Queries;
 using Api.Infrastructure.Extensions;
 using Microsoft.AspNetCore.Builder;
@@ -9,9 +10,21 @@ public class MessageRoute : IRoute
 {
     public void MapRoutes(WebApplication app)
     {
-        var group = app.MapGroup("").WithTags("Messages");
+        var group = app
+            .MapGroup("")
+            .WithTags("Сообщения");
 
-        group.MapGet("/messages/my", GetMessages.Handle);
-        group.MapGet("/messages/{id:int}", GetMessageById.Handle);
+        group.MapPost("/messages", SendMessage.Handle)
+            .DisableAntiforgery();
+
+        group.MapGet("/messages/my", GetMessages.Handle)
+            .WithDescription(
+                $"Получение сообщений пользователя"
+            );
+
+        group.MapGet("/messages/{id:int}", GetMessageById.Handle)
+            .WithDescription(
+                $"Получение сообщения по id"
+            );
     }
 }

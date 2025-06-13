@@ -1,9 +1,10 @@
 using System;
 using System.Collections.Generic;
+using Api.Features.Messages.DTOs;
 
-namespace Api.Features.Messages.DTOs;
+namespace Api.Features.Chats.DTOs;
 
-public class MessageDto
+public class LastMessageDto
 {
     public int Id { get; set; }
     
@@ -16,10 +17,5 @@ public class MessageDto
     public int? UserId { get; set; }
     public int? StudentId { get; set; }
     
-    public ReplyDto? ReplyTo { get; set; }
-    public IEnumerable<ReplyDto> Replies { get; set; } = [];
-    
     public IEnumerable<MessageAttachmentDto> Attachments { get; set; } = [];
-    
-    public required string Cursor { get; set; }
 }

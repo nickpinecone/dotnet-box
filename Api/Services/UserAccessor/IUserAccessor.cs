@@ -5,5 +5,5 @@ namespace Api.Services.UserAccessor;
 
 public interface IUserAccessor
 {
-    public Task<User?> GetUserAsync();
+    public Task<User> GetUserAsync();
 }

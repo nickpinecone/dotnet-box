@@ -10,6 +10,7 @@ using Minio.DataModel.Args;
 
 namespace Api.Services.FileStorage;
 
+// TODO dont need blob response anymore as it's not [Owned]
 public class MinioStorage : IFileStorage
 {
     private readonly string _bucketName;

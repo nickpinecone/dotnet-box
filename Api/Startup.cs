@@ -6,6 +6,7 @@ using Api.Data;
 using Api.Infrastructure.Extensions;
 using Api.Infrastructure.Handlers;
 using Api.Services.FileStorage;
+using Api.Services.RequestCache;
 using Api.Services.UserAccessor;
 using Api.Signal;
 using FluentValidation;
@@ -37,7 +38,7 @@ public static class Startup
             o.SerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower;
             o.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
         });
-        
+
         builder.Services.Configure<JsonOptions>(o =>
         {
             o.SerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower;
@@ -54,7 +55,8 @@ public static class Startup
     private static void RegisterServices(this IServiceCollection services)
     {
         services.AddScoped<IUserAccessor, UserAccessor>();
-        
+        services.AddScoped<IRequestCache, RequestCache>();
+
         services.AddMinio(configureClient => configureClient
             .WithEndpoint(Environment.GetEnvironmentVariable("MINIO_URL"))
             .WithCredentials(Environment.GetEnvironmentVariable("MINIO_ROOT_USER"),
@@ -95,6 +97,7 @@ public static class Startup
         if (app.Environment.IsDevelopment())
         {
             app.MapOpenApi();
+
             app.MapScalarApiReference(o =>
             {
                 o.Servers =

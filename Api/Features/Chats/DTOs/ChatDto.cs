@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using Api.Features.Messages.DTOs;
 
 namespace Api.Features.Chats.DTOs;
 
@@ -14,7 +13,7 @@ public class ChatDto
     public required int UserId { get; set; }
     public required int StudentId { get; set; }
 
-    public IEnumerable<MessageDto> Messages { get; set; } = [];
+    public IEnumerable<LastMessageDto> Messages { get; set; } = [];
 
     public required string Cursor { get; set; }
 }

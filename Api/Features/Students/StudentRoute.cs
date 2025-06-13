@@ -10,6 +10,6 @@ public class StudentRoute : IRoute
     public void MapRoutes(WebApplication app)
     {
         app.MapGet("/students/all", GetAllStudents.Handle)
-            .WithTags("Students");
+            .WithTags("Студенты");
     }
 }

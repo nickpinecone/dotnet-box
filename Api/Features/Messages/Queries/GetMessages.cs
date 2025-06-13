@@ -2,12 +2,12 @@ using System.Linq;
 using System.Threading.Tasks;
 using Api.Data;
 using Api.Features.Messages.DTOs;
+using Api.Features.Students;
 using Api.Infrastructure.Extensions;
 using Api.Infrastructure.Rest;
 using Api.Models;
 using Api.Services.UserAccessor;
-using FluentResults;
-using Microsoft.AspNetCore.Authentication;
+using FluentValidation;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
@@ -17,10 +17,33 @@ namespace Api.Features.Messages.Queries;
 
 public static class GetMessages
 {
+    public record Request(int? StudentId, CursorType? Cursor, string? Search, CursorMode Mode, int Limit);
+
+    public class Validator : AbstractValidator<Request>
+    {
+        public Validator(AppDbContext db)
+        {
+            RuleFor(x => x.StudentId)
+                .MustAsync(async (id, cancellation) =>
+                {
+                    if (id is null)
+                    {
+                        return true;
+                    }
+
+                    var student = await db.Students.FirstOrDefaultAsync(s => s.Id == id, cancellation);
+                    return student != null;
+                })
+                .WithMessage(StudentErrors.NotFound());
+        }
+    }
+
     public static async Task<Results<Ok<PaginatedList<MessageDto>>, NotFound<ProblemDetails>>> Handle(
         AppDbContext db,
         MessageMapper mapper,
         IUserAccessor userAccessor,
+        IValidator<Request> validator,
+        // Parameters
         [FromQuery(Name = "student_id")] int? studentId,
         CursorType? cursor,
         string? search,
@@ -28,21 +51,13 @@ public static class GetMessages
         int limit = -1
     )
     {
+        var request = new Request(studentId, cursor, search, mode, limit);
         var user = await userAccessor.GetUserAsync();
+        var validation = await validator.ValidateAsync(request);
 
-        if (user is null)
+        if (!validation.IsValid)
         {
-            throw new AuthenticationFailureException("User is unauthenticated");
-        }
-
-        if (studentId is not null)
-        {
-            var student = await db.Students.FirstOrDefaultAsync(s => s.Id == studentId);
-
-            if (student is null)
-            {
-                return Result.Fail($"Student does not exist: {studentId}").ToNotFoundProblem();
-            }
+            return validation.ToNotFoundProblem();
         }
 
         var query = db.Messages
@@ -52,17 +67,17 @@ public static class GetMessages
             .Include(m => m.Attachments)
             .AsSplitQuery();
 
-        query = studentId is null
+        query = request.StudentId is null
             ? query.Where(m => m.Chat!.UserId == user.Id)
-            : query.Where(m => m.Chat!.UserId == user.Id && m.Chat.StudentId == studentId);
+            : query.Where(m => m.Chat!.UserId == user.Id && m.Chat.StudentId == request.StudentId);
 
-        var filtered = Filter(query, search);
+        query = Filter(query, request);
 
-        if (cursor is null)
+        if (request.Cursor is null)
         {
             var firstUnread = await db.Messages
                 .Include(m => m.Chat)
-                .Where(m => m.Chat!.UserId == user.Id && m.Chat.StudentId == studentId)
+                .Where(m => m.Chat!.UserId == user.Id && m.Chat.StudentId == request.StudentId)
                 .OrderBy(m => m.CreatedAt)
                 .ThenBy(m => m.Id)
                 .FirstOrDefaultAsync(m => !m.IsRead && m.StudentId != null);
@@ -75,10 +90,10 @@ public static class GetMessages
         }
 
         var paged = await PaginationService.CreateAsync(
-            filtered,
+            query,
             m => m.CreatedAt,
             m => m.Id,
-            cursor, limit, mode
+            cursor, request.Limit, mode
         );
 
         var mapped = paged.With(mapper.Map(paged.Content));
@@ -86,14 +101,14 @@ public static class GetMessages
         return TypedResults.Ok(mapped);
     }
 
-    private static IQueryable<Message> Filter(IQueryable<Message> items, string? search)
+    private static IQueryable<Message> Filter(IQueryable<Message> query, Request request)
     {
-        if (!string.IsNullOrEmpty(search))
+        if (!string.IsNullOrEmpty(request.Search))
         {
-            items = items
-                .Where(i => i.Content.ToLower().Contains(search.ToLower()));
+            query = query
+                .Where(i => i.Content.ToLower().Contains(request.Search.ToLower()));
         }
 
-        return items;
+        return query;
     }
 }

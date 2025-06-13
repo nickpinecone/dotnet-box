@@ -5,31 +5,30 @@ using Api.Features.Chats.DTOs;
 using Api.Infrastructure.Rest;
 using Api.Models;
 using Api.Services.UserAccessor;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace Api.Features.Chats.Queries;
 
 public static class GetMyChats
 {
+    private record Request(CursorType? Cursor, string? Search, CursorMode Mode, int Limit);
+
     public static async Task<Ok<PaginatedList<ChatDto>>> Handle(
         AppDbContext db,
         ChatMapper mapper,
         IUserAccessor userAccessor,
+        // Parameters
         CursorType? cursor,
         string? search,
         CursorMode mode = CursorMode.before,
         int limit = -1
     )
     {
+        var request = new Request(cursor, search, mode, limit);
         var user = await userAccessor.GetUserAsync();
-
-        if (user is null)
-        {
-            throw new AuthenticationFailureException("User is unauthenticated");
-        }
 
         var query = db.Chats
             .Where(ch => ch.UserId == user.Id)
@@ -42,16 +41,16 @@ public static class GetMyChats
             )
             .AsSplitQuery();
 
-        var filtered = Filter(query, search);
+        query = Filter(query, request);
 
         var paged = await PaginationService.CreateAsync(
-            filtered,
+            query,
             ch => ch.Messages
                 .OrderByDescending(m => m.CreatedAt)
                 .ThenByDescending(m => m.Id)
                 .First().CreatedAt,
             ch => ch.Id,
-            cursor, limit, mode
+            request.Cursor, request.Limit, request.Mode
         );
 
         var mapped = paged.With(mapper.Map(paged.Content));
@@ -59,14 +58,14 @@ public static class GetMyChats
         return TypedResults.Ok(mapped);
     }
 
-    private static IQueryable<Chat> Filter(IQueryable<Chat> items, string? search)
+    private static IQueryable<Chat> Filter(IQueryable<Chat> query, Request request)
     {
-        if (!string.IsNullOrEmpty(search))
+        if (!string.IsNullOrEmpty(request.Search))
         {
-            items = items
-                .Where(i => i.Student!.Email.ToLower().Contains(search.ToLower()));
+            query = query
+                .Where(i => i.Student!.Email.ToLower().Contains(request.Search.ToLower()));
         }
 
-        return items;
+        return query;
     }
 }
