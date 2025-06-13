@@ -1,11 +1,10 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Api.Data;
-using Api.Features.Attachments;
 using Api.Features.Attachments.DTOs;
-using Api.Features.Messages.DTOs;
 using Api.Infrastructure.Extensions;
 using Api.Infrastructure.Rest;
+using Api.Models;
 using Api.Services.UserAccessor;
 using FluentResults;
 using Microsoft.AspNetCore.Authentication;
@@ -14,7 +13,7 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace Api.Features.Chats.Queries;
+namespace Api.Features.Attachments.Queries;
 
 public static class GetAttachments
 {
@@ -22,7 +21,7 @@ public static class GetAttachments
         AppDbContext db,
         AttachmentMapper mapper,
         IUserAccessor userAccessor,
-        [FromRoute(Name = "student_id")] int studentId,
+        [FromQuery(Name = "student_id")] int? studentId,
         CursorType? cursor,
         string? search,
         CursorMode mode = CursorMode.before,
@@ -36,20 +35,28 @@ public static class GetAttachments
             throw new AuthenticationFailureException("User is unauthenticated");
         }
 
-        var student = await db.Students.FirstOrDefaultAsync(s => s.Id == studentId);
-
-        if (student is null)
+        if (studentId is not null)
         {
-            return Result.Fail($"Student does not exist: {studentId}").ToNotFoundProblem();
+            var student = await db.Students.FirstOrDefaultAsync(s => s.Id == studentId);
+
+            if (student is null)
+            {
+                return Result.Fail($"Student does not exist: {studentId}").ToNotFoundProblem();
+            }
         }
 
         var query = db.Attachments
             .Include(a => a.Chat)
-            .Where(a => a.Chat!.UserId == user.Id && a.Chat.StudentId == studentId)
             .AsSplitQuery();
 
+        query = studentId is null
+            ? query.Where(m => m.Chat!.UserId == user.Id)
+            : query.Where(m => m.Chat!.UserId == user.Id && m.Chat.StudentId == studentId);
+
+        var filtered = Filter(query, search);
+
         var paged = await PaginationService.CreateAsync(
-            query,
+            filtered,
             a => a.CreatedAt,
             a => a.Id,
             cursor, limit, mode
@@ -58,5 +65,16 @@ public static class GetAttachments
         var mapped = paged.With(mapper.Map(paged.Content));
 
         return TypedResults.Ok(mapped);
+    }
+
+    private static IQueryable<Attachment> Filter(IQueryable<Attachment> items, string? search)
+    {
+        if (!string.IsNullOrEmpty(search))
+        {
+            items = items
+                .Where(i => i.Name.ToLower().Contains(search.ToLower()));
+        }
+
+        return items;
     }
 }

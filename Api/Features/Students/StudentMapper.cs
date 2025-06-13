@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.Linq;
 using Api.Features.Students.DTOs;
 using Api.Infrastructure.Extensions;

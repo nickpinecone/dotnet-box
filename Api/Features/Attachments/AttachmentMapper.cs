@@ -1,6 +1,4 @@
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using Api.Features.Attachments.DTOs;
 using Api.Infrastructure.Extensions;
 using Api.Models;
@@ -12,7 +10,5 @@ namespace Api.Features.Attachments;
 public partial class AttachmentMapper : IMapper
 {
     public partial AttachmentDto Map(Attachment attachment);
-    public partial IQueryable<AttachmentDto> Map(IQueryable<Attachment> attachments);
-    
     public partial IEnumerable<AttachmentDto> Map(IEnumerable<Attachment> attachments);
 }

@@ -1,10 +1,10 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Api.Data;
-using Api.Features.Messages;
 using Api.Features.Messages.DTOs;
 using Api.Infrastructure.Extensions;
 using Api.Infrastructure.Rest;
+using Api.Models;
 using Api.Services.UserAccessor;
 using FluentResults;
 using Microsoft.AspNetCore.Authentication;
@@ -13,7 +13,7 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace Api.Features.Chats.Queries;
+namespace Api.Features.Messages.Queries;
 
 public static class GetMessages
 {
@@ -21,7 +21,7 @@ public static class GetMessages
         AppDbContext db,
         MessageMapper mapper,
         IUserAccessor userAccessor,
-        [FromRoute(Name = "student_id")] int studentId,
+        [FromQuery(Name = "student_id")] int? studentId,
         CursorType? cursor,
         string? search,
         CursorMode mode = CursorMode.before,
@@ -35,11 +35,14 @@ public static class GetMessages
             throw new AuthenticationFailureException("User is unauthenticated");
         }
 
-        var student = await db.Students.FirstOrDefaultAsync(s => s.Id == studentId);
-
-        if (student is null)
+        if (studentId is not null)
         {
-            return Result.Fail($"Student does not exist: {studentId}").ToNotFoundProblem();
+            var student = await db.Students.FirstOrDefaultAsync(s => s.Id == studentId);
+
+            if (student is null)
+            {
+                return Result.Fail($"Student does not exist: {studentId}").ToNotFoundProblem();
+            }
         }
 
         var query = db.Messages
@@ -47,8 +50,13 @@ public static class GetMessages
             .Include(m => m.Replies)
             .Include(m => m.ReplyTo)
             .Include(m => m.Attachments)
-            .Where(m => m.Chat!.UserId == user.Id && m.Chat.StudentId == studentId)
             .AsSplitQuery();
+
+        query = studentId is null
+            ? query.Where(m => m.Chat!.UserId == user.Id)
+            : query.Where(m => m.Chat!.UserId == user.Id && m.Chat.StudentId == studentId);
+
+        var filtered = Filter(query, search);
 
         if (cursor is null)
         {
@@ -67,7 +75,7 @@ public static class GetMessages
         }
 
         var paged = await PaginationService.CreateAsync(
-            query,
+            filtered,
             m => m.CreatedAt,
             m => m.Id,
             cursor, limit, mode
@@ -76,5 +84,16 @@ public static class GetMessages
         var mapped = paged.With(mapper.Map(paged.Content));
 
         return TypedResults.Ok(mapped);
+    }
+
+    private static IQueryable<Message> Filter(IQueryable<Message> items, string? search)
+    {
+        if (!string.IsNullOrEmpty(search))
+        {
+            items = items
+                .Where(i => i.Content.ToLower().Contains(search.ToLower()));
+        }
+
+        return items;
     }
 }

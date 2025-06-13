@@ -13,7 +13,5 @@ public class ChatRoute : IRoute
         
         group.MapGet("/chats/my", GetMyChats.Handle);
         group.MapGet("/chats/{student_id:int}", GetChatById.Handle);
-        group.MapGet("/chats/{student_id:int}/messages", GetMessages.Handle);
-        group.MapGet("/chats/{student_id:int}/attachments", GetAttachments.Handle);
     }
 }

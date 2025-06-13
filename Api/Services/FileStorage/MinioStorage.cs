@@ -4,7 +4,6 @@ using System.IO;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Api.Models;
 using Microsoft.Extensions.Options;
 using Minio;
 using Minio.DataModel.Args;
