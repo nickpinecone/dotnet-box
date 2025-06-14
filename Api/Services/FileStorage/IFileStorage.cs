@@ -1,6 +1,9 @@
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Api.Models;
+using Microsoft.AspNetCore.Http;
 
 namespace Api.Services.FileStorage;
 
@@ -16,4 +19,6 @@ public interface IFileStorage
     public Task<BlobData?> DownloadAsync(Guid fileId, CancellationToken cancellationToken = default);
 
     public Task DeleteAsync(Guid fileId, CancellationToken cancellationToken = default);
+
+    public Task<List<Attachment>> ToAttachmentsAsync(IFormFileCollection files, int chatId, CancellationToken cancellationToken = default);
 }
