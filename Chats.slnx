@@ -1,4 +1,0 @@
-﻿<Solution>
-  <Project Path="Api\Api.csproj" Type="Classic C#" />
-  <Project Path="Bot\Bot.csproj" Type="Classic C#" />
-</Solution>

@@ -1,69 +1,55 @@
 services:
-  chats-minio:
+  news-minio:
     image: minio/minio
     command: server --console-address ":9001" /var/lib/minio/data
     ports:
-      - "5004:9001"
+      - "5002:9001"
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:9000/minio/health/live" ]
+      timeout: 10s
+      interval: 10s
+      retries: 5
     volumes:
-      - chats-minio-data:/var/lib/minio/data
+      - news-minio-data:/var/lib/minio/data
     environment:
       - MINIO_ROOT_USER=${MINIO_ROOT_USER}
       - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD}
   
-  chats-api-db:
+  news-db:
     image: postgres
     ports:
-      - "5002:5432"
+      - "5001:5432"
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready" ]
+      interval: 10s
+      timeout: 10s
+      retries: 5
     environment:
-      POSTGRES_USER: ${API_POSTGRES_USER}
-      POSTGRES_PASSWORD: ${API_POSTGRES_PASSWORD}
-      POSTGRES_DB: ${API_POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
     volumes:
-      - chats-api-db-data:/var/lib/postgresql/data
+      - news-db-data:/var/lib/postgresql/data
   
-  chats-api:
-    build: ./Api
+  news:
+    build: ./
     depends_on:
-      - chats-minio
-      - chats-api-db
+      news-minio:
+        condition: service_healthy
+      news-db:
+        condition: service_healthy
     ports:
       - "5000:5000"
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:5000/healthy" ]
+      timeout: 10s
+      interval: 10s
+      retries: 5
     volumes:
-      - './Api:/api:z'
-      - './.env:/.env'
-      - '/api/bin'
-      - '/api/obj'
-    env_file:
-      - .env
-      
-
-  chats-bot-db:
-    image: postgres
-    ports:
-      - "5003:5432"
-    environment:
-      POSTGRES_USER: ${BOT_POSTGRES_USER}
-      POSTGRES_PASSWORD: ${BOT_POSTGRES_PASSWORD}
-      POSTGRES_DB: ${BOT_POSTGRES_DB}
-    volumes:
-      - chats-bot-db-data:/var/lib/postgresql/data
-
-  chats-bot:
-    build: ./Bot
-    depends_on:
-      - chats-minio
-      - chats-bot-db
-    ports:
-      - "5001:5001"
-    volumes:
-      - './Bot:/bot:z'
-      - './.env:/.env'
-      - '/bot/bin'
-      - '/bot/obj'
-    env_file:
-      - .env
+      - './:/app:z'
+      - '/app/bin'
+      - '/app/obj'
 
 volumes:
-  chats-minio-data:
-  chats-api-db-data:
-  chats-bot-db-data:
+  news-minio-data:
+  news-db-data:
