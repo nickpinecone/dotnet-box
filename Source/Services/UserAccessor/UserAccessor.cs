@@ -22,13 +22,5 @@ public class UserAccessor : IUserAccessor
             Email = "",
             Id = 0
         });
-        // var user = await _db.Users.FirstOrDefaultAsync();
-        //
-        // if (user is null)
-        // {
-        //     throw new AuthenticationFailureException("User is unauthenticated");
-        // }
-        //
-        // return user;
     }
 }

@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Threading.Channels;
 using News.Infrastructure.Extensions;
 using FluentValidation;
 using Microsoft.AspNetCore.Builder;
@@ -11,11 +12,13 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Minio;
+using News.Background;
 using News.Data;
 using News.Infrastructure.Handlers;
-using News.Services.BotService;
+using News.Models;
 using News.Services.FileStorage;
 using News.Services.RequestCache;
+using News.Services.StudentService;
 using News.Services.UserAccessor;
 using News.Signal;
 using Scalar.AspNetCore;
@@ -58,7 +61,15 @@ public static class Startup
     {
         services.AddScoped<IUserAccessor, UserAccessor>();
         services.AddScoped<IRequestCache, RequestCache>();
-        services.AddScoped<IBotService, BotService>();
+        services.AddScoped<IStudentService, StudentService>();
+        
+        var channel = Channel.CreateBounded<DispatchCommand>(new BoundedChannelOptions(1000)
+        {
+            FullMode = BoundedChannelFullMode.Wait
+        });
+        
+        services.AddSingleton(channel);
+        services.AddHostedService<DispatchService>();
 
         services.AddHttpClient("telegram_bot_client")
             .RemoveAllLoggers()
@@ -93,7 +104,11 @@ public static class Startup
 
         services.AddDbContext<AppDbContext>(o =>
         {
-            o.UseNpgsql(connection);
+            o.UseNpgsql(connection, npgsql =>
+            {
+                npgsql.MapEnum<Status>("Status");
+                npgsql.MapEnum<Frequency>("Frequency");
+            });
             o.ConfigureWarnings(w => w.Throw(RelationalEventId.MultipleCollectionIncludeWarning));
         });
     }

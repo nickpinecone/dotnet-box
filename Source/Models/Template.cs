@@ -5,13 +5,13 @@ namespace News.Models;
 
 public enum Frequency
 {
-    Once,
-    EveryDay,
-    EveryWeek,
-    EveryMonth,
-    EveryQuarter,
-    EveryYear,
-    Custom,
+    once,
+    every_day,
+    every_week,
+    every_month,
+    every_quarter,
+    every_year,
+    custom,
 }
 
 public class Template

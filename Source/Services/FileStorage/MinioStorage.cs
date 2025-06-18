@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
@@ -40,37 +39,26 @@ public class MinioStorage : IFileStorage
         }
     }
 
-    public async Task<BlobResponse> UploadAsync(BlobData data, CancellationToken cancellationToken = default)
+    public async Task<Guid> UploadAsync(Stream stream, string? contentType = null,
+        CancellationToken cancellationToken = default)
     {
         await CreateBucketIfNotExists();
 
         var blobId = Guid.NewGuid();
 
-        var nameBytes = Encoding.UTF8.GetBytes(data.Name);
-        var name = Convert.ToBase64String(nameBytes);
-
         var putArgs = new PutObjectArgs()
             .WithBucket(_bucketName)
             .WithObject(blobId.ToString())
-            .WithStreamData(data.Stream)
-            .WithObjectSize(data.Stream.Length)
-            .WithContentType(data.ContentType)
-            .WithHeaders(new Dictionary<string, string>()
-            {
-                { "x-amz-meta-name", name},
-            });
+            .WithStreamData(stream)
+            .WithObjectSize(stream.Length)
+            .WithContentType(contentType);
 
         await _minioClient.PutObjectAsync(putArgs, cancellationToken);
 
-        return new BlobResponse()
-        {
-            Name = data.Name,
-            BlobId = blobId,
-            MimeType = data.ContentType
-        };
+        return blobId;
     }
 
-    public async Task<BlobData?> DownloadAsync(Guid fileId, CancellationToken cancellationToken = default)
+    public async Task<Stream?> DownloadAsync(Guid fileId, CancellationToken cancellationToken = default)
     {
         var stream = new MemoryStream();
         var task = new TaskCompletionSource<bool>();
@@ -86,20 +74,11 @@ public class MinioStorage : IFileStorage
                     task.SetResult(true);
                 });
 
-            var response = await _minioClient.GetObjectAsync(getArgs, cancellationToken);
+            await _minioClient.GetObjectAsync(getArgs, cancellationToken);
             await task.Task;
-
-            var nameBytes = Convert.FromBase64String(response.MetaData["name"]);
-            var name = Encoding.UTF8.GetString(nameBytes);
-
             stream.Seek(0, SeekOrigin.Begin);
 
-            return new BlobData()
-            {
-                Stream = stream,
-                ContentType = response.ContentType,
-                Name = name
-            };
+            return stream;
         }
         catch
         {
@@ -116,8 +95,30 @@ public class MinioStorage : IFileStorage
         await _minioClient.RemoveObjectAsync(deleteArgs, cancellationToken);
     }
 
-    public Task<List<Attachment>> ToAttachmentsAsync(IFormFileCollection files, int chatId, CancellationToken cancellationToken = default)
+    public async Task<List<Attachment>> ToAttachmentsAsync(IFormFileCollection? files,
+        CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        var attachments = new List<Attachment>();
+
+        if (files is not null && files.Count > 0)
+        {
+            foreach (var file in files)
+            {
+                await using var stream = file.OpenReadStream();
+                var blobId = await UploadAsync(stream, cancellationToken: cancellationToken);
+
+                var attachment = new Attachment()
+                {
+                    Name = file.FileName,
+                    BlobId = blobId,
+                    CreatedAt = DateTime.UtcNow,
+                    MimeType = file.ContentType,
+                };
+
+                attachments.Add(attachment);
+            }
+        }
+
+        return attachments;
     }
 }

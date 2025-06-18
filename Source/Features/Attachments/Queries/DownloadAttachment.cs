@@ -22,18 +22,15 @@ public static class DownloadAttachment
         int id
     )
     {
-        // var user = await userAccessor.GetUserAsync();
-        
-        var attachment = await db.Attachments
-            // .Include(a => a.Chat)
-            // .Where(a => a.Chat!.UserId == user.Id)
-            .FirstOrDefaultAsync(a => a.Id == id);
+        await userAccessor.GetUserAsync();
+
+        var attachment = await db.Attachments.FirstOrDefaultAsync(a => a.Id == id);
 
         if (attachment is null)
         {
             return Result.Fail(AttachmentErrors.NotFound(id)).ToNotFoundProblem();
         }
-        
+
         var data = await fileStorage.DownloadAsync(attachment.BlobId);
 
         if (data is null)
@@ -41,6 +38,6 @@ public static class DownloadAttachment
             return Result.Fail(AttachmentErrors.DownloadFailed(id)).ToNotFoundProblem();
         }
 
-        return TypedResults.File(data.Stream, data.ContentType, data.Name);
+        return TypedResults.File(data, attachment.MimeType, attachment.Name);
     }
 }

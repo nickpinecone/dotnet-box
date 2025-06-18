@@ -15,4 +15,7 @@ public class Message
     public int? TgMessageId { get; set; }
     public required int StudentId { get; set; }
     public required Status Status { get; set; }
+    
+    public required int NewsletterId { get; set; } 
+    public Newsletter? Newsletter { get; set; }
 }

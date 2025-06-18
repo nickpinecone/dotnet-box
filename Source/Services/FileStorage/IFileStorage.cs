@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
@@ -14,11 +15,11 @@ public class FileStorageOptions
 
 public interface IFileStorage
 {
-    public Task<BlobResponse> UploadAsync(BlobData data, CancellationToken cancellationToken = default);
+    public Task<Guid> UploadAsync(Stream stream, string? contentType = null, CancellationToken cancellationToken = default);
 
-    public Task<BlobData?> DownloadAsync(Guid fileId, CancellationToken cancellationToken = default);
+    public Task<Stream?> DownloadAsync(Guid fileId, CancellationToken cancellationToken = default);
 
     public Task DeleteAsync(Guid fileId, CancellationToken cancellationToken = default);
 
-    public Task<List<Attachment>> ToAttachmentsAsync(IFormFileCollection files, int chatId, CancellationToken cancellationToken = default);
+    public Task<List<Attachment>> ToAttachmentsAsync(IFormFileCollection? files, CancellationToken cancellationToken = default);
 }
