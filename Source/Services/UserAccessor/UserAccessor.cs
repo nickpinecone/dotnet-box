@@ -1,8 +1,5 @@
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.EntityFrameworkCore;
 using News.Data;
-using News.Models;
 
 namespace News.Services.UserAccessor;
 
@@ -15,11 +12,11 @@ public class UserAccessor : IUserAccessor
         _db = db;
     }
 
-    public Task<User> GetUserAsync()
+    public Task<User?> GetUserAsync()
     {
-        return Task.FromResult(new User()
+        return Task.FromResult<User?>(new User()
         {
-            Email = "",
+            Email = "admin@example.com",
             Id = 0
         });
     }

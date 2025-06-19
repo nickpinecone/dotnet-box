@@ -17,7 +17,6 @@ using News.Data;
 using News.Infrastructure.Handlers;
 using News.Models;
 using News.Services.FileStorage;
-using News.Services.RequestCache;
 using News.Services.StudentService;
 using News.Services.UserAccessor;
 using News.Signal;
@@ -60,16 +59,16 @@ public static class Startup
     private static void RegisterServices(this IServiceCollection services)
     {
         services.AddScoped<IUserAccessor, UserAccessor>();
-        services.AddScoped<IRequestCache, RequestCache>();
         services.AddScoped<IStudentService, StudentService>();
-        
+
         var channel = Channel.CreateBounded<DispatchCommand>(new BoundedChannelOptions(1000)
         {
             FullMode = BoundedChannelFullMode.Wait
         });
-        
+
         services.AddSingleton(channel);
-        services.AddHostedService<DispatchService>();
+        services.AddSingleton<IDispatchService, DispatchService>();
+        services.AddHostedService(provider => (DispatchService)provider.GetRequiredService<IDispatchService>());
 
         services.AddHttpClient("telegram_bot_client")
             .RemoveAllLoggers()
@@ -89,7 +88,7 @@ public static class Startup
         {
             o.BucketName = Environment.GetEnvironmentVariable("MINIO_BUCKET")!;
         });
-        services.AddSingleton<IFileStorage, MinioStorage>();
+        services.AddSingleton<IFileStorage, FileStorage>();
     }
 
     private static void SetupDatabase(this IServiceCollection services)
@@ -106,7 +105,8 @@ public static class Startup
         {
             o.UseNpgsql(connection, npgsql =>
             {
-                npgsql.MapEnum<Status>("Status");
+                npgsql.MapEnum<StatusCode>("StatusCode");
+                npgsql.MapEnum<ChannelCode>("ChannelCode");
                 npgsql.MapEnum<Frequency>("Frequency");
             });
             o.ConfigureWarnings(w => w.Throw(RelationalEventId.MultipleCollectionIncludeWarning));

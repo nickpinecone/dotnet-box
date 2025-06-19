@@ -1,21 +1,25 @@
 namespace News.Models;
 
-public enum Status
+public enum StatusCode
 {
     Lost,
     Sent,
-    Read,
+}
+
+public enum ChannelCode
+{
+    Telegram,
+    Email,
 }
 
 public class Message
 {
     public int Id { get; set; }
-    
-    public int? TgChatId { get; set; }
-    public int? TgMessageId { get; set; }
+
     public required int StudentId { get; set; }
-    public required Status Status { get; set; }
-    
-    public required int NewsletterId { get; set; } 
+    public required StatusCode Status { get; set; }
+    public ChannelCode Channel { get; set; }
+
+    public required int NewsletterId { get; set; }
     public Newsletter? Newsletter { get; set; }
 }

@@ -1,4 +1,7 @@
 using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Channels;
 using System.Threading.RateLimiting;
@@ -10,15 +13,22 @@ using Microsoft.Extensions.Logging;
 using News.Data;
 using News.Models;
 using News.Services.FileStorage;
+using News.Services.StudentService;
 using Polly;
 using Polly.Retry;
 using Telegram.Bot;
+using Telegram.Bot.Types;
 
 namespace News.Background;
 
 public record DispatchCommand(int NewsletterId);
 
-public class DispatchService : BackgroundService
+public interface IDispatchService
+{
+    public Task Enqueue(DispatchCommand command);
+}
+
+public class DispatchService : BackgroundService, IDispatchService
 {
     private readonly ITelegramBotClient _bot;
     private readonly Channel<DispatchCommand> _channel;
@@ -67,6 +77,7 @@ public class DispatchService : BackgroundService
         {
             using var scope = _scopeFactory.CreateScope();
             var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+            var studentService = scope.ServiceProvider.GetRequiredService<IStudentService>();
 
             var newsletter = await db.Newsletters
                 .Include(n => n.Attachments)
@@ -76,18 +87,31 @@ public class DispatchService : BackgroundService
 
             if (newsletter == null) continue;
 
+            var streams = new Dictionary<int, Stream?>();
+
+            foreach (var attachment in newsletter.Attachments)
+            {
+                var stream = await _fileStorage.DownloadAsync(attachment.BlobId, cancellationToken);
+                streams.Add(attachment.Id, stream);
+            }
+
             foreach (var message in newsletter.Messages)
             {
-                if (message.Status != Status.Lost || message.TgChatId is null) continue;
+                var student = await studentService.GetStudentAsync(message.StudentId);
+
+                if (message.Status != StatusCode.Lost || student?.TelegramId is null)
+                {
+                    continue;
+                }
 
                 await _pipeline.ExecuteAsync(async token =>
                 {
                     try
                     {
-                        var id = await SendToRecipient(newsletter, message, token);
+                        await SendByTelegram(newsletter, streams, (int)student.TelegramId, token);
 
-                        message.TgMessageId = id;
-                        message.Status = Status.Sent;
+                        message.Status = StatusCode.Sent;
+                        message.Channel = ChannelCode.Telegram;
 
                         await db.SaveChangesAsync(token);
                     }
@@ -103,13 +127,43 @@ public class DispatchService : BackgroundService
                     }
                 }, cancellationToken);
             }
+
+            foreach (var stream in streams)
+            {
+                stream.Value?.Close();
+            }
         }
     }
 
-    private async Task<int> SendToRecipient(Newsletter newsletter, Models.Message message, CancellationToken token)
+    private async Task SendByTelegram(Newsletter newsletter, Dictionary<int, Stream?> streams, int chatId,
+        CancellationToken token)
     {
-        var sent = await _bot.SendMessage(message.TgChatId!, newsletter.Content, cancellationToken: token);
+        if (newsletter.Attachments.Count > 0)
+        {
+            var album = new List<IAlbumInputMedia>();
 
-        return sent.Id;
+            for (var i = 0; i < newsletter.Attachments.Count; i++)
+            {
+                var attachment = newsletter.Attachments.ElementAt(i);
+                var stream = streams[attachment.Id];
+
+                if (stream is null) continue;
+
+                var document = new InputMediaDocument(new InputFileStream(stream, attachment.Name));
+
+                if (i == newsletter.Attachments.Count - 1)
+                {
+                    document.Caption = newsletter.Content;
+                }
+
+                album.Add(document);
+            }
+
+            await _bot.SendMediaGroup(chatId, album, cancellationToken: token);
+        }
+        else
+        {
+            await _bot.SendMessage(chatId, newsletter.Content, cancellationToken: token);
+        }
     }
 }

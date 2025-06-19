@@ -14,8 +14,9 @@ namespace News.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AlterDatabase()
+                .Annotation("Npgsql:Enum:ChannelCode", "email,telegram")
                 .Annotation("Npgsql:Enum:Frequency", "custom,every_day,every_month,every_quarter,every_week,every_year,once")
-                .Annotation("Npgsql:Enum:Status", "lost,read,sent");
+                .Annotation("Npgsql:Enum:StatusCode", "lost,sent");
 
             migrationBuilder.CreateTable(
                 name: "Newsletters",
@@ -54,10 +55,9 @@ namespace News.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    TgChatId = table.Column<int>(type: "integer", nullable: true),
-                    TgMessageId = table.Column<int>(type: "integer", nullable: true),
                     StudentId = table.Column<int>(type: "integer", nullable: false),
-                    Status = table.Column<Status>(type: "\"Status\"", nullable: false),
+                    Status = table.Column<StatusCode>(type: "\"StatusCode\"", nullable: false),
+                    Channel = table.Column<ChannelCode>(type: "\"ChannelCode\"", nullable: false),
                     NewsletterId = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>

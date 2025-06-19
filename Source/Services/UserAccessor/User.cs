@@ -1,4 +1,4 @@
-namespace News.Models;
+namespace News.Services.UserAccessor;
 
 public class User
 {

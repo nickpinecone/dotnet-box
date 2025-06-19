@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Channels;
 using System.Threading.Tasks;
 using FluentValidation;
 using Microsoft.AspNetCore.Http;
@@ -55,8 +54,7 @@ public static class CreateNewsletter
         AppDbContext db,
         IFileStorage fileStorage,
         IValidator<Request> validator,
-        Channel<DispatchCommand> channel,
-        // [FromServices] DispatchService dispatch,
+        IDispatchService dispatch,
         NewsletterMapper mapper,
         // Parameters
         [FromQuery(Name = "student_ids")] int[] studentIds,
@@ -86,18 +84,16 @@ public static class CreateNewsletter
         {
             var message = new Message()
             {
-                Status = Status.Lost,
+                Status = StatusCode.Lost,
                 NewsletterId = newsletter.Id,
                 StudentId = studentId,
-                TgChatId = studentId,
             };
             
             newsletter.Messages.Add(message);
         }
         
         await db.SaveChangesAsync();
-        await channel.Writer.WriteAsync(new DispatchCommand(newsletter.Id));
-        // await dispatch.Enqueue(new DispatchCommand(newsletter.Id));
+        await dispatch.Enqueue(new DispatchCommand(newsletter.Id));
 
         var mapped = mapper.Map(newsletter);
         return TypedResults.Ok(mapped);

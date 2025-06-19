@@ -13,7 +13,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace News.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250618164600_Initial")]
+    [Migration("20250619150839_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -24,8 +24,9 @@ namespace News.Migrations
                 .HasAnnotation("ProductVersion", "9.0.5")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
+            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "ChannelCode", new[] { "email", "telegram" });
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "Frequency", new[] { "custom", "every_day", "every_month", "every_quarter", "every_week", "every_year", "once" });
-            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "Status", new[] { "lost", "read", "sent" });
+            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "StatusCode", new[] { "lost", "sent" });
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
             modelBuilder.Entity("News.Models.Attachment", b =>
@@ -73,19 +74,16 @@ namespace News.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<ChannelCode>("Channel")
+                        .HasColumnType("\"ChannelCode\"");
+
                     b.Property<int>("NewsletterId")
                         .HasColumnType("integer");
 
-                    b.Property<Status>("Status")
-                        .HasColumnType("\"Status\"");
+                    b.Property<StatusCode>("Status")
+                        .HasColumnType("\"StatusCode\"");
 
                     b.Property<int>("StudentId")
-                        .HasColumnType("integer");
-
-                    b.Property<int?>("TgChatId")
-                        .HasColumnType("integer");
-
-                    b.Property<int?>("TgMessageId")
                         .HasColumnType("integer");
 
                     b.HasKey("Id");

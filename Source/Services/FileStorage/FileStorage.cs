@@ -11,13 +11,12 @@ using News.Models;
 
 namespace News.Services.FileStorage;
 
-// TODO dont need blob response anymore as it's not [Owned]
-public class MinioStorage : IFileStorage
+public class FileStorage : IFileStorage
 {
     private readonly string _bucketName;
     private readonly IMinioClient _minioClient;
 
-    public MinioStorage(IOptions<FileStorageOptions> options, IMinioClient minioClient)
+    public FileStorage(IOptions<FileStorageOptions> options, IMinioClient minioClient)
     {
         _minioClient = minioClient;
         _bucketName = options.Value.BucketName;
@@ -39,7 +38,7 @@ public class MinioStorage : IFileStorage
         }
     }
 
-    public async Task<Guid> UploadAsync(Stream stream, string? contentType = null,
+    public async Task<Guid> UploadAsync(Stream stream, string contentType,
         CancellationToken cancellationToken = default)
     {
         await CreateBucketIfNotExists();
@@ -105,7 +104,7 @@ public class MinioStorage : IFileStorage
             foreach (var file in files)
             {
                 await using var stream = file.OpenReadStream();
-                var blobId = await UploadAsync(stream, cancellationToken: cancellationToken);
+                var blobId = await UploadAsync(stream, file.ContentType, cancellationToken: cancellationToken);
 
                 var attachment = new Attachment()
                 {

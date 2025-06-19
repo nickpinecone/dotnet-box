@@ -15,7 +15,7 @@ public class FileStorageOptions
 
 public interface IFileStorage
 {
-    public Task<Guid> UploadAsync(Stream stream, string? contentType = null, CancellationToken cancellationToken = default);
+    public Task<Guid> UploadAsync(Stream stream, string contentType, CancellationToken cancellationToken = default);
 
     public Task<Stream?> DownloadAsync(Guid fileId, CancellationToken cancellationToken = default);
 

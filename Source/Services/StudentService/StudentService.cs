@@ -1,15 +1,14 @@
 using System.Threading.Tasks;
-using News.Models;
 
 namespace News.Services.StudentService;
 
 public class StudentService : IStudentService
 {
-    public Task<Student> GetAsync(int id)
+    public Task<Student?> GetStudentAsync(int id)
     {
-        return Task.FromResult(new Student()
+        return Task.FromResult<Student?>(new Student()
         {
-            Email = "",
+            Email = "student@example.com",
             TelegramId = 592566902,
             Id = 0,
         });
