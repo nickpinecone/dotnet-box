@@ -17,19 +17,19 @@ public class PagedList<T>
     public bool HasNextPage => PageSize != -1 && PageNumber * PageSize < TotalRecord;
     public bool HasPreviousPage => PageNumber > 1;
 
-    public static async Task<PagedList<T>> CreateAsync(IQueryable<T> original, int? page, int? pageSize)
+    public static async Task<PagedList<T>> CreateAsync(IQueryable<T> original, int? page, int? limit)
     {
         page ??= 1;
         page = Math.Max(1, (int)page);
-        pageSize ??= -1;
-        pageSize = Math.Max(-1, (int)pageSize);
+        limit ??= -1;
+        limit = Math.Max(-1, (int)limit);
 
         var totalCount = original.Count();
         var items = original;
 
-        if (pageSize != -1)
+        if (limit != -1)
         {
-            items = original.Skip(((int)page - 1) * (int)pageSize).Take((int)pageSize);
+            items = original.Skip(((int)page - 1) * (int)limit).Take((int)limit);
         }
         else
         {
@@ -40,8 +40,19 @@ public class PagedList<T>
         {
             Content = await items.ToListAsync(),
             PageNumber = (int)page,
-            PageSize = (int)pageSize,
+            PageSize = (int)limit,
             TotalRecord = totalCount,
+        };
+    }
+
+    public PagedList<V> With<V>(IEnumerable<V> items)
+    {
+        return new PagedList<V>()
+        {
+            PageNumber = this.PageNumber,
+            PageSize = this.PageSize,
+            TotalRecord = this.TotalRecord,
+            Content = items,
         };
     }
 }

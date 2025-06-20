@@ -12,10 +12,11 @@ using News.Features.Attachments.DTOs;
 using News.Infrastructure.Extensions;
 using News.Models;
 using News.Services.FileStorage;
+using Riok.Mapperly.Abstractions;
 
 namespace News.Features.Newsletters.Commands;
 
-public static class CreateNewsletter
+public static partial class CreateNewsletter
 {
     public class Response
     {
@@ -27,10 +28,10 @@ public static class CreateNewsletter
         public IEnumerable<AttachmentDto> Attachments { get; set; } = [];
     }
 
-    public class Request(string content, int[] studentIds, IFormFileCollection? files)
+    public class Request(string? content, int[]? studentIds, IFormFileCollection? files)
     {
-        public string Content { get; set; } = content;
-        public int[] StudentIds { get; set; } = studentIds;
+        public string Content { get; set; } = content ?? "";
+        public int[] StudentIds { get; set; } = studentIds ?? [];
         public IFormFileCollection? Files { get; set; } = files;
     }
 
@@ -41,25 +42,26 @@ public static class CreateNewsletter
             RuleFor(x => x.Content)
                 .NotEmpty()
                 .When(x => !x.Files?.Any() ?? true)
+                .OverridePropertyName("content")
                 .WithMessage(NewsletterErrors.Empty());
 
             RuleFor(x => x.StudentIds)
                 .NotEmpty()
-                .WithName("Студенты")
+                .OverridePropertyName("student_ids")
                 .WithMessage(NewsletterErrors.NoRecipients());
         }
     }
 
-    public static async Task<Results<Ok<Response>, BadRequest<ProblemDetails>>> Handle(
+    public static async Task<Results<Ok<Response>, ValidationProblem>> Handle(
         AppDbContext db,
         IFileStorage fileStorage,
         IValidator<Request> validator,
         IDispatchService dispatch,
-        NewsletterMapper mapper,
+        Mapper mapper,
         // Parameters
-        [FromQuery(Name = "student_ids")] int[] studentIds,
-        [FromQuery(Name = "content")] string content,
-        [FromForm] IFormFileCollection? files = null
+        [FromQuery(Name = "student_ids")] int[]? studentIds,
+        [FromQuery(Name = "content")] string? content,
+        [FromForm] IFormFileCollection? files
     )
     {
         var request = new Request(content, studentIds, files);
@@ -67,7 +69,7 @@ public static class CreateNewsletter
         var validation = await validator.ValidateAsync(request);
         if (!validation.IsValid)
         {
-            return validation.ToBadRequestProblem();
+            return validation.ToValidationProblem();
         }
 
         var newsletter = new Newsletter()
@@ -84,18 +86,24 @@ public static class CreateNewsletter
         {
             var message = new Message()
             {
-                Status = StatusCode.Lost,
+                Status = StatusCode.lost,
                 NewsletterId = newsletter.Id,
                 StudentId = studentId,
             };
-            
+
             newsletter.Messages.Add(message);
         }
-        
+
         await db.SaveChangesAsync();
         await dispatch.Enqueue(new DispatchCommand(newsletter.Id));
 
         var mapped = mapper.Map(newsletter);
         return TypedResults.Ok(mapped);
+    }
+
+    [Mapper]
+    public partial class Mapper : IMapper
+    {
+        public partial Response Map(Newsletter newsletter);
     }
 }

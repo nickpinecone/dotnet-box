@@ -34,7 +34,7 @@ public class DispatchService : BackgroundService, IDispatchService
     private readonly Channel<DispatchCommand> _channel;
     private readonly IServiceScopeFactory _scopeFactory;
     private readonly IFileStorage _fileStorage;
-    private readonly ResiliencePipeline _pipeline;
+    private readonly ResiliencePipeline _rateLimiter;
     private readonly ILogger<DispatchService> _logger;
 
     public DispatchService(
@@ -50,7 +50,7 @@ public class DispatchService : BackgroundService, IDispatchService
         _fileStorage = fileStorage;
         _logger = logger;
 
-        _pipeline = new ResiliencePipelineBuilder()
+        _rateLimiter = new ResiliencePipelineBuilder()
             .AddRateLimiter(new FixedWindowRateLimiter(new FixedWindowRateLimiterOptions()
             {
                 Window = TimeSpan.FromSeconds(1),
@@ -95,23 +95,24 @@ public class DispatchService : BackgroundService, IDispatchService
                 streams.Add(attachment.Id, stream);
             }
 
+            // TODO fallback to email if cant send to telegram
             foreach (var message in newsletter.Messages)
             {
                 var student = await studentService.GetStudentAsync(message.StudentId);
 
-                if (message.Status != StatusCode.Lost || student?.TelegramId is null)
+                if (message.Status != StatusCode.lost || student?.TelegramId is null)
                 {
                     continue;
                 }
 
-                await _pipeline.ExecuteAsync(async token =>
+                await _rateLimiter.ExecuteAsync(async token =>
                 {
                     try
                     {
                         await SendByTelegram(newsletter, streams, (int)student.TelegramId, token);
 
-                        message.Status = StatusCode.Sent;
-                        message.Channel = ChannelCode.Telegram;
+                        message.Status = StatusCode.sent;
+                        message.Channel = ChannelCode.telegram;
 
                         await db.SaveChangesAsync(token);
                     }
@@ -128,9 +129,12 @@ public class DispatchService : BackgroundService, IDispatchService
                 }, cancellationToken);
             }
 
-            foreach (var stream in streams)
+            foreach (var stream in streams.Values)
             {
-                stream.Value?.Close();
+                if (stream is not null)
+                {
+                    await stream.DisposeAsync();
+                }
             }
         }
     }

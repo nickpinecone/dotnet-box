@@ -12,6 +12,7 @@ public class UserAccessor : IUserAccessor
         _db = db;
     }
 
+    // TODO grab user from the auth service
     public Task<User?> GetUserAsync()
     {
         return Task.FromResult<User?>(new User()

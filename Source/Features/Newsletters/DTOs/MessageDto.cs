@@ -1,19 +1,8 @@
-namespace News.Models;
+using News.Models;
 
-public enum StatusCode
-{
-    lost,
-    sent,
-}
+namespace News.Features.Newsletters.DTOs;
 
-public enum ChannelCode
-{
-    none,
-    telegram,
-    email,
-}
-
-public class Message
+public class MessageDto
 {
     public int Id { get; set; }
 
@@ -22,5 +11,4 @@ public class Message
     public ChannelCode Channel { get; set; }
 
     public required int NewsletterId { get; set; }
-    public Newsletter? Newsletter { get; set; }
 }
