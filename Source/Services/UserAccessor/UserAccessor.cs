@@ -1,7 +1,7 @@
 using System.Threading.Tasks;
-using News.Data;
+using Newleaf.Data;
 
-namespace News.Services.UserAccessor;
+namespace Newleaf.Services.UserAccessor;
 
 public class UserAccessor : IUserAccessor
 {

@@ -1,4 +1,4 @@
-namespace News.Features.Attachments;
+namespace Newleaf.Features.Attachments;
 
 public static class AttachmentErrors
 {

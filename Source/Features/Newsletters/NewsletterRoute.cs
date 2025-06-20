@@ -1,11 +1,11 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
-using News.Infrastructure.Extensions;
-using News.Features.Newsletters.Commands;
-using News.Features.Newsletters.Queries;
-using News.Models;
+using Newleaf.Features.Newsletters.Commands;
+using Newleaf.Features.Newsletters.Queries;
+using Newleaf.Infrastructure.Extensions;
+using Newleaf.Models;
 
-namespace News.Features.Newsletters;
+namespace Newleaf.Features.Newsletters;
 
 public class NewsletterRoute : IRoute
 {

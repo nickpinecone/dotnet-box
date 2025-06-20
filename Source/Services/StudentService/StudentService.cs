@@ -1,6 +1,6 @@
 using System.Threading.Tasks;
 
-namespace News.Services.StudentService;
+namespace Newleaf.Services.StudentService;
 
 public class StudentService : IStudentService
 {

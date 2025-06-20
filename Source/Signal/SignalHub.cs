@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.SignalR;
 
-namespace News.Signal;
+namespace Newleaf.Signal;
 
 public class SignalHub : Hub
 {

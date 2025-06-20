@@ -4,17 +4,17 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using News.Data;
-using News.Models;
+using Newleaf.Data;
+using Newleaf.Models;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace News.Migrations
+namespace Newleaf.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250620061754_AddNoneChannelCode")]
-    partial class AddNoneChannelCode
+    [Migration("20250620081020_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -29,7 +29,7 @@ namespace News.Migrations
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "StatusCode", new[] { "lost", "sent" });
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("News.Models.Attachment", b =>
+            modelBuilder.Entity("Newleaf.Models.Attachment", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -66,7 +66,7 @@ namespace News.Migrations
                     b.ToTable("Attachments");
                 });
 
-            modelBuilder.Entity("News.Models.Message", b =>
+            modelBuilder.Entity("Newleaf.Models.Message", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -93,7 +93,7 @@ namespace News.Migrations
                     b.ToTable("Messages");
                 });
 
-            modelBuilder.Entity("News.Models.Newsletter", b =>
+            modelBuilder.Entity("Newleaf.Models.Newsletter", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -113,7 +113,7 @@ namespace News.Migrations
                     b.ToTable("Newsletters");
                 });
 
-            modelBuilder.Entity("News.Models.Template", b =>
+            modelBuilder.Entity("Newleaf.Models.Template", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -143,20 +143,20 @@ namespace News.Migrations
                     b.ToTable("Templates");
                 });
 
-            modelBuilder.Entity("News.Models.Attachment", b =>
+            modelBuilder.Entity("Newleaf.Models.Attachment", b =>
                 {
-                    b.HasOne("News.Models.Newsletter", null)
+                    b.HasOne("Newleaf.Models.Newsletter", null)
                         .WithMany("Attachments")
                         .HasForeignKey("NewsletterId");
 
-                    b.HasOne("News.Models.Template", null)
+                    b.HasOne("Newleaf.Models.Template", null)
                         .WithMany("Attachments")
                         .HasForeignKey("TemplateId");
                 });
 
-            modelBuilder.Entity("News.Models.Message", b =>
+            modelBuilder.Entity("Newleaf.Models.Message", b =>
                 {
-                    b.HasOne("News.Models.Newsletter", "Newsletter")
+                    b.HasOne("Newleaf.Models.Newsletter", "Newsletter")
                         .WithMany("Messages")
                         .HasForeignKey("NewsletterId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -165,14 +165,14 @@ namespace News.Migrations
                     b.Navigation("Newsletter");
                 });
 
-            modelBuilder.Entity("News.Models.Newsletter", b =>
+            modelBuilder.Entity("Newleaf.Models.Newsletter", b =>
                 {
                     b.Navigation("Attachments");
 
                     b.Navigation("Messages");
                 });
 
-            modelBuilder.Entity("News.Models.Template", b =>
+            modelBuilder.Entity("Newleaf.Models.Template", b =>
                 {
                     b.Navigation("Attachments");
                 });

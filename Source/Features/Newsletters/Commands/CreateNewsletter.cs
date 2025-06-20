@@ -6,15 +6,15 @@ using FluentValidation;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
-using News.Background;
-using News.Data;
-using News.Features.Attachments.DTOs;
-using News.Infrastructure.Extensions;
-using News.Models;
-using News.Services.FileStorage;
+using Newleaf.Background;
+using Newleaf.Data;
+using Newleaf.Features.Attachments.DTOs;
+using Newleaf.Infrastructure.Extensions;
+using Newleaf.Models;
+using Newleaf.Services.FileStorage;
 using Riok.Mapperly.Abstractions;
 
-namespace News.Features.Newsletters.Commands;
+namespace Newleaf.Features.Newsletters.Commands;
 
 public static partial class CreateNewsletter
 {

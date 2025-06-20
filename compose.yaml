@@ -1,5 +1,5 @@
 services:
-  news-minio:
+  newleaf-minio:
     image: minio/minio
     command: server --console-address ":9001" /var/lib/minio/data
     ports:
@@ -10,12 +10,12 @@ services:
       interval: 10s
       retries: 5
     volumes:
-      - news-minio-data:/var/lib/minio/data
+      - newleaf-minio-data:/var/lib/minio/data
     environment:
       - MINIO_ROOT_USER=${MINIO_ROOT_USER}
       - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD}
   
-  news-db:
+  newleaf-db:
     image: postgres
     ports:
       - "5001:5432"
@@ -30,14 +30,14 @@ services:
       POSTGRES_DB: ${POSTGRES_DB}
       PGUSER: ${POSTGRES_USER}
     volumes:
-      - news-db-data:/var/lib/postgresql/data
+      - newleaf-db-data:/var/lib/postgresql/data
   
-  news:
+  newleaf:
     build: ./
     depends_on:
-      news-minio:
+      newleaf-minio:
         condition: service_healthy
-      news-db:
+      newleaf-db:
         condition: service_healthy
     ports:
       - "5000:5000"
@@ -52,5 +52,5 @@ services:
       - '/app/obj'
 
 volumes:
-  news-minio-data:
-  news-db-data:
+  newleaf-minio-data:
+  newleaf-db-data:

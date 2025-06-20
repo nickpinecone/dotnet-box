@@ -1,8 +1,8 @@
-using News.Infrastructure.Extensions;
+using Newleaf.Infrastructure.Extensions;
 using dotenv.net;
 using Microsoft.AspNetCore.Builder;
 
-namespace News;
+namespace Newleaf;
 
 public static class Program
 {

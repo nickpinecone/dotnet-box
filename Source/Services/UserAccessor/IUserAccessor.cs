@@ -1,6 +1,6 @@
 using System.Threading.Tasks;
 
-namespace News.Services.UserAccessor;
+namespace Newleaf.Services.UserAccessor;
 
 public interface IUserAccessor
 {

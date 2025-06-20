@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace News.Models;
+namespace Newleaf.Models;
 
 public enum Frequency
 {

@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
-namespace News.Infrastructure.Handlers;
+namespace Newleaf.Infrastructure.Handlers;
 
 public class ExceptionHandler : IExceptionHandler
 {

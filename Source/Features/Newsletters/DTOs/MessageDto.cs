@@ -1,6 +1,6 @@
-using News.Models;
+using Newleaf.Models;
 
-namespace News.Features.Newsletters.DTOs;
+namespace Newleaf.Features.Newsletters.DTOs;
 
 public class MessageDto
 {

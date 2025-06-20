@@ -7,12 +7,12 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using News.Data;
-using News.Features.Attachments.DTOs;
-using News.Features.Newsletters;
-using News.Features.Newsletters.DTOs;
-using News.Infrastructure.Extensions;
-using News.Models;
+using Newleaf.Data;
+using Newleaf.Features.Attachments.DTOs;
+using Newleaf.Features.Newsletters;
+using Newleaf.Features.Newsletters.DTOs;
+using Newleaf.Infrastructure.Extensions;
+using Newleaf.Models;
 using Riok.Mapperly.Abstractions;
 
 public static partial class GetNewsletterById

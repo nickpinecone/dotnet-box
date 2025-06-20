@@ -1,4 +1,4 @@
-namespace News.Models;
+namespace Newleaf.Models;
 
 public enum StatusCode
 {

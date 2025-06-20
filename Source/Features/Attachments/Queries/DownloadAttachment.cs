@@ -1,15 +1,15 @@
 using System.Threading.Tasks;
-using News.Infrastructure.Extensions;
+using Newleaf.Infrastructure.Extensions;
 using FluentResults;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using News.Data;
-using News.Services.FileStorage;
-using News.Services.UserAccessor;
+using Newleaf.Data;
+using Newleaf.Services.FileStorage;
+using Newleaf.Services.UserAccessor;
 
-namespace News.Features.Attachments.Queries;
+namespace Newleaf.Features.Attachments.Queries;
 
 public static class DownloadAttachment
 {

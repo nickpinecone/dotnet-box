@@ -1,4 +1,4 @@
-namespace News.Features.Newsletters;
+namespace Newleaf.Features.Newsletters;
 
 public static class NewsletterErrors
 {

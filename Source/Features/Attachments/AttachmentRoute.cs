@@ -1,9 +1,9 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
-using News.Infrastructure.Extensions;
-using News.Features.Attachments.Queries;
+using Newleaf.Features.Attachments.Queries;
+using Newleaf.Infrastructure.Extensions;
 
-namespace News.Features.Attachments;
+namespace Newleaf.Features.Attachments;
 
 public class AttachmentRoute : IRoute
 {

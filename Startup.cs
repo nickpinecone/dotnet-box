@@ -3,7 +3,7 @@ using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Channels;
-using News.Infrastructure.Extensions;
+using Newleaf.Infrastructure.Extensions;
 using FluentValidation;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http.Json;
@@ -12,18 +12,18 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Minio;
-using News.Background;
-using News.Data;
-using News.Infrastructure.Handlers;
-using News.Models;
-using News.Services.FileStorage;
-using News.Services.StudentService;
-using News.Services.UserAccessor;
-using News.Signal;
+using Newleaf.Background;
+using Newleaf.Data;
+using Newleaf.Infrastructure.Handlers;
+using Newleaf.Models;
+using Newleaf.Services.FileStorage;
+using Newleaf.Services.StudentService;
+using Newleaf.Services.UserAccessor;
+using Newleaf.Signal;
 using Scalar.AspNetCore;
 using Telegram.Bot;
 
-namespace News;
+namespace Newleaf;
 
 public static class Startup
 {
@@ -135,7 +135,7 @@ public static class Startup
         app.UseExceptionHandler();
         app.UseHealthChecks("/healthy");
 
-        app.MapHub<SignalHub>("/news-hub");
+        app.MapHub<SignalHub>("/newsletter-hub");
     }
 
     private static void MigrateDatabase(this WebApplication app)

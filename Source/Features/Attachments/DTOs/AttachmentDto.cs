@@ -1,6 +1,6 @@
 using System;
 
-namespace News.Features.Attachments.DTOs;
+namespace Newleaf.Features.Attachments.DTOs;
 
 public class AttachmentDto
 {

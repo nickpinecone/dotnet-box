@@ -5,15 +5,15 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
-using News.Data;
-using News.Features.Attachments.DTOs;
-using News.Features.Newsletters.DTOs;
-using News.Infrastructure.Extensions;
-using News.Infrastructure.Rest;
-using News.Models;
+using Newleaf.Data;
+using Newleaf.Features.Attachments.DTOs;
+using Newleaf.Features.Newsletters.DTOs;
+using Newleaf.Infrastructure.Extensions;
+using Newleaf.Infrastructure.Rest;
+using Newleaf.Models;
 using Riok.Mapperly.Abstractions;
 
-namespace News.Features.Newsletters.Queries;
+namespace Newleaf.Features.Newsletters.Queries;
 
 public static partial class GetAllNewsletters
 {

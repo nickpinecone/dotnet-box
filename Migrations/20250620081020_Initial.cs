@@ -1,11 +1,11 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
-using News.Models;
+using Newleaf.Models;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace News.Migrations
+namespace Newleaf.Migrations
 {
     /// <inheritdoc />
     public partial class Initial : Migration
@@ -14,7 +14,7 @@ namespace News.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AlterDatabase()
-                .Annotation("Npgsql:Enum:ChannelCode", "email,telegram")
+                .Annotation("Npgsql:Enum:ChannelCode", "email,none,telegram")
                 .Annotation("Npgsql:Enum:Frequency", "custom,every_day,every_month,every_quarter,every_week,every_year,once")
                 .Annotation("Npgsql:Enum:StatusCode", "lost,sent");
 

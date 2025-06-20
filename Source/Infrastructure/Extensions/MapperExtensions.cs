@@ -2,7 +2,7 @@ using System.Linq;
 using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace News.Infrastructure.Extensions;
+namespace Newleaf.Infrastructure.Extensions;
 
 public interface IMapper { }
 

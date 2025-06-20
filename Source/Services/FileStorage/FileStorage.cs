@@ -7,9 +7,9 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Minio;
 using Minio.DataModel.Args;
-using News.Models;
+using Newleaf.Models;
 
-namespace News.Services.FileStorage;
+namespace Newleaf.Services.FileStorage;
 
 public class FileStorage : IFileStorage
 {

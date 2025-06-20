@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
-using News.Models;
+using Newleaf.Models;
 
-namespace News.Data;
+namespace Newleaf.Data;
 
 public class AppDbContext : DbContext
 {

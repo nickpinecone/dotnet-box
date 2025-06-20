@@ -1,4 +1,4 @@
-namespace News.Services.UserAccessor;
+namespace Newleaf.Services.UserAccessor;
 
 public class User
 {

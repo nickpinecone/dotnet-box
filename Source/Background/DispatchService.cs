@@ -10,16 +10,16 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using News.Data;
-using News.Models;
-using News.Services.FileStorage;
-using News.Services.StudentService;
+using Newleaf.Data;
+using Newleaf.Models;
+using Newleaf.Services.FileStorage;
+using Newleaf.Services.StudentService;
 using Polly;
 using Polly.Retry;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 
-namespace News.Background;
+namespace Newleaf.Background;
 
 public record DispatchCommand(int NewsletterId);
 

@@ -4,9 +4,9 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
-using News.Models;
+using Newleaf.Models;
 
-namespace News.Services.FileStorage;
+namespace Newleaf.Services.FileStorage;
 
 public class FileStorageOptions
 {

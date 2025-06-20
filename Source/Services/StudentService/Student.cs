@@ -1,4 +1,4 @@
-namespace News.Services.StudentService;
+namespace Newleaf.Services.StudentService;
 
 public class Student
 {

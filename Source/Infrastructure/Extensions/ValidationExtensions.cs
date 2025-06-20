@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
-namespace News.Infrastructure.Extensions;
+namespace Newleaf.Infrastructure.Extensions;
 
 public static class ValidationExtensions
 {
