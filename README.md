@@ -1,2 +1,2 @@
 # Newleaf
-Robust newsletter system
+Robust telegram and email newsletter
