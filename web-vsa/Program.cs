@@ -1,8 +1,8 @@
-using Webvsa.Infrastructure.Extensions;
+using WebVsa.Infrastructure.Extensions;
 using dotenv.net;
 using Microsoft.AspNetCore.Builder;
 
-namespace Webvsa;
+namespace WebVsa;
 
 public static class Program
 {

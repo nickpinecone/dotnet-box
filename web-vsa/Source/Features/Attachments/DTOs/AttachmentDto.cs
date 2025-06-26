@@ -1,8 +1,8 @@
 using System;
 
-namespace WebVsa.Models;
+namespace WebVsa.Features.Attachments.DTOs;
 
-public class Attachment
+public class AttachmentDto
 {
     public int Id { get; set; }
     public required Guid BlobId { get; set; }

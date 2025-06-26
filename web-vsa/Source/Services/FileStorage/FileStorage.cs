@@ -7,9 +7,9 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Minio;
 using Minio.DataModel.Args;
-using Webvsa.Models;
+using WebVsa.Models;
 
-namespace Webvsa.Services.FileStorage;
+namespace WebVsa.Services.FileStorage;
 
 public class FileStorage : IFileStorage
 {

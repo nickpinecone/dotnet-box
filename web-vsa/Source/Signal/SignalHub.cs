@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.SignalR;
 
-namespace Webvsa.Signal;
+namespace WebVsa.Signal;
 
 public class SignalHub : Hub
 {

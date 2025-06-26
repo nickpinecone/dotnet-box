@@ -1,28 +1,37 @@
-using System;
 using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Webvsa.Infrastructure.Extensions;
+using WebVsa.Infrastructure.Extensions;
 using FluentValidation;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Http.Json;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Minio;
 using Scalar.AspNetCore;
-using Webvsa.Data;
-using Webvsa.Infrastructure.Handlers;
-using Webvsa.Services.FileStorage;
-using Webvsa.Signal;
+using WebVsa.Data;
+using WebVsa.Infrastructure.Handlers;
+using WebVsa.Services.FileStorage;
+using WebVsa.Signal;
 
-namespace Webvsa;
+namespace WebVsa;
 
 public static class Startup
 {
     public static void ConfigureServices(this WebApplicationBuilder builder)
     {
+        builder.Configuration.AddEnvironmentVariables();
+        var appSettings = new AppSettings();
+        builder.Configuration.Bind(appSettings);
+        builder.Services.AddSingleton(appSettings);
+
+        builder.Logging.ClearProviders();
+        builder.Logging.AddConsole();
+        builder.Logging.AddDebug();
+
         builder.Services.AddHttpContextAccessor();
         builder.Services.AddProblemDetails();
         builder.Services.AddExceptionHandler<ExceptionHandler>();
@@ -40,33 +49,32 @@ public static class Startup
         builder.Services.AddMappers(typeof(Program).Assembly);
         builder.Services.AddValidatorsFromAssembly(typeof(Program).Assembly);
 
-        builder.Services.SetupDatabase();
-        builder.Services.RegisterServices();
+        builder.Services.RegisterServices(appSettings);
+        builder.Services.SetupDatabase(appSettings);
     }
 
-    private static void RegisterServices(this IServiceCollection services)
+    private static void RegisterServices(this IServiceCollection services, AppSettings appSettings)
     {
         services.AddMinio(configureClient => configureClient
-            .WithEndpoint(Environment.GetEnvironmentVariable("MINIO_URL"))
-            .WithCredentials(Environment.GetEnvironmentVariable("MINIO_ROOT_USER"),
-                Environment.GetEnvironmentVariable("MINIO_ROOT_PASSWORD"))
+            .WithEndpoint(appSettings.MINIO_URL)
+            .WithCredentials(appSettings.MINIO_ROOT_USER, appSettings.MINIO_ROOT_PASSWORD)
             .WithSSL(false)
             .Build()
         );
 
         services.Configure<FileStorageOptions>(o =>
         {
-            o.BucketName = Environment.GetEnvironmentVariable("MINIO_BUCKET")!;
+            o.BucketName = appSettings.MINIO_BUCKET;
         });
         services.AddSingleton<IFileStorage, FileStorage>();
     }
 
-    private static void SetupDatabase(this IServiceCollection services)
+    private static void SetupDatabase(this IServiceCollection services, AppSettings appSettings)
     {
-        var host = Environment.GetEnvironmentVariable("POSTGRES_URL");
-        var database = Environment.GetEnvironmentVariable("POSTGRES_DB");
-        var password = Environment.GetEnvironmentVariable("POSTGRES_PASSWORD");
-        var user = Environment.GetEnvironmentVariable("POSTGRES_USER");
+        var host = appSettings.POSTGRES_URL;
+        var database = appSettings.POSTGRES_DB;
+        var password = appSettings.POSTGRES_PASSWORD;
+        var user = appSettings.POSTGRES_USER;
 
         var connection =
             $"Host={host};Port={5432};Database={database};Username={user};Password={password};Include Error Detail=True";
@@ -74,6 +82,7 @@ public static class Startup
         services.AddDbContext<AppDbContext>(o =>
         {
             o.UseNpgsql(connection);
+            o.UseProjectables();
             o.ConfigureWarnings(w => w.Throw(RelationalEventId.MultipleCollectionIncludeWarning));
         });
     }

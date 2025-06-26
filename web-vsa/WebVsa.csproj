@@ -6,6 +6,7 @@
 
     <ItemGroup>
         <PackageReference Include="dotenv.net" Version="3.2.1" />
+        <PackageReference Include="EntityFrameworkCore.Projectables" Version="4.0.0" />
         <PackageReference Include="FluentResults" Version="3.16.0" />
         <PackageReference Include="FluentValidation" Version="12.0.0" />
         <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="12.0.0" />
@@ -14,6 +15,7 @@
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
             <PrivateAssets>all</PrivateAssets>
         </PackageReference>
+        <PackageReference Include="Microsoft.Extensions.Logging" Version="9.0.6" />
         <PackageReference Include="Minio.AspNetCore" Version="6.0.1" />
         <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.4" />
         <PackageReference Include="Polly.Core" Version="8.6.1" />

@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Webvsa.Infrastructure.Extensions;
+namespace WebVsa.Infrastructure.Extensions;
 
 public static class ResultExtensions
 {

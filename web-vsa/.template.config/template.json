@@ -8,7 +8,7 @@
     "identity": "DotNetBox.WebVsa",
     "name": "DotNetBox.WebVsa",
     "shortName": "webvsa",
-    "sourceName": "Webvsa",
+    "sourceName": "WebVsa",
     "tags": {
         "language": "C#",
         "type": "project"

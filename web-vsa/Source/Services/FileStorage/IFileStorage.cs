@@ -4,9 +4,9 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
-using Webvsa.Models;
+using WebVsa.Models;
 
-namespace Webvsa.Services.FileStorage;
+namespace WebVsa.Services.FileStorage;
 
 public class FileStorageOptions
 {

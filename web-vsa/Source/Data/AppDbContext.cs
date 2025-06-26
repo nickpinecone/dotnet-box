@@ -1,9 +1,12 @@
 using Microsoft.EntityFrameworkCore;
+using WebVsa.Models;
 
-namespace Webvsa.Data;
+namespace WebVsa.Data;
 
 public class AppDbContext : DbContext
 {
+    public DbSet<Attachment> Attachments => Set<Attachment>();
+    
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
     {
     }
