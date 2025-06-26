@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 
-namespace AppName.Infrastructure.Rest;
+namespace Webvsa.Infrastructure.Rest;
 
 public class PagedList<T>
 {

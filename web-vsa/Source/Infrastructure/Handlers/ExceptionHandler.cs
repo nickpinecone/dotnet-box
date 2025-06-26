@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
-namespace AppName.Infrastructure.Handlers;
+namespace Webvsa.Infrastructure.Handlers;
 
 public class ExceptionHandler : IExceptionHandler
 {

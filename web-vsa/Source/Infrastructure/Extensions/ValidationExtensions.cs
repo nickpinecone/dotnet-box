@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
-namespace AppName.Infrastructure.Extensions;
+namespace Webvsa.Infrastructure.Extensions;
 
 public static class ValidationExtensions
 {

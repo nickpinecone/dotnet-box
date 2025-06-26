@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using AppName.Models;
 using Microsoft.AspNetCore.Http;
+using Webvsa.Models;
 
-namespace AppName.Services.FileStorage;
+namespace Webvsa.Services.FileStorage;
 
 public class FileStorageOptions
 {

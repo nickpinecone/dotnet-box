@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 
-namespace AppName.Data;
+namespace Webvsa.Data;
 
 public class AppDbContext : DbContext
 {

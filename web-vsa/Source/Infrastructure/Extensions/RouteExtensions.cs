@@ -3,7 +3,7 @@ using System.Linq;
 using System.Reflection;
 using Microsoft.AspNetCore.Builder;
 
-namespace AppName.Infrastructure.Extensions;
+namespace Webvsa.Infrastructure.Extensions;
 
 public interface IRoute
 {

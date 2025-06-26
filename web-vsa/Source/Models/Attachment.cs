@@ -1,6 +1,6 @@
 using System;
 
-namespace AppName.Models;
+namespace Webvsa.Models;
 
 public class Attachment
 {

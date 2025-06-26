@@ -2,11 +2,7 @@ using System;
 using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using AppName.Data;
-using AppName.Infrastructure.Handlers;
-using AppName.Services.FileStorage;
-using AppName.Signal;
-using AppName.Infrastructure.Extensions;
+using Webvsa.Infrastructure.Extensions;
 using FluentValidation;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http.Json;
@@ -16,8 +12,12 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Minio;
 using Scalar.AspNetCore;
+using Webvsa.Data;
+using Webvsa.Infrastructure.Handlers;
+using Webvsa.Services.FileStorage;
+using Webvsa.Signal;
 
-namespace AppName;
+namespace Webvsa;
 
 public static class Startup
 {
@@ -32,12 +32,6 @@ public static class Startup
         builder.Services.AddOpenApi();
 
         builder.Services.ConfigureHttpJsonOptions(o =>
-        {
-            o.SerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower;
-            o.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
-        });
-
-        builder.Services.Configure<JsonOptions>(o =>
         {
             o.SerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower;
             o.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
@@ -106,7 +100,7 @@ public static class Startup
         app.UseExceptionHandler();
         app.UseHealthChecks("/healthy");
 
-        app.MapHub<SignalHub>("/appname-hub");
+        app.MapHub<SignalHub>("/webvsa-hub");
     }
 
     private static void MigrateDatabase(this WebApplication app)
