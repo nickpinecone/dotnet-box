@@ -1,6 +1,6 @@
 using System;
 
-namespace Newleaf.Models;
+namespace AppName.Models;
 
 public class Attachment
 {

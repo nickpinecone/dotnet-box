@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 
-namespace Newleaf.Infrastructure.Rest;
+namespace AppName.Infrastructure.Rest;
 
 public class PagedList<T>
 {

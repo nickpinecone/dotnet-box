@@ -1,2 +1,2 @@
-# Newleaf
-Robust telegram and email newsletter
+# AppName
+Vertical slice template for Asp.Net 

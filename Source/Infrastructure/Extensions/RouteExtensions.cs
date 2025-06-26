@@ -3,7 +3,7 @@ using System.Linq;
 using System.Reflection;
 using Microsoft.AspNetCore.Builder;
 
-namespace Newleaf.Infrastructure.Extensions;
+namespace AppName.Infrastructure.Extensions;
 
 public interface IRoute
 {

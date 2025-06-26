@@ -20,6 +20,12 @@
         <PackageReference Include="Polly.RateLimiting" Version="8.6.1" />
         <PackageReference Include="Riok.Mapperly" Version="4.2.1" />
         <PackageReference Include="Scalar.AspNetCore" Version="2.4.11" />
-        <PackageReference Include="Telegram.Bot" Version="22.5.1" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Migrations\" />
+      <Folder Include="Source\Background\" />
+      <Folder Include="Source\Features\" />
+      <Folder Include="Source\Models\" />
     </ItemGroup>
 </Project>

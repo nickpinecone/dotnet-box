@@ -2,8 +2,11 @@ using System;
 using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using System.Threading.Channels;
-using Newleaf.Infrastructure.Extensions;
+using AppName.Data;
+using AppName.Infrastructure.Handlers;
+using AppName.Services.FileStorage;
+using AppName.Signal;
+using AppName.Infrastructure.Extensions;
 using FluentValidation;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http.Json;
@@ -12,18 +15,9 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Minio;
-using Newleaf.Background;
-using Newleaf.Data;
-using Newleaf.Infrastructure.Handlers;
-using Newleaf.Models;
-using Newleaf.Services.FileStorage;
-using Newleaf.Services.StudentService;
-using Newleaf.Services.UserAccessor;
-using Newleaf.Signal;
 using Scalar.AspNetCore;
-using Telegram.Bot;
 
-namespace Newleaf;
+namespace AppName;
 
 public static class Startup
 {
@@ -58,24 +52,6 @@ public static class Startup
 
     private static void RegisterServices(this IServiceCollection services)
     {
-        services.AddScoped<IUserAccessor, UserAccessor>();
-        services.AddScoped<IStudentService, StudentService>();
-
-        var channel = Channel.CreateBounded<DispatchCommand>(new BoundedChannelOptions(1000)
-        {
-            FullMode = BoundedChannelFullMode.Wait
-        });
-
-        services.AddSingleton(channel);
-        services.AddSingleton<IDispatchService, DispatchService>();
-        services.AddHostedService(provider => (DispatchService)provider.GetRequiredService<IDispatchService>());
-
-        services.AddHttpClient("telegram_bot_client")
-            .RemoveAllLoggers()
-            .AddTypedClient<ITelegramBotClient>((httpClient) =>
-                new TelegramBotClient(Environment.GetEnvironmentVariable("BOT_TOKEN")!, httpClient)
-            );
-
         services.AddMinio(configureClient => configureClient
             .WithEndpoint(Environment.GetEnvironmentVariable("MINIO_URL"))
             .WithCredentials(Environment.GetEnvironmentVariable("MINIO_ROOT_USER"),
@@ -103,12 +79,7 @@ public static class Startup
 
         services.AddDbContext<AppDbContext>(o =>
         {
-            o.UseNpgsql(connection, npgsql =>
-            {
-                npgsql.MapEnum<StatusCode>("StatusCode");
-                npgsql.MapEnum<ChannelCode>("ChannelCode");
-                npgsql.MapEnum<Frequency>("Frequency");
-            });
+            o.UseNpgsql(connection);
             o.ConfigureWarnings(w => w.Throw(RelationalEventId.MultipleCollectionIncludeWarning));
         });
     }
@@ -135,7 +106,7 @@ public static class Startup
         app.UseExceptionHandler();
         app.UseHealthChecks("/healthy");
 
-        app.MapHub<SignalHub>("/newsletter-hub");
+        app.MapHub<SignalHub>("/appname-hub");
     }
 
     private static void MigrateDatabase(this WebApplication app)

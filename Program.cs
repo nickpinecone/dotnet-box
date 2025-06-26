@@ -1,8 +1,8 @@
-using Newleaf.Infrastructure.Extensions;
+using AppName.Infrastructure.Extensions;
 using dotenv.net;
 using Microsoft.AspNetCore.Builder;
 
-namespace Newleaf;
+namespace AppName;
 
 public static class Program
 {

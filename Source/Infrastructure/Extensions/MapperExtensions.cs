@@ -2,7 +2,7 @@ using System.Linq;
 using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Newleaf.Infrastructure.Extensions;
+namespace AppName.Infrastructure.Extensions;
 
 public interface IMapper { }
 

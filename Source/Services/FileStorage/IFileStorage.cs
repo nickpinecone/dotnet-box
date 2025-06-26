@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using AppName.Models;
 using Microsoft.AspNetCore.Http;
-using Newleaf.Models;
 
-namespace Newleaf.Services.FileStorage;
+namespace AppName.Services.FileStorage;
 
 public class FileStorageOptions
 {
